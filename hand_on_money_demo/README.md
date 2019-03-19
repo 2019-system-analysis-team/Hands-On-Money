@@ -29,4 +29,11 @@ conda insatll flask-bcrypt
 
 3. run `python run.py`
 
+<<<<<<< HEAD
 > -- end --
+=======
+> -- end --
+
+Deployment Testing
+95.179.171.246:5000
+>>>>>>> a4d987957e36ec7e3ab39334ce4193bff60c8ff5
