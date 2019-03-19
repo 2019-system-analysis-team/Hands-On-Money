@@ -1,0 +1,69 @@
+<html>
+	<head>
+		<title>Money App</title>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+	</head>
+	<body>
+		<!-- Insert Data Part--->
+		<div class="content-section">
+			<fieldset class="form-group">
+				<legend class="border-bottom mb-4">Register</legend>
+				<form method="POST">
+					Username: <br>
+					<input type="text" name="username">
+					<br>
+					E-mail: <br>
+					<input type="text" name="email">
+					<br>
+					Password: <br>
+					<input type="password" name="password">
+					<br>
+					<input type="submit" name="button" value="add">
+				</form>
+			</fieldset>	
+		</div>
+
+		<!-- Query Data Part--->
+		<div class="content-section">
+			<fieldset class="form-group">
+				<legend class="border-bottom mb-4">Search</legend>
+				<form method="POST">
+					Username: <br>
+					<input type="text" name="username2">
+					<input type="submit" name="button" value="search">
+				</form>
+			</fieldset>	
+		</div>
+
+		<!-- Show Data Part--->
+		<div class="content-section">
+			<legend class="border-bottom mb-4">Result</legend>
+			<fieldset class="form-group">
+				{% with messages = get_flashed_messages() %}
+					{% if messages %}
+						<ul class=flashes>
+					    {% for message in messages %}
+					      <li>{{ message }}</li>
+					    {% endfor %}
+					    </ul>
+					{% endif %}
+				{% endwith %}
+			</fieldset>
+			
+		</div>
+
+		<!-- Vue Part--->
+		<div class="content-section">
+			<legend class="border-bottom mb-4">Vue part</legend>
+			<fieldset class="form-group">
+				<div id='app'>[[title]]</div>
+			</fieldset>
+			
+		</div>
+		
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script type="text/javascript" src="{{url_for('static', filename='vue.js')}}"></script>
+
+	</body>
+</html>
