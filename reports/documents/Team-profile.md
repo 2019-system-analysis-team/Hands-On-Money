@@ -2,19 +2,13 @@
 
 目前，HOM团队有7位成员，3个小组
 
-- 项目经理：席睿，吴宇祺
-- 前端团队：王友坤，杨芮
-- 后端团队：王雁玲，许倚安，孙肖冉
-
-具体每位成员职责如下：
-
-| 学号 | 姓名（昵称） | 岗位角色           |
-| ---- | ------------ | ------------------ |
-|      | 席睿         | 项目经理           |
-|      | 吴宇祺       | 项目经理           |
-|      | 杨芮         | js工程师           |
-|      | 王友坤       | js工程师           |
-|      | 王雁玲       | 后台 python 工程师 |
-|      | 许倚安       | 后台 python 工程师 |
-|      | 孙肖冉       | 后台 python 工程师 |
+| 学号     | 昵称      | Github                                            | 岗位角色           |
+| -------- | --------- | ------------------------------------------------- | ------------------ |
+|          | Siri      | [Sirius See](https://github.com/Siriussee)        | 项目经理           |
+| 16340242 | Yuki      | [WuYuQi0301](https://github.com/WuYuQi0301)       | 项目经理           |
+|          | cyuhei    | [cyulei](https://github.com/cyulei)               | js工程师           |
+|          | Sapphire  | [Sapphire12138](https://github.com/Sapphire12138) | js工程师           |
+| 16340225 | Popiko    | [Popiko](https://github.com/Popiko)               | 后台 python 工程师 |
+|          | 465924212 | [465924212](https://github.com/465924212)         | 后台 python 工程师 |
+|          | enao_sun  | [enao_sun](https://github.com/enaosun)            | 后台 python 工程师 |
 
