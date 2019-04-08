@@ -1,5 +1,5 @@
 from moneyapp import db
-from moneyapp.models import User, Organization, Task, Receiver_Task
+from moneyapp.models import User, Organization, Task, Receiver_Task, Organization_Member, Transaction
 
 
 # ====================================================================
@@ -48,12 +48,49 @@ def addOrganization(_name, _image_file, _bio):
 	db.session.add(organization)
 	db.session.commit()
 
+	all_organizations = Organization.query.all()
+
+	id = len(all_organizations)
+
+	return id
+
+
+
+def chargeForOrganization(_user_id, _organization_id, _money):
+	transaction = Transaction(user_id=_user_id, organization_id=_organization_id, money=_money)
+	
+
+	organization = Organization.query.filter_by(id=_organization_id).first()
+	organization.balance += float(_money)
+	
+	db.session.add(transaction)
+	db.session.commit()
+	
+
+# ===============================================================
+# Organization Member
+def addMember(_user_id, _organization_id, _status):
+	organization_member = Organization_Member(user_id=_user_id, organization_id=_organization_id, status=_status)
+	db.session.add(organization_member)
+	db.session.commit()
+
+# 可以用于判断xx用户是否是xx组织成员，有没有权限以组织名义发任务
+def queryRecord(_user_id, _organization_id):
+	record = Organization_Member.query.filter_by(user_id=_user_id, organization_id=_organization_id).first()
+	if record:
+		return record
+
 
 # ====================================================================
 # Task
 # no organization
 def createTask(_user_id, _money, _tag, _number, _applicapable_user, _title, _description, _status):
 	task = Task(user_id=_user_id, money=_money, tag=_tag, number=_number, applicapable_user=_applicapable_user, title=_title, description=_description, status=_status)
+	db.session.add(task)
+	db.session.commit()
+
+def createTaskOrganization(_organization_id, _user_id, _money, _tag, _number, _applicapable_user, _title, _description, _status):
+	task = Task(organization_id=_organization_id, user_id=_user_id, money=_money, tag=_tag, number=_number, applicapable_user=_applicapable_user, title=_title, description=_description, status=_status)
 	db.session.add(task)
 	db.session.commit()
 

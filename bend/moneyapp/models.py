@@ -22,7 +22,7 @@ class User(db.Model):
 class Organization(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(100), unique=True, nullable=False)
-	image_file = db.Column(db.String(20), unique=True, default='default.jpg')
+	image_file = db.Column(db.String(20), default='default.jpg')
 	bio = db.Column(db.Text, default='')
 	balance = db.Column(db.Float, default=0.0)
 	average_comment = db.Column(db.Float, default=5.0)
@@ -51,9 +51,23 @@ class Receiver_Task(db.Model):
 	task = db.relationship('Task', backref=db.backref('received_tasks', lazy='dynamic'))
 	received_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow()) # 时间以后再修改
 	status = db.Column(db.String(50), nullable=False, default='On going') # 自己完成的情况
-	# def __repr__(self):
-	# 	return f"User('{self.username}', '{self.email}', '{self.password}')"
+	
 
+class Organization_Member(db.Model):
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+	user = db.relationship('User', backref=db.backref('organization_members', lazy='dynamic'))
+	organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), primary_key=True)
+	organization = db.relationship('Organization', backref=db.backref('organization_members', lazy='dynamic'))
+	status = db.Column(db.String(50), nullable=False, default='ordinary member')
+
+class Transaction(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	user = db.relationship('User', backref=db.backref('transactions', lazy='dynamic'))
+	organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'))
+	organization = db.relationship('Organization', backref=db.backref('transactions', lazy='dynamic'))
+	money = db.Column(db.Float, nullable=False)
+	time = db.Column(db.DateTime, default=datetime.utcnow())
 # class User(db.Model):
 # 	id = db.Column(db.Integer, primary_key=True)
 # 	username = db.Column(db.String(30), unique=True, nullable=False)
