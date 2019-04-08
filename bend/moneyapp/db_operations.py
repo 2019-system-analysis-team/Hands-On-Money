@@ -1,5 +1,5 @@
 from moneyapp import db
-from moneyapp.models import User, Organization, Task
+from moneyapp.models import User, Organization, Task, Receiver_Task
 
 
 # ====================================================================
@@ -57,5 +57,12 @@ def createTask(_user_id, _money, _tag, _number, _applicapable_user, _title, _des
 	db.session.add(task)
 	db.session.commit()
 
+
+# ======================================================
+# Receiver_Task
+def receiveTask(_user_id, _task_id):
+	receiver_task = Receiver_Task(user_id=_user_id, task_id=_task_id)
+	db.session.add(receiver_task)
+	db.session.commit()
 
  

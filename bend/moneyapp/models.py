@@ -44,7 +44,13 @@ class Task(db.Model):
 	description = db.Column(db.Text, nullable=True, default='No description')
 	status = db.Column(db.String(50), nullable=False, default='On going')
 
-	
+class Receiver_Task(db.Model):
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+	user = db.relationship('User', backref=db.backref('received_tasks', lazy='dynamic'))
+	task_id = db.Column(db.Integer, db.ForeignKey('task.id'), primary_key=True)
+	task = db.relationship('Task', backref=db.backref('received_tasks', lazy='dynamic'))
+	received_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow()) # 时间以后再修改
+	status = db.Column(db.String(50), nullable=False, default='On going') # 自己完成的情况
 	# def __repr__(self):
 	# 	return f"User('{self.username}', '{self.email}', '{self.password}')"
 

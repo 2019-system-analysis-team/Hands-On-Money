@@ -4,8 +4,8 @@ import uuid
 from werkzeug.utils import secure_filename
 from flask import render_template, url_for, request, flash, jsonify
 from moneyapp import app, db, bcrypt
-from moneyapp.models import User, Organization, Task
-from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, modify_profile
+from moneyapp.models import User, Organization, Task, Receiver_Task
+from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, modify_profile, receiveTask
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/profile_pics')
@@ -38,7 +38,7 @@ def get_all_users():
     return json.dumps({"username":user.username, "email":user.email})
 
 
-
+##=========== Users ============
 @app.route('/users/search', methods=['POST'])
 def search():
     username = request.get_json()['username2']
@@ -52,6 +52,26 @@ def search():
 
     return result
 
+# 登录
+@app.route('/users/login', methods=['POST', 'GET'])
+def userLogin():
+    if request.method == 'GET':
+        # 暂时先考虑只用username进行登录，以后再修改
+        username = request.form['username']
+        password = request.form['password']
+        user = queryUser(username)
+        if user:
+            if bcrypt.check_password_hash(user.password, password):
+                result = jsonify({"status": "success", "message": "Successfully login!"})
+            else:
+                result = jsonify({"status": "fail", "message": "password incorrect"})
+        else:
+            result = jsonify({"status": "fail", "message": "no such user"})
+
+        return result
+
+
+# 注册
 @app.route('/users/register_test', methods=['POST', 'GET'])
 def test_regis():
     if request.method == 'POST':
@@ -103,6 +123,7 @@ def test_regis():
 
         return jsonify({'result': result})
 
+# 修改信息
 @app.route('/users/modify_profile_test', methods=['POST', 'GET'])
 def test_modify():
     if request.method == 'POST':
@@ -148,9 +169,37 @@ def test_modify():
 
     return result
 
+# 查找用户信息
+@app.route('/users/search_user', methods=['POST', 'GET'])
+def search_user():
+    if request.method == 'GET':
+        username = request.form['username']
+        user = queryUser(username)
+        if user:
+            task_titles = []
+            for task in user.tasks:
+                task_titles.append(task.title)
+            result = {
+                'status': 'true',
+                'username': user.username,
+                'bio': user.bio,
+                'tasks': task_titles
+            }
+        else:
+            result = {
+                'status': 'false',
+                'message': 'no such user'
+            }
+
+
+
+        return jsonify({'result': result})
+
+#======================================
     
 
 
+##============ Organization ============
 @app.route('/organizations/create_test', methods=['POST', 'GET'])
 def test_org_create():
     if request.method=='POST':
@@ -163,6 +212,10 @@ def test_org_create():
 
     return result
 
+@app.route('/organizations/')
+
+
+##================ Task =======================
 @app.route('/task/create_test', methods=['POST', 'GET'])
 def test_task_create():
     if request.method=='POST':
@@ -180,6 +233,23 @@ def test_task_create():
         result = jsonify({"result": "add!"})
 
     return result
+
+@app.route('/task/receive_task', methods=['POST'])
+def receive_task():
+    if request.method == 'POST':
+        user_id = request.form['user_id']
+        task_id = request.form['task_id']
+
+        receiveTask(user_id, task_id)
+
+        result = jsonify({"result": "add!"})
+
+        return result
+
+
+
+##=================================================
+
 
 @app.route('/users/register', methods=['POST', 'GET'])
 def uploadFile():
