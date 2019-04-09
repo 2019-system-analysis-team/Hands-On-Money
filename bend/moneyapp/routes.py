@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from flask import render_template, url_for, request, flash, jsonify
 from moneyapp import app, db, bcrypt
 from moneyapp.models import User, Organization, Task, Receiver_Task, Organization_Member, Transaction
-from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization
+from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization, checkBalance
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/profile_pics')
@@ -69,7 +69,6 @@ def userLogin():
             result = jsonify({"status": "fail", "message": "no such user"})
 
         return result
-
 
 # 注册
 @app.route('/users/register_test', methods=['POST', 'GET'])
@@ -326,6 +325,20 @@ def organization_charge():
 
     return jsonify(result)
 
+# TODO 按名字搜索组织
+@app.route('/organizations/filter', methods=['GET'])
+def organization_filter():
+    """
+    需要首先在db_operations.py里面实现一个filter函数，可以参考queryUser
+    然后在这里调用
+    :param request.form['organization_name'] 用户id
+    :rtype: json {"organization_name": {}}
+    """
+    if request.method == 'GET':
+        return
+
+
+
 ##=========== Organization Member ==========
 # TODO 群主设置成员为管理员
 @app.route('/organizations/set_status', methods=['POST'])
@@ -371,10 +384,6 @@ def add_organization_member():
     return result
 
 
-
-
-
-
 ##================ Task =======================
 # 用户个人创建
 @app.route('/task/create_test', methods=['POST', 'GET'])
@@ -389,9 +398,11 @@ def test_task_create():
         description = request.form['description']
         status = request.form['status']
 
-        createTask(user_id, money, tag, number, applicapable_user, title, description, status)
-
-        result = jsonify({"result": "add!"})
+        if checkBalance(user_id, None, float(money)):
+            createTask(user_id, money, tag, number, applicapable_user, title, description, status)
+            result = jsonify({"result": "add!"})
+        else:
+            result = jsonify({"status":"fail", "message":"no enough money"})
 
     return result
 
@@ -407,7 +418,6 @@ def delete_user_task():
     """
     if request.method == 'POST':
         return
-
 
 # 组织创建
 @app.route('/task/create_organization', methods=['POST'])
@@ -426,10 +436,11 @@ def organization_create_task():
             title = request.form['title']
             description = request.form['description']
             status = request.form['status']
-
-            createTaskOrganization(organization_id, user_id, money, tag, number, applicapable_user, title, description, status)
-
-            result = jsonify({"result": "add!"})
+            if checkBalance(user_id, organization_id, float(money)):
+                createTaskOrganization(organization_id, user_id, money, tag, number, applicapable_user, title, description, status)
+                result = jsonify({"result": "add!"})
+            else:
+                result = jsonify({"status":"fail", "message":"no enough money"})
         else:
             result = jsonify({"result": "Permission denied!"})
 
@@ -477,6 +488,39 @@ def task_filter():
     :rtype: json {"status": "", "message": "", "filtered task": {"", ""}}
     """
     if request.method == 'GET':
+
+        return
+
+# TODO 任务接收者修改所接受的任务的状态（mark完成了几步）
+#（暂时修改status为传入的request.form['status']的内容）
+@app.route('/task/receiver_set_status', methods=['POST'])
+def receiver_set_status():
+    """
+    需要首先在db_operations.py里面实现一个filter函数
+    然后在这里调用
+    需要先判断user和task是否是接收关系（record） -》需要另外在db_operations.py里写一个函数
+    :param request.form['user_id'] 用户id
+    :param request.form['task'] 任务id
+    :param request.form['status'] 要设置任务为什么状态
+    :rtype: json {"status": "", "message": ""}
+    """
+    if request.method == 'POST':
+
+        return
+
+# TODO 任务发布者修改发布任务的状态（比如设置为已完成...)
+@app.route('/task/owner_set_status', methods=['POST'])
+def owner_set_status():
+    """
+    需要首先在db_operations.py里面实现一个filter函数
+    然后在这里调用
+    需要先判断user和task的关系 -》需要另外在db_operations.py里写一个函数
+    :param request.form['user_id'] 用户id
+    :param request.form['task'] 任务id
+    :param request.form['status'] 要设置任务为什么状态
+    :rtype: json {"status": "", "message": ""}
+    """
+    if request.method == 'POST':
 
         return
 

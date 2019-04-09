@@ -38,6 +38,10 @@ def queryUser(_username):
 	user = User.query.filter_by(username=_username).first()
 	return user
 
+def queryUserById(_user_id):
+	user = User.query.filter_by(id=_user_id).first()
+	return user
+
 
 
 
@@ -65,6 +69,11 @@ def chargeForOrganization(_user_id, _organization_id, _money):
 	
 	db.session.add(transaction)
 	db.session.commit()
+
+def queryOrganizationByID(_organization_id):
+	organization = Organization.query.filter_by(id=_organization_id).first()
+	return organization
+
 	
 
 # ===============================================================
@@ -86,11 +95,15 @@ def queryRecord(_user_id, _organization_id):
 # no organization
 def createTask(_user_id, _money, _tag, _number, _applicapable_user, _title, _description, _status):
 	task = Task(user_id=_user_id, money=_money, tag=_tag, number=_number, applicapable_user=_applicapable_user, title=_title, description=_description, status=_status)
+	user = User.query.filter_by(id=_user_id).first()
+	user.balance -= float(_money)
 	db.session.add(task)
 	db.session.commit()
 
 def createTaskOrganization(_organization_id, _user_id, _money, _tag, _number, _applicapable_user, _title, _description, _status):
 	task = Task(organization_id=_organization_id, user_id=_user_id, money=_money, tag=_tag, number=_number, applicapable_user=_applicapable_user, title=_title, description=_description, status=_status)
+	organization = Organization.query.filter_by(id=_organization_id).first()
+	organization.balance -= float(_money)
 	db.session.add(task)
 	db.session.commit()
 
@@ -101,5 +114,23 @@ def receiveTask(_user_id, _task_id):
 	receiver_task = Receiver_Task(user_id=_user_id, task_id=_task_id)
 	db.session.add(receiver_task)
 	db.session.commit()
+
+# =====================================================
+# Money
+def checkBalance(_user_id, _organization_id, _money):
+	if _organization_id:
+		organization = queryOrganizationByID(_organization_id)
+		return organization.balance >= _money
+	elif _user_id:
+		user = queryUserById(_user_id)
+		return user.balance >= _money
+
+
+
+
+
+
+
+
 
  
