@@ -3,6 +3,8 @@ import Router from 'vue-router'
 import mainpage from '@/components/MainPage'
 import userlogin from '@/components/UserLogin'
 import userregister from '@/components/UserRegister'
+import userinfomodify from '@/components/UserInfoModify'
+import organregister from '@/components/OrganRegister'
 import iView from 'iview';
 import 'iview/dist/styles/iview.css';
 
@@ -27,6 +29,16 @@ export default new Router({
 			path: '/userregister',
 			name: 'userregister',
 			component: userregister			
+		},
+		{
+			path: '/userinfomodify',
+			name: 'userinfomodify',
+			component: userinfomodify
+		},
+		{
+			path: '/organregister',
+			name: 'organregister',
+			component: organregister
 		}
   ]
 })

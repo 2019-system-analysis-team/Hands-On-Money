@@ -31,7 +31,7 @@
                     </div>
 					<div class="layout-button">
 						<Button type="default" ghost v-on:click="login">登录</Button>
-						<Button type="primary" ghost v-on:click="login">注册</Button>
+						<Button type="primary" ghost v-on:click="register">注册</Button>
 					</div>
                 </Menu>
             </Header>

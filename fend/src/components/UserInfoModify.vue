@@ -3,14 +3,46 @@
         <Layout>
             <Header>
                 <Menu mode="horizontal" theme="dark" active-name="1">
-					<div class="layout-head">
-						个人注册
+                    <div class="layout-logo"></div>
+                    <div class="layout-nav">
+                        <Submenu name="1">
+							 <template slot="title">
+								<Icon type="ios-navigate"></Icon>
+								任务
+							 </template>
+							<MenuItem name="1-1">我的任务</MenuItem>
+							<MenuItem name="1-2">新建任务</MenuItem>
+                        </Submenu>
+                        <Submenu name="2">
+							<template slot="title">
+								<Icon type="ios-keypad"></Icon>
+								组织
+							</template>
+							<MenuItem name="2-1">我的组织</MenuItem>
+							<MenuItem name="2-2" to="/organregister">新建组织</MenuItem>
+                        </Submenu>
+						<Submenu name="3">
+							<template slot="title">
+								<Icon type="ios-stats" />
+								余额:{{money}}
+							</template>
+							<MenuItem name="3-1">充值</MenuItem>
+							<MenuItem name="3-2">提现</MenuItem>
+						</Submenu>
+                    </div>
+					<div>
+						<Submenu name="4">
+							<template slot="title">
+								<Avatar src="https://i.loli.net/2017/08/21/599a521472424.jpg" />
+							</template>
+							<MenuItem name="4-1" to="/">退出</MenuItem>
+						</Submenu>
 					</div>
-				</Menu>
+                </Menu>
             </Header>
-            <Content :style="{padding: '50px 50px'}">
+			<Content :style="{padding: '50px 50px'}">
 				<Card :bordered="false">
-					<p slot="title">请填写下列信息</p>
+					<p slot="title">您的个人信息如下</p>
 					<Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" id="form">
 						<FormItem label="头像" prop="photo">
 							<div class="demo-upload-list" v-for="item in uploadList">
@@ -50,10 +82,10 @@
 							<Input v-model="formValidate.nickname" placeholder="请输入您的昵称"></Input>
 						</FormItem>
 						<FormItem label="真实姓名" prop="name">
-							<Input v-model="formValidate.name" placeholder="请输入您的真实姓名"></Input>
+							<Input disabled v-model="formValidate.name" placeholder="请输入您的真实姓名"></Input>
 						</FormItem>
 						<FormItem label="学号" prop="stunumber">
-							<Input v-model="formValidate.stunumber" placeholder="请输入您的学号"></Input>
+							<Input disabled v-model="formValidate.stunumber" placeholder="请输入您的学号"></Input>
 						</FormItem>
 						<FormItem label="年级" prop="grade">
 							<Select v-model="formValidate.grade">
@@ -99,9 +131,8 @@
 							<Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 2,maxRows: 5}"></Input>
 						</FormItem>
 						<FormItem>
-							<Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
-							<Button @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
-							<Button @click="test()" style="margin-left: 8px">修改信息</Button>
+							<Button type="primary" @click="handleSubmit('formValidate')">修改</Button>
+							<Button @click="handleReturnHomepage()" style="margin-left: 8px">返回主页</Button>
 						</FormItem>
 					</Form>
 				</Card>
@@ -172,6 +203,7 @@
 				}
 			};
             return {
+				money:'',
 				ageoptionsList:[],
                 formValidate: {
 					nickname: '',
@@ -243,18 +275,29 @@
 				for(;i<=30;i++){
 					this.$data.ageoptionsList.push({label:i.toString(),value:i.toString()});
 				}
+				this.$data.formValidate.nickname = 'pml';
+				this.$data.formValidate.name = '潘茂林';
+				this.$data.formValidate.stunumber = '12345678';
+				this.$data.formValidate.phone = '13013021302';
+				this.$data.formValidate.mail = '123@123.com';
+				this.$data.formValidate.phone = '13013021302';
+				this.$data.formValidate.desc = 'nb';
+				this.$data.money = 999;
 			},
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.$Message.success('注册成功!');
+                        this.$Message.success('修改成功!');
                     } else {
                         this.$Message.error('信息填写有误!');
                     }
                 })
             },
-            handleReset (name) {
-                this.$refs[name].resetFields();
+            handleReturnHomepage () {
+                // 返回主页
+				this.$router.push({
+						path: '/'
+				});		
             },
 			handleView (name) {
                 this.imgName = name;
@@ -287,11 +330,6 @@
 				}
                 return check;
             },
-			test(){
-					this.$router.push({
-						path: '/userinfomodify'
-				});	
-			}
         },
         mounted () {
             this.uploadList = this.$refs.upload.fileList;
@@ -306,12 +344,20 @@
     border-radius: 4px;
     overflow: hidden;
 }
-.layout-head{
-    width: 150px;
+.layout-logo{
+    width: 100px;
     height: 30px;
-    color: white;
-	margin:0 auto;
-	font-size: 30px;
+    background: #5b6270;
+    border-radius: 3px;
+    float: left;
+    position: relative;
+    top: 15px;
+    left: 20px;
+}
+.layout-nav{
+    width: 420px;
+    margin: 0 auto;
+    margin-right: 80px;
 }
 .layout-footer-center{
     text-align: center;
