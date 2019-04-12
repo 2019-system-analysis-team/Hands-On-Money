@@ -24,10 +24,11 @@
 						<Submenu name="3">
 							<template slot="title">
 								<Icon type="ios-stats" />
-								余额:{{money}}
+								钱包
 							</template>
-							<MenuItem name="3-1">充值</MenuItem>
+							<MenuItem name="3-1" @click.native="GotoTopup()">充值</MenuItem>
 							<MenuItem name="3-2">提现</MenuItem>
+							<MenuItem name="3-3">账户余额 : {{money}}</MenuItem>
 						</Submenu>
                     </div>
 					<div>
@@ -66,7 +67,7 @@
 								:on-format-error="handleFormatError"
 								:on-exceeded-size="handleMaxSize"
 								:before-upload="handleBeforeUpload"
-								multiple
+								accept="image/png,image/jpeg,image/gif,image/jpg"
 								type="drag"
 								action="//jsonplaceholder.typicode.com/posts/"
 								style="display: inline-block;width:78px;">
@@ -105,9 +106,40 @@
 						</FormItem>
 						<FormItem label="学院" prop="school">
 							<Select v-model="formValidate.school">
-								<Option value="数据科学与计算机学院">数据科学与计算机学院</Option>
-								<Option value="管理学院">管理学院</Option>
+								<Option value="中国语言文学系">中国语言文学系</Option>
+								<Option value="历史学系">历史学系</Option>
+								<Option value="哲学系">哲学系</Option>
+								<Option value="社会学与人类学学院">社会学与人类学学院</Option>
+								<Option value="博雅学院">博雅学院</Option>
+								<Option value="岭南学院">岭南学院</Option>
+								<Option value="外国语学院">外国语学院</Option>
 								<Option value="法学院">法学院</Option>
+								<Option value="政治与公共事务管理学院">政治与公共事务管理学院</Option>
+								<Option value="管理学院">管理学院</Option>
+								<Option value="马克思主义学院">马克思主义学院</Option>
+								<Option value="心理学系">心理学系</Option>
+								<Option value="传播与设计学院">传播与设计学院</Option>
+								<Option value="资讯管理学院">资讯管理学院</Option>
+								<Option value="艺术学院">艺术学院</Option>
+								<Option value="数学学院">数学学院</Option>
+								<Option value="物理学院">物理学院</Option>
+								<Option value="化学学院">化学学院</Option>
+								<Option value="地理科学与规划学院">地理科学与规划学院</Option>
+								<Option value="生命科学学院">生命科学学院</Option>
+								<Option value="工学院">工学院</Option>
+								<Option value="材料科学与工程学院">材料科学与工程学院</Option>
+								<Option value="电子与信息工程学院">电子与信息工程学院</Option>
+								<Option value="数据科学与计算机学院">数据科学与计算机学院</Option>
+								<Option value="国家保密学院">国家保密学院</Option>
+								<Option value="网络安全学院">网络安全学院</Option>
+								<Option value="环境科学与工程学院">环境科学与工程学院</Option>
+								<Option value="系统科学与工程学院">系统科学与工程学院</Option>
+								<Option value="中山医学院">中山医学院</Option>
+								<Option value="光华口腔医学院">光华口腔医学院</Option>
+								<Option value="公共卫生学院">公共卫生学院</Option>
+								<Option value="药学院">药学院</Option>
+								<Option value="护理学院">护理学院</Option>
+								<Option value="逸仙学院">逸仙学院</Option>
 							</Select>
 						</FormItem>
 						<FormItem label="年龄" prop="age">
@@ -139,6 +171,35 @@
             </Content>
             <Footer class="layout-footer-center">2019-2019 &copy; SYSU</Footer>
         </Layout>
+		<Drawer
+			title="充值"
+			v-model="topup"
+			width="400"
+			:mask-closable="false"
+			:styles="styles"
+		>
+			<Form :model="topupData">
+					<FormItem label="充值金额 : " label-position="top">
+					<InputNumber
+								:max="10000"
+								:min="1"
+								 v-model="topupData.value"
+								></InputNumber>
+					</FormItem>
+					<FormItem label="支付方式" label-position="top">
+						<Select v-model="topupData.mode">
+							<Option value="支付宝">支付宝</Option>
+							<Option value="微信支付">微信支付</Option>
+							<Option value="信用卡">信用卡</Option>
+						</Select>
+					</FormItem>
+				</Row>
+			</Form>
+			<div class="demo-drawer-footer">
+				<Button style="margin-right: 8px" @click="topup = false">取消</Button>
+				<Button type="primary" v-on:click="recharge">充值</Button>
+			</div>
+		</Drawer>    
     </div>
 </template>
 <script>
@@ -203,7 +264,18 @@
 				}
 			};
             return {
+				topup: false,
+                styles: {
+                    height: 'calc(100% - 55px)',
+                    overflow: 'auto',
+                    paddingBottom: '53px',
+                    position: 'static'
+                },
 				money:'',
+                topupData: {
+                    value: 1,
+					mode: '支付宝',
+                },
 				ageoptionsList:[],
                 formValidate: {
 					nickname: '',
@@ -282,7 +354,7 @@
 				this.$data.formValidate.mail = '123@123.com';
 				this.$data.formValidate.phone = '13013021302';
 				this.$data.formValidate.desc = 'nb';
-				this.$data.money = 999;
+				this.$data.money = 15;
 			},
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
@@ -296,7 +368,11 @@
             handleReturnHomepage () {
                 // 返回主页
 				this.$router.push({
-						path: '/'
+					path: '/', 
+					name: 'mainpage',
+					params: { 
+						studentID: this.$data.formValidate.stunumber
+					}
 				});		
             },
 			handleView (name) {
@@ -330,6 +406,14 @@
 				}
                 return check;
             },
+			GotoTopup (){
+				this.topup = true;
+			},
+			recharge(){
+				this.$Message.success('充值成功!');
+				this.money = this.topupData.value + this.money;
+				this.topup = false;
+			}
         },
         mounted () {
             this.uploadList = this.$refs.upload.fileList;
@@ -401,5 +485,15 @@
 #form{
 	margin:0 auto;
 	width: 40%;
+}
+.demo-drawer-footer{
+	width: 100%;
+	position: absolute;
+	bottom: 50%;
+	left: 0;
+	border-top: 1px solid #e8e8e8;
+	padding: 10px 16px;
+	text-align: right;
+	background: #fff;
 }
 </style>

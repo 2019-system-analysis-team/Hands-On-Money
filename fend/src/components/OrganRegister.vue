@@ -34,7 +34,7 @@
 								:on-format-error="handleFormatError"
 								:on-exceeded-size="handleMaxSize"
 								:before-upload="handleBeforeUpload"
-								multiple
+								accept="image/png,image/jpeg,image/gif,image/jpg"
 								type="drag"
 								action="//jsonplaceholder.typicode.com/posts/"
 								style="display: inline-block;width:78px;">

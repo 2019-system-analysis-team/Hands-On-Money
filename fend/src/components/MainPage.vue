@@ -29,9 +29,18 @@
 							</MenuGroup>
 						</Submenu>
                     </div>
-					<div class="layout-button">
+					<div class="layout-button" v-if="!isLogin">
 						<Button type="default" ghost v-on:click="login">登录</Button>
 						<Button type="primary" ghost v-on:click="register">注册</Button>
+					</div>
+					<div>
+						<Submenu name="4" v-if="isLogin">
+							<template slot="title">
+								<Avatar src="https://i.loli.net/2017/08/21/599a521472424.jpg" />
+							</template>
+							<MenuItem name="4-1" to="/userinfomodify">个人信息</MenuItem>
+							<MenuItem name="4-2" @click.native="logout()">退出</MenuItem>
+						</Submenu>
 					</div>
                 </Menu>
             </Header>
@@ -55,9 +64,24 @@
     export default {
 		data() {
 			return { 
+				studentID: '',
+				isLogin: false,
 			};
 		}, 
+		created: function () { 
+			//在created阶段初始化
+			this.getEventData();
+		},
 		methods: {
+			getEventData:function() {
+				let routerParamsStudentID = this.$route.params.studentID;
+				if(routerParamsStudentID == null){
+					this.isLogin = false;
+				}else{
+					this.studentID = routerParamsStudentID;
+					this.isLogin = true;
+				}
+			},
 			login: function () {
 				this.$router.push({
 						path: '/userlogin'
@@ -67,6 +91,10 @@
 				this.$router.push({
 						path: '/userregister'
 				});		
+			},
+			logout (){
+				this.isLogin = false;
+				this.studentID = '';
 			}
 		}
     }

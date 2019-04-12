@@ -34,7 +34,7 @@
 								:on-format-error="handleFormatError"
 								:on-exceeded-size="handleMaxSize"
 								:before-upload="handleBeforeUpload"
-								multiple
+								accept="image/png,image/jpeg,image/gif,image/jpg"
 								type="drag"
 								action="//jsonplaceholder.typicode.com/posts/"
 								style="display: inline-block;width:78px;">
@@ -73,9 +73,40 @@
 						</FormItem>
 						<FormItem label="学院" prop="school">
 							<Select v-model="formValidate.school">
-								<Option value="数据科学与计算机学院">数据科学与计算机学院</Option>
-								<Option value="管理学院">管理学院</Option>
+								<Option value="中国语言文学系">中国语言文学系</Option>
+								<Option value="历史学系">历史学系</Option>
+								<Option value="哲学系">哲学系</Option>
+								<Option value="社会学与人类学学院">社会学与人类学学院</Option>
+								<Option value="博雅学院">博雅学院</Option>
+								<Option value="岭南学院">岭南学院</Option>
+								<Option value="外国语学院">外国语学院</Option>
 								<Option value="法学院">法学院</Option>
+								<Option value="政治与公共事务管理学院">政治与公共事务管理学院</Option>
+								<Option value="管理学院">管理学院</Option>
+								<Option value="马克思主义学院">马克思主义学院</Option>
+								<Option value="心理学系">心理学系</Option>
+								<Option value="传播与设计学院">传播与设计学院</Option>
+								<Option value="资讯管理学院">资讯管理学院</Option>
+								<Option value="艺术学院">艺术学院</Option>
+								<Option value="数学学院">数学学院</Option>
+								<Option value="物理学院">物理学院</Option>
+								<Option value="化学学院">化学学院</Option>
+								<Option value="地理科学与规划学院">地理科学与规划学院</Option>
+								<Option value="生命科学学院">生命科学学院</Option>
+								<Option value="工学院">工学院</Option>
+								<Option value="材料科学与工程学院">材料科学与工程学院</Option>
+								<Option value="电子与信息工程学院">电子与信息工程学院</Option>
+								<Option value="数据科学与计算机学院">数据科学与计算机学院</Option>
+								<Option value="国家保密学院">国家保密学院</Option>
+								<Option value="网络安全学院">网络安全学院</Option>
+								<Option value="环境科学与工程学院">环境科学与工程学院</Option>
+								<Option value="系统科学与工程学院">系统科学与工程学院</Option>
+								<Option value="中山医学院">中山医学院</Option>
+								<Option value="光华口腔医学院">光华口腔医学院</Option>
+								<Option value="公共卫生学院">公共卫生学院</Option>
+								<Option value="药学院">药学院</Option>
+								<Option value="护理学院">护理学院</Option>
+								<Option value="逸仙学院">逸仙学院</Option>
 							</Select>
 						</FormItem>
 						<FormItem label="年龄" prop="age">
@@ -248,6 +279,14 @@
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         this.$Message.success('注册成功!');
+						//跳转到主页
+						this.$router.push({
+							path: '/', 
+							name: 'mainpage',
+							params: { 
+								studentID: this.$data.formValidate.stunumber
+							}
+						});
                     } else {
                         this.$Message.error('信息填写有误!');
                     }
