@@ -2,19 +2,19 @@
 
 ## 标准
 
-[What is REST](https://restfulapi.net/)
-[A RESTful Tutorial](https://www.restapitutorial.com/)
-[表现层状态转换](https://zh.wikipedia.org/wiki/%E8%A1%A8%E7%8E%B0%E5%B1%82%E7%8A%B6%E6%80%81%E8%BD%AC%E6%8D%A2)
-[理解RESTful架构](http://www.ruanyifeng.com/blog/2011/09/restful.html)
+- [What is REST](https://restfulapi.net/)
+- [A RESTful Tutorial](https://www.restapitutorial.com/)
+- [表现层状态转换](https://zh.wikipedia.org/wiki/%E8%A1%A8%E7%8E%B0%E5%B1%82%E7%8A%B6%E6%80%81%E8%BD%AC%E6%8D%A2)
+- [理解RESTful架构](http://www.ruanyifeng.com/blog/2011/09/restful.html)
 
 ## 参考
-[baoleme API doc](https://baoleme.github.io/API-document/#/)
-[Tiny Hippo 点餐系统API文档](https://rookies-sysu.github.io/Dashboard/07-03-API)
+- [baoleme API doc](https://baoleme.github.io/API-document/#/)
+- [Tiny Hippo 点餐系统API文档](https://rookies-sysu.github.io/Dashboard/07-03-API)
 > Remember, they are not restful at all.
 
 
-[基于 Token 的身份验证：JSON Web Token JWT](https://ninghao.net/blog/2834)
-[Flask-JWT doc](https://pythonhosted.org/Flask-JWT/)
+- [基于 Token 的身份验证：JSON Web Token JWT](https://ninghao.net/blog/2834)
+- [Flask-JWT doc](https://pythonhosted.org/Flask-JWT/)
 
 
 ## 目录
@@ -25,7 +25,7 @@ pass
 
 - 数据表结构
 
-![er model db design](https://imgchr.com/i/AIKv7V)
+![er model db design](https://s2.ax1x.com/2019/04/09/AIKv7V.png)
 
 - 约定
     - 对于每个 request，response 列表的优先级自顶向下递减；
@@ -72,7 +72,7 @@ Content-Type: application/json
     "user_id":"123456",
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6MSwiaWF0IjoxNDQ0OTE3NjQwLCJuYmYiOjE0NDQ5MTc2NDAsImV4cCI6MTQ0NDkxNzk0MH0.KPmI6WSjRjlpzecPvs3q_T3cJQvAgJvaQAPtk1abC_E"
 }
-//about access_token, see [Flask-JWT doc](https://pythonhosted.org/Flask-JWT/) for further information.
+//about access_token, see Flask-JWT doc(https://pythonhosted.org/Flask-JWT/) for further information.
 
 //response: create conflicted, duplicate email or phone_number
 HTTP/1.1 409 Conflict
@@ -107,7 +107,7 @@ Content-Type: application/json
 {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6MSwiaWF0IjoxNDQ0OTE3NjQwLCJuYmYiOjE0NDQ5MTc2NDAsImV4cCI6MTQ0NDkxNzk0MH0.KPmI6WSjRjlpzecPvs3q_T3cJQvAgJvaQAPtk1abC_E"
 }
-//about access_token, see [Flask-JWT doc](https://pythonhosted.org/Flask-JWT/) for further information.
+//about access_token, see Flask-JWT doc(https://pythonhosted.org/Flask-JWT/) for further information.
 
 //response: login failed, account not found/password incorrect
 HTTP/1.1 404 Not Found //link to /
@@ -122,7 +122,7 @@ Content-Type: application/json
 
 ```json
 //request: get user info
-GET /users/{user_id} HTTP/1.1
+GET /users/:user_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 ```
 
@@ -155,7 +155,7 @@ Content-Type: application/json
     "error_msg": "Unauthorized"
 }
 
-//response: no this user:/users/{user_id} in table
+//response: no this user:/users/:user_id in table
 HTTP/1.1 404 Not Found
 Content-Type: application/json
 {
@@ -168,7 +168,7 @@ Content-Type: application/json
 
 ```json
 //request: update personality
-PUT /users/{user_id}/personality HTTP/1.1
+PUT /users/:user_id/personality HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
@@ -177,7 +177,7 @@ Content-Type: application/json
 }
 
 //request: update school
-PUT /users/{user_id}/school HTTP/1.1
+PUT /users/:user_id/school HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
@@ -187,7 +187,7 @@ Content-Type: application/json
 }
 
 //request: update personal_info
-PUT /users/{user_id}/personal_info HTTP/1.1
+PUT /users/:user_id/personal_info HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
@@ -197,7 +197,7 @@ Content-Type: application/json
 }
 
 //request: update photo, after update, download photo again
-PUT /users/{user_id}/profile_photo HTTP/1.1
+PUT /users/:user_id/profile_photo HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
@@ -210,7 +210,7 @@ Content-Type: application/json
 HTTP/1.1 200 OK
 Content-Type: application/json
 {
-    "key1": "value", //key is the class you just updated
+    "key1": "value",
     "key2": "value",
     "key3": "value"
 }
@@ -223,7 +223,7 @@ Content-Type: application/json
     "error_msg": "Unauthorized"
 }
 
-//response: no this user:/users/{user_id} in table
+//response: no this /users/:user_id in table
 HTTP/1.1 404 Not Found
 Content-Type: application/json
 {
