@@ -6,6 +6,7 @@
 - [A RESTful Tutorial](https://www.restapitutorial.com/)
 - [表现层状态转换](https://zh.wikipedia.org/wiki/%E8%A1%A8%E7%8E%B0%E5%B1%82%E7%8A%B6%E6%80%81%E8%BD%AC%E6%8D%A2)
 - [理解RESTful架构](http://www.ruanyifeng.com/blog/2011/09/restful.html)
+- [Media Uploading](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)
 
 ## 参考
 - [baoleme API doc](https://baoleme.github.io/API-document/#/)
@@ -19,7 +20,23 @@
 
 ## 目录
 
-pass
+- [RESTful API 设计文档](#restful-api-%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3)
+  - [标准](#%E6%A0%87%E5%87%86)
+  - [参考](#%E5%8F%82%E8%80%83)
+  - [目录](#%E7%9B%AE%E5%BD%95)
+  - [API](#api)
+    - [用户创建](#%E7%94%A8%E6%88%B7%E5%88%9B%E5%BB%BA)
+    - [用户登陆](#%E7%94%A8%E6%88%B7%E7%99%BB%E9%99%86)
+    - [用户登陆注销](#%E7%94%A8%E6%88%B7%E7%99%BB%E9%99%86%E6%B3%A8%E9%94%80)
+    - [用户信息](#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)
+    - [用户信息修改](#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E4%BF%AE%E6%94%B9)
+    - [组织创建](#%E7%BB%84%E7%BB%87%E5%88%9B%E5%BB%BA)
+    - [组织信息](#%E7%BB%84%E7%BB%87%E4%BF%A1%E6%81%AF)
+    - [组织信息修改](#%E7%BB%84%E7%BB%87%E4%BF%A1%E6%81%AF%E4%BF%AE%E6%94%B9)
+    - [组织成员添加](#%E7%BB%84%E7%BB%87%E6%88%90%E5%91%98%E6%B7%BB%E5%8A%A0)
+    - [组织成员权限变更](#%E7%BB%84%E7%BB%87%E6%88%90%E5%91%98%E6%9D%83%E9%99%90%E5%8F%98%E6%9B%B4)
+    - [组织成员删除](#%E7%BB%84%E7%BB%87%E6%88%90%E5%91%98%E5%88%A0%E9%99%A4)
+    - [组织删除](#%E7%BB%84%E7%BB%87%E5%88%A0%E9%99%A4)
 
 ## API
 
@@ -32,6 +49,7 @@ pass
     - `error_msg` 只是我随便写的，你们可以自己改；
     - 对于键值不符合文档要求的 request，一律返回 400 Bad Request
     - 对于不在文档列表中的 request HTTP verb，一律返回 405 Method Not Allowed
+    - 除部分注册、登陆可访问的 API 之外，未经正确验证 JWT 的 API 访问一律返回 401 Unauthorized
 ```json
 //response: Bad Request. This post is SOMEHOW WRONG. e.g. key is not correct, or value contain not-allowed characters (just like attacker)
 HTTP/1.1 400 Bad Request
@@ -50,6 +68,15 @@ Content-Type: application/json
     "error_msg": "fuck you asshole"
 }
 ```
+```json
+//response: JWT missing/incorrect/timeout, redirect ot login page
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+{
+    "error_code": 401,
+    "error_msg": "Unauthorized"
+}
+```
 
 ### 用户创建
 
@@ -66,7 +93,7 @@ Content-Type: application/json
 
 ```json
 //response: create successfully
-HTTP/1.1 201 Created  //link to /
+HTTP/1.1 201 Created  //redirect to /
 Content-Type: application/json
 {
     "user_id":"123456",
@@ -102,7 +129,7 @@ Content-Type: application/json
 
 ```json
 //response: login successfully
-HTTP/1.1 200 OK //link to /
+HTTP/1.1 200 OK //redirect to /
 Content-Type: application/json
 {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6MSwiaWF0IjoxNDQ0OTE3NjQwLCJuYmYiOjE0NDQ5MTc2NDAsImV4cCI6MTQ0NDkxNzk0MH0.KPmI6WSjRjlpzecPvs3q_T3cJQvAgJvaQAPtk1abC_E"
@@ -110,13 +137,29 @@ Content-Type: application/json
 //about access_token, see Flask-JWT doc(https://pythonhosted.org/Flask-JWT/) for further information.
 
 //response: login failed, account not found/password incorrect
-HTTP/1.1 404 Not Found //link to /
+HTTP/1.1 404 Not Found //redirect to login page
 Content-Type: application/json
 {
     "error_code": 404,
     "error_msg": "account not found/password incorrect"
 }
 ```
+
+### 用户登陆注销
+
+```json
+//request: delete user session
+DELETE /users/:user_id/session HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+```
+
+```json
+//response: delete session successfully, redirect to login page
+HTTP/1.1 200 OK
+//response: Unauthorized JWT, do not delete session, but redirect to login page
+HTTP/1.1 401 Unauthorized
+```
+
 
 ### 用户信息
 
@@ -166,6 +209,8 @@ Content-Type: application/json
 
 ### 用户信息修改
 
+分段更新。
+
 ```json
 //request: update personality
 PUT /users/:user_id/personality HTTP/1.1
@@ -196,13 +241,10 @@ Content-Type: application/json
     "sex": "sex"
 }
 
-//request: update photo, after update, download photo again
-PUT /users/:user_id/profile_photo HTTP/1.1
+//request: update photo, after update, pull photo to client
+POST /users/:user_id/profile_photo HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
-Content-Type: application/json
-{
-    "profile_photo": "image_obj"
-}
+Content-Type: image/jpeg
 ```
 
 ```json
@@ -230,5 +272,294 @@ Content-Type: application/json
     "error_code": 404,
     "error_msg": "user Not Found"
 }
+//response: not support img format
+HTTP/1.1 415 Unsupported Media Type
+Content-Type: application/json
+{
+    "error_code": 415,
+    "error_msg": "Unsupported Media Type"
+}
 ```
 
+### 组织创建
+
+```json
+//request: creating organization 
+POST /users/:user_id/organization HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+Content-Type: application/json
+{
+    "name": "organization_name",
+    "bio": "bio",
+}
+```
+
+```json
+//response: create successfully
+HTTP/1.1 201 Created  //redirect to /organization/:organization_id
+Content-Type: application/json
+{
+    "organization_id":"123456"
+}
+
+//response: JWT missing/incorrect/timeout
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+{
+    "error_code": 401,
+    "error_msg": "Unauthorized"
+}
+
+//response: create conflicted, duplicate email or phone_number
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+{
+    "error_code": 409,
+    "error_msg": "create conflicted, duplicate organization name"
+}
+```
+
+### 组织信息
+```json
+//request: get organization info. All registered user can see it.
+GET /users/:user_id/organization/:organization_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+
+//request: get organization balance. Only admin can see it.
+GET /users/:user_id/organization/:organization_id/balance HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+```
+
+```json
+//response: get organization info successfully. 
+//user profile_photo will be downloaded independently from API
+// NOTE: If you want member list to show more info of members, it will lead to N+1 problem, see also (https://restfulapi.net/rest-api-n-1-problem/). Try server side solutions.
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "name": "",
+    "bio": "",
+    "avg_comment": 0,
+    "members":[
+        {
+            "user_id": 123,
+            "status": "status"
+        },
+        {
+            "user_id": 123,
+            "status": "status"
+        }
+    ]
+}
+
+//response: get organization balance successfully
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "balance": 0
+}
+
+//response: JWT missing/incorrect/timeout
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+{
+    "error_code": 401,
+    "error_msg": "Unauthorized"
+}
+
+//response: no this organization/:organization_id in table
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+{
+    "error_code": 404,
+    "error_msg": "organization Not Found"
+}
+```
+
+### 组织信息修改
+
+```json
+//request: update organization info
+PUT /users/:user_id/organization/:organization_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+Content-Type: application/json
+{
+    "name": "name",
+    "bio": "bio"
+}
+//request: update organization photo, after update, pull photo to client
+POST /users/:user_id/organization/:organization_id/profile_photo HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+Content-Type: image/jpeg
+```
+
+```json
+//response: get organization info successfully. 
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "name": "",
+    "bio": ""
+}
+//response: JWT missing/incorrect/timeout
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+{
+    "error_code": 401,
+    "error_msg": "Unauthorized",
+}
+//response: no this organization/:organization_id in table
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+{
+    "error_code": 404,
+    "error_msg": "organization Not Found"
+}
+//response: not support img format
+HTTP/1.1 415 Unsupported Media Type
+Content-Type: application/json
+{
+    "error_code": 415,
+    "error_msg": "Unsupported Media Type"
+}
+```
+
+### 组织成员添加
+```json
+//request: add organization member
+POST /users/:user_id/organization/:organization_id/members HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+Content-Type: application/json
+{
+    "email": "email@mail.com",
+    "status": "member"
+}
+or
+{
+    "phone_number": "13123456789",
+    "status": "member"
+}
+```
+```json
+//response: add member successfully. Redirect to organization info
+HTTP/1.1 201 Created
+
+//response: JWT missing/incorrect/timeout, redirect to login;
+//or you dont have permission to add member to such "status"
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+{
+    "error_code": 401,
+    "error_msg": "Unauthorized"
+}
+or
+{
+    "error_code": 401,
+    "error_msg": "insufficient permission"
+}
+//response: no this user/organization in users
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+{
+    "error_code": 404,
+    "error_msg": "user/organization Not Found"
+}
+```
+
+### 组织成员权限变更
+```json
+//request: modify organization member status
+PUT /users/:user_id/organization/:organization_id/members/:user_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+Content-Type: application/json
+{
+    "status": "member"
+}
+```
+```json
+//response: modify member successfully. Redirect to organization info
+HTTP/1.1 200 OK
+
+//response: JWT missing/incorrect/timeout, redirect to login;
+//or you dont have permission to modify member to such "status"
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+{
+    "error_code": 401,
+    "error_msg": "Unauthorized"
+}
+or
+{
+    "error_code": 401,
+    "error_msg": "insufficient permission"
+}
+//response: no this user/organization in users
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+{
+    "error_code": 404,
+    "error_msg": "user/organization Not Found"
+}
+```
+
+### 组织成员删除
+```json
+//request: delete organization member
+DELETE /users/:user_id/organization/:organization_id/members/:user_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+```
+```json
+//response: delete member successfully. Redirect to organization info
+HTTP/1.1 200 OK
+
+//response: JWT missing/incorrect/timeout, redirect to login;
+//or you dont have permission to delete member while he is in such "status"
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+{
+    "error_code": 401,
+    "error_msg": "Unauthorized"
+}
+or
+{
+    "error_code": 401,
+    "error_msg": "insufficient permission"
+}
+//response: no this user/organization in users
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+{
+    "error_code": 404,
+    "error_msg": "user/organization Not Found"
+}
+```
+
+### 组织删除
+```json
+//request: delete organization, only creator
+DELETE /users/:user_id/organization/:organization_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+```
+```json
+//response: show deleted organization info. 
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "name": "",
+    "bio": ""
+}
+//response: JWT missing/incorrect/timeout
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+{
+    "error_code": 401,
+    "error_msg": "Unauthorized",
+}
+//response: no this organization/:organization_id in table
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+{
+    "error_code": 404,
+    "error_msg": "organization Not Found"
+}
+```
