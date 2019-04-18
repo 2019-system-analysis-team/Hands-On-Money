@@ -12,40 +12,6 @@
                 <Card :bordered="false">
 					<p slot="title">请填写下列信息</p>
 					<Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" id="form">
-						<FormItem label="组织头像" prop="photo">
-							<div class="demo-upload-list" v-for="item in uploadList">
-								<template v-if="item.status === 'finished'">
-									<img :src="item.url">
-									<div class="demo-upload-list-cover">
-										<Icon type="ios-eye-outline" @click.native="handleView(item.name)"></Icon>
-									</div>
-								</template>
-								<template v-else>
-									<Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
-								</template>
-							</div>
-							<Upload
-								ref="upload"
-								:show-upload-list="false"
-								:default-file-list="defaultList"
-								:on-success="handleSuccess"
-								:format="['jpg','jpeg','png']"
-								:max-size="2048"
-								:on-format-error="handleFormatError"
-								:on-exceeded-size="handleMaxSize"
-								:before-upload="handleBeforeUpload"
-								accept="image/png,image/jpeg,image/gif,image/jpg"
-								type="drag"
-								action="//jsonplaceholder.typicode.com/posts/"
-								style="display: inline-block;width:78px;">
-								<div style="width: 78px;height:78px;line-height: 78px;">
-									<Icon type="ios-camera" size="40"></Icon>
-								</div>
-							</Upload>
-							<Modal title="浏览头像" v-model="visible">
-								<img :src="'https://o5wwk8baw.qnssl.com/' + imgName + '/avatar'" v-if="visible" style="width: 100%">
-							</Modal>
-						</FormItem>
 						<FormItem label="组织名称" prop="name">
 							<Input v-model="formValidate.name" placeholder="请输入组织名称"></Input>
 						</FormItem>
@@ -85,20 +51,11 @@
 			    }
 			};
 		 return {
-			ageoptionsList:[],
+			 userID:"",
 			 formValidate: {
 				 name: '',
 				 desc: ''
 			 },
-			 defaultList: [
-				 {
-					 'name': 'a42bdcc1178e62b4694c830f028db5c0',
-					 'url': 'https://o5wwk8baw.qnssl.com/a42bdcc1178e62b4694c830f028db5c0/avatar'
-				 }
-			 ],
-			 imgName: '',
-			 visible: false,
-			 uploadList: [],
 			 ruleValidate: {
 				 name: [
 					 { required: true, validator: validateNameCheck, trigger: 'blur' }
@@ -109,11 +66,33 @@
 			 }
 		 }
 		}, 
+		created: function () { 
+			this.getEventData();
+		},
 		methods: {
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.$Message.success('组织注册成功!');
+						var jwt = "JWT " + window.localStorage.getItem('token');
+						var url = "/users/:"+ this.$data.userID.toString() +"/organization";
+						this.$axios({
+							 method:"post",
+							 url: url,
+							 data:{
+								name: this.$data.formValidate.name,
+								bio: this.$data.formValidate.desc
+							 },
+							 headers:{
+								'Authorization': jwt,
+							 }
+						}).then(function (response){
+							this.$Message.success('组织注册成功!');
+							console.log(response);
+							// 跳转到组织页面
+						}).catch(function (error) {
+							console.log(error);
+						});
+                        
                     } else {
                         this.$Message.error('信息填写有误!');
                     }
@@ -122,40 +101,36 @@
             handleReset (name) {
                 this.$refs[name].resetFields();
             },
-			handleView (name) {
-                this.imgName = name;
-                this.visible = true;
-            },
-            handleSuccess (res, file) {
-                file.url = 'https://o5wwk8baw.qnssl.com/a42bdcc1178e62b4694c830f028db5c0/avatar';
-                file.name = 'a42bdcc1178e62b4694c830f028db5c0';
-            },
-            handleFormatError (file) {
-                this.$Notice.warning({
-                    title: '文件格式不正确',
-                    desc: '文件 ' + file.name + ' 的格式不正确, 请选择 jpg 或者 png.'
-                });
-            },
-            handleMaxSize (file) {
-                this.$Notice.warning({
-                    title: '超出文件大小限制',
-                    desc: '文件  ' + file.name + ' 太大, 不能超过 2M.'
-                });
-            },
-            handleBeforeUpload () {
-                const check = this.uploadList.length == 1;
-                if (check) {
-					this.$refs.upload.fileList.splice(0, 1);
-                }
-				else
-				{
-					return !check;
+			getEventData:function() {
+				/*
+				let uID = window.localStorage.getItem('userID');
+				if(uID == null || uID == ""){
+					//跳转到主页
+					this.$router.push({
+						path: '/', 
+						name: 'mainpage'
+					});
 				}
-                return check;
-            }
-        },
-        mounted () {
-            this.uploadList = this.$refs.upload.fileList;
+				this.$data.userID = uID;
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+						 method:"get",
+						 url:url,
+						 headers:{
+							'Authorization': jwt,
+						 }
+				}).then(function (response){
+					console.log(response);
+				}).catch(function (error) {
+					console.log(error.data.error_msg);
+					//跳转到主页
+					this.$router.push({
+						path: '/', 
+						name: 'mainpage'
+					});
+				});
+				*/
+			},
         }
     }
 </script>

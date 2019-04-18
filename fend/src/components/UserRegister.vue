@@ -12,39 +12,17 @@
 				<Card :bordered="false">
 					<p slot="title">请填写下列信息</p>
 					<Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" id="form">
-						<FormItem label="头像" prop="photo">
-							<div class="demo-upload-list" v-for="item in uploadList">
-								<template v-if="item.status === 'finished'">
-									<img :src="item.url">
-									<div class="demo-upload-list-cover">
-										<Icon type="ios-eye-outline" @click.native="handleView(item.name)"></Icon>
-									</div>
-								</template>
-								<template v-else>
-									<Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
-								</template>
-							</div>
-							<Upload
-								ref="upload"
-								:show-upload-list="false"
-								:default-file-list="defaultList"
-								:on-success="handleSuccess"
-								:format="['jpg','jpeg','png']"
-								:max-size="2048"
-								:on-format-error="handleFormatError"
-								:on-exceeded-size="handleMaxSize"
-								:before-upload="handleBeforeUpload"
-								accept="image/png,image/jpeg,image/gif,image/jpg"
-								type="drag"
-								action="//jsonplaceholder.typicode.com/posts/"
-								style="display: inline-block;width:78px;">
-								<div style="width: 78px;height:78px;line-height: 78px;">
-									<Icon type="ios-camera" size="40"></Icon>
-								</div>
-							</Upload>
-							<Modal title="浏览头像" v-model="visible">
-								<img :src="'https://o5wwk8baw.qnssl.com/' + imgName + '/avatar'" v-if="visible" style="width: 100%">
-							</Modal>
+						<FormItem label="电话" prop="phone">
+							<Input v-model="formValidate.phone" placeholder="请输入您的电话号码" ></Input>
+						</FormItem>
+						<FormItem label="E-mail" prop="mail">
+							<Input v-model="formValidate.mail" placeholder="请输入您的邮箱" ></Input>
+						</FormItem>
+						<FormItem label="密码" prop="passwd" >
+							<Input type="password" v-model="formValidate.passwd" placeholder="请输入您的密码"></Input>
+						</FormItem>
+						<FormItem label="确认密码" prop="passwdCheck" >
+							<Input type="password" v-model="formValidate.passwdCheck" placeholder="请再次输入您的密码"></Input>
 						</FormItem>
 						<FormItem label="昵称" prop="nickname">
 							<Input v-model="formValidate.nickname" placeholder="请输入您的昵称"></Input>
@@ -114,25 +92,12 @@
 								<Option v-for="item in ageoptionsList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 							</Select>						
 						</FormItem>
-						<FormItem label="电话" prop="phone">
-							<Input v-model="formValidate.phone" placeholder="请输入您的电话号码" ></Input>
-						</FormItem>
-						<FormItem label="E-mail" prop="mail">
-							<Input v-model="formValidate.mail" placeholder="请输入您的邮箱" ></Input>
-						</FormItem>
-						<FormItem label="密码" prop="passwd" >
-							<Input type="password" v-model="formValidate.passwd" placeholder="请输入您的密码"></Input>
-						</FormItem>
-						<FormItem label="确认密码" prop="passwdCheck" >
-							<Input type="password" v-model="formValidate.passwdCheck" placeholder="请再次输入您的密码"></Input>
-						</FormItem>
 						<FormItem label="自我介绍" prop="desc">
 							<Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 2,maxRows: 5}"></Input>
 						</FormItem>
 						<FormItem>
 							<Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
 							<Button @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
-							<Button @click="test()" style="margin-left: 8px">修改信息</Button>
 						</FormItem>
 					</Form>
 				</Card>
@@ -208,25 +173,16 @@
 					nickname: '',
                     name: '',
 					stunumber: '',
-					grade: '大一',
-					school: '数据科学与计算机学院',
-					age: '18',
+					grade: '',
+					school: '',
+					age: '',
 					phone: '',
                     mail: '',
-                    gender: '女生',
+                    gender: '',
                     desc: '',
                     passwd: '',
                     passwdCheck: '',
                 },
-                defaultList: [
-                    {
-                        'name': 'a42bdcc1178e62b4694c830f028db5c0',
-                        'url': 'https://o5wwk8baw.qnssl.com/a42bdcc1178e62b4694c830f028db5c0/avatar'
-                    }
-                ],
-                imgName: '',
-                visible: false,
-				uploadList: [],
                 ruleValidate: {
                     passwd: [
                         { required: true, validator: validatePass, trigger: 'blur' }
@@ -237,30 +193,12 @@
 					nickname: [
                         { required: true, validator: validateNicknameCheck, trigger: 'blur' }
                     ],
-                    name: [
-                        { required: true, validator: validateNameCheck, trigger: 'blur' }
-                    ],
-                    stunumber: [
-                        { required: true, validator: validateStuNumberCheck, trigger: 'blur' }
-                    ],
-					grade:[
-						{required: true}
-					],
-					school:[
-						{required: true}
-					],
-					age:[
-						{required: true}
-					],
 					phone:[
 						{ required: true, validator: validatePhoneCheck, trigger: 'blur' }				
 					],
                     mail: [
                         { required: true, message: '邮箱不能为空', trigger: 'blur' },
                         { type: 'email', message: '错误的邮箱格式', trigger: 'blur' }
-                    ],
-                    gender: [
-                        { required: true}
                     ]
                 }
             }
@@ -278,15 +216,73 @@
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.$Message.success('注册成功!');
-						//跳转到主页
-						this.$router.push({
-							path: '/', 
-							name: 'mainpage',
-							params: { 
-								studentID: this.$data.formValidate.stunumber
-							}
-						});
+						this.$axios({
+							 method:"post",
+							 url:"/users",
+							 data:{
+								email: this.$data.formValidate.email,
+								phone_number: this.$data.formValidate.phone,
+								password: this.$data.formValidate.passwd
+							 }
+							}).then(function (response){
+								console.log(response);
+								window.localStorage.setItem('token', response.data.access_token);
+								window.localStorage.setItem('userID', response.data.user_id);
+								var url_all = "/users/:" + response.data.user_id.toString();
+								var url_id = url_all + "/personality";
+								var jwt = "JWT " + response.data.access_token;
+								this.$axios({
+									 method:"put",
+									 url: url_id,
+									 data:{
+										nickname: this.$data.formValidate.nickname,
+										bio: this.$data.formValidate.desc
+									 },
+									 headers:{
+										'Authorization': jwt,
+									 }
+								});
+								var url_school = url_all + "/school";
+								this.$axios({
+									 method:"put",
+									 url: url_school,
+									 data:{
+										school: this.$data.formValidate.school,
+										grade: this.$data.formValidate.grade,
+										student_number: this.$data.formValidate.stunumber
+									 },
+									 headers:{
+										'Authorization': jwt,
+									 }
+								});
+								var url_info = url_all + "/personal_info";
+								this.$axios({
+									 method:"put",
+									 url: url_info,
+									 data:{
+										name: this.$data.formValidate.name,
+										age: this.$data.formValidate.age,
+										sex: this.$data.formValidate.gender
+									 },
+									 headers:{
+										'Authorization': jwt,
+									 }
+								});		
+								this.$Message.success('注册成功!');
+								
+								//跳转到主页
+								this.$router.push({
+									path: '/', 
+									name: 'mainpage',
+									params: { 
+										userID: response.data.user_id
+									}
+								});
+							})
+							.catch(function (error) {
+								console.log(error.data.error_msg);
+								this.$Message.error('注册失败，重复的电子邮件或电话号码');
+							});
                     } else {
                         this.$Message.error('信息填写有误!');
                     }
@@ -294,46 +290,7 @@
             },
             handleReset (name) {
                 this.$refs[name].resetFields();
-            },
-			handleView (name) {
-                this.imgName = name;
-                this.visible = true;
-            },
-            handleSuccess (res, file) {
-                file.url = 'https://o5wwk8baw.qnssl.com/a42bdcc1178e62b4694c830f028db5c0/avatar';
-                file.name = 'a42bdcc1178e62b4694c830f028db5c0';
-            },
-            handleFormatError (file) {
-                this.$Notice.warning({
-                    title: '文件格式不正确',
-                    desc: '文件 ' + file.name + ' 的格式不正确, 请选择 jpg 或者 png.'
-                });
-            },
-            handleMaxSize (file) {
-                this.$Notice.warning({
-                    title: '超出文件大小限制',
-                    desc: '文件  ' + file.name + ' 太大, 不能超过 2M.'
-                });
-            },
-            handleBeforeUpload () {
-                const check = this.uploadList.length == 1;
-                if (check) {
-					this.$refs.upload.fileList.splice(0, 1);
-                }
-				else
-				{
-					return !check;
-				}
-                return check;
-            },
-			test(){
-					this.$router.push({
-						path: '/userinfomodify'
-				});	
-			}
-        },
-        mounted () {
-            this.uploadList = this.$refs.upload.fileList;
+            }
         }
     }
 </script>
@@ -354,42 +311,6 @@
 }
 .layout-footer-center{
     text-align: center;
-}
-.demo-upload-list{
-	display: inline-block;
-	width: 80px;
-	height: 80px;
-	text-align: center;
-	line-height: 80px;
-	border: 1px solid transparent;
-	border-radius: 4px;
-	overflow: hidden;
-	background: #fff;
-	position: relative;
-	box-shadow: 0 1px 1px rgba(0,0,0,.2);
-	margin-right: 4px;
-}
-.demo-upload-list img{
-	width: 100%;
-	height: 100%;
-}
-.demo-upload-list-cover{
-	display: none;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	background: rgba(0,0,0,.6);
-}
-.demo-upload-list:hover .demo-upload-list-cover{
-	display: block;
-}
-.demo-upload-list-cover i{
-	color: #fff;
-	font-size: 20px;
-	cursor: pointer;
-	margin: 0 2px;
 }
 #form{
 	margin:0 auto;
