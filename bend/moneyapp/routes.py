@@ -5,7 +5,8 @@ from werkzeug.utils import secure_filename
 from flask import render_template, url_for, request, flash, jsonify
 from moneyapp import app, db, bcrypt
 from moneyapp.models import User, Organization, Task, Receiver_Task, Organization_Member, Transaction
-from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization, checkBalance
+from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization, checkBalance,queryUserById,chargeForUser,queryOrganizationByID,deleteOrganization
+from moneyapp.db_operations import queryOrganizationByName,addManager,queryTaskByTag,userChangeReceiveTask,queryReceiverTask,changTaskStatus,queryTaskById
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/profile_pics')
@@ -205,8 +206,29 @@ def user_charge():
     :rtype: json {"status": "", "message": "", 
                     "organization_id": ""}
     """
+
+#只能通过user_id进行充值
+
     if request.method == 'POST':
-        return
+        user_id = request.form['user_id']
+        money = request.form['money']
+        user = queryUserById(user_id)
+        if user:
+            chargeForUser(user_id,money)
+            result = {
+                'status': 'success',
+                
+                'message':"Successfully charge"
+            }
+        else:
+            result = {
+                'status': 'fail',
+                'message': 'no such user'
+            }
+    else:
+        result = {"status": "fail",
+                  "message": "no post"}  
+    return jsonify(result)
     
 
 
@@ -263,7 +285,26 @@ def delete_organization():
     :rtype: json {"status": "", "message": ""}
     """
     if request.method == 'POST':
-        return
+        user_id = request.form['user_id']
+        organization_id = request.form['organization_id']
+        organization = queryOrganizationByID(organization_id)
+        if organization:
+            #判断是否为组织的创建者
+            record = queryRecord(user_id,organization_id)
+            if record and record.status == 'owner':
+                deleteOrganization(organization_id)
+                result = {"status": "success", 
+                      "message": "Successfully delete"}
+            else:
+                result = {"status":"fail",
+                        "message":"No Permission"}
+        else:
+            result = {"status": "fail",
+                      "message": "No Organization"}
+    else:
+        result = {"status": "fail",
+                  "message": "no post"}
+    return jsonify(result)
 
 # TODO 组织信息的录入和修改
 @app.route('/organizations/modify_profile', methods=['POST'])
@@ -282,8 +323,23 @@ def organization_modify_profile():
     :rtype: json {"status": "", "message": "", 
                     "organization_name": "", "organization_bio": "", "orgnazation_avatar_path":""}
     """
+  
     if request.method == 'POST':
-        return
+        user_id = request.form['user_id']
+        organization_id = request.form['organization_id']
+        organization_name = request.form['name']
+        organization_bio = request.form['bio']
+       
+       
+        result = {'status':'fail',
+                'message':'no permission'}
+
+
+    else:
+        result = {"status": "fail",
+                  "message": "no post"}
+        
+    return jsonify(result)
 
 # 给组织充值
 @app.route('/organizations/charge', methods=['POST'])
@@ -307,7 +363,6 @@ def organization_charge():
         record = queryRecord(user_id, organization_id)
         if record:
             
-
             chargeForOrganization(user_id, organization_id, money)
             
             result = {"status": "success", 
@@ -334,8 +389,20 @@ def organization_filter():
     :param request.form['organization_name'] 用户id
     :rtype: json {"organization_name": {}}
     """
+    #返回的信息不定
     if request.method == 'GET':
-        return
+        organization_name = request.form['organization_name']
+        organization = queryOrganizationByName(organization_name)
+        if organization:
+            result = {"status":"true",
+                       "message":"successfully get" }
+        else:
+            result = {"status":"false",
+                      "message":"no such organization"}
+    else:
+        result = {"status": "false",
+                  "message": "no get"}
+    return jsonify(result)
 
 
 
@@ -355,8 +422,26 @@ def set_member_status():
                     "organization_id": ""}
     """
     if request.method == 'POST':
+        owner_id = request.form['owner_id']
+        member_id = request.form['member_id']
+        organization_id = request.form['organization_id']
+        owner = queryRecord(owner_id,organization_id)
+        member = queryRecord(member_id,organization_id)
+        if owner and member:
+            if owner.status == 'owner' and member.status == 'ordinary':
+                addManager(member_id,organization_id)
+                result = {'status':'success',
+                          'message' : 'change'}
+            else:
+                result = {'status':'fail'}
+        else:
+            result = {'status':'fail'}
 
-        return
+    else:
+        result = {"status": "false", 
+                  "message": "no post"}
+
+    return jsonify(result)
 
 
 # 群主管理员添加成员
@@ -417,7 +502,17 @@ def delete_user_task():
     :rtype: json {"status": "", "message": ""}
     """
     if request.method == 'POST':
-        return
+        user_id = request.form['user_id'];
+        task_id = request.form['task_id'];
+        deleteTask(user_id,task_id);
+        result = {'status':"successfully",
+                  'message':'delete!'}
+
+    else:
+        result = {'status': 'fail',
+                  'message':'no post'}
+    
+    return jsonify(result)
 
 # 组织创建
 @app.route('/task/create_organization', methods=['POST'])
@@ -463,7 +558,15 @@ def delete_organization_task():
     :rtype: json {"status": "", "message": ""}
     """
     if request.method == 'POST':
-        return
+        user_id = request.form['user_id']
+        task_id = request.form['task_id']
+        organization_id = request.form['organization_id']
+        organization_member = queryMemberById(user_id,organization_id)
+        if organization_member.status != 'ordinary':
+            deleteTaskOrganization(organization_id,task_id)
+            result = {'status':'true',
+                      'message':'successfully delete!'}
+    return jsonify(result)
 
 # 接收任务
 @app.route('/task/receive_task', methods=['POST'])
@@ -488,8 +591,20 @@ def task_filter():
     :rtype: json {"status": "", "message": "", "filtered task": {"", ""}}
     """
     if request.method == 'GET':
+        tag = request.form['tag']
 
-        return
+        
+        task = queryTaskByTag(tag)
+        if task:
+            result = {'status':'success',
+                      'message':'search successful'}
+        
+        else:
+            result = {'status':'fail'}
+    else:
+        result = {'status':'fail',
+                  'message':'no get'}
+    return jsonify(result)
 
 # TODO 任务接收者修改所接受的任务的状态（mark完成了几步）
 #（暂时修改status为传入的request.form['status']的内容）
@@ -505,8 +620,24 @@ def receiver_set_status():
     :rtype: json {"status": "", "message": ""}
     """
     if request.method == 'POST':
+        user_id = request.form['user_id']
+        task_id = request.form['task_id']
+        status = request.form['status']
+        record = queryReceiverTask(user_id,task_id)
+        if record:
+           userChangeReceiveTask(user_id,task_id,status)
+           result = {'status':'success',
+          'message':'change successfully'} 
 
-        return
+        else:
+            result = {'status':'fail',
+           'message':'no suit'}
+        
+    else:
+        result = {'status': 'fail',
+        'message':'no post'}
+
+    return jsonify(result)
 
 # TODO 任务发布者修改发布任务的状态（比如设置为已完成...)
 @app.route('/task/owner_set_status', methods=['POST'])
@@ -521,8 +652,27 @@ def owner_set_status():
     :rtype: json {"status": "", "message": ""}
     """
     if request.method == 'POST':
-
-        return
+        user_id = request.form['user_id']
+        task_id = request.form['task']
+        status = request.form['status']
+        
+        
+        task = queryTaskById(user_id,task_id)
+        result = {'status':'successfully'}
+        
+        if task:
+            changTaskStatus(task_id,status)
+            result = {'status':'successfully',
+            'message':'change!'}
+        else:
+            result = {
+            'status':'fail',
+            'message': 'no task'
+            }
+        
+    else:
+        result = {'status':'fail'}     
+    return jsonify(result)
 
 
 

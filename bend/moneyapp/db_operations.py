@@ -38,8 +38,8 @@ def queryUser(_username):
 	user = User.query.filter_by(username=_username).first()
 	return user
 
-def queryUserById(_user_id):
-	user = User.query.filter_by(id=_user_id).first()
+def queryUserById(_id):
+	user = User.query.filter_by(id=_id).first()
 	return user
 
 
@@ -73,8 +73,31 @@ def chargeForOrganization(_user_id, _organization_id, _money):
 def queryOrganizationByID(_organization_id):
 	organization = Organization.query.filter_by(id=_organization_id).first()
 	return organization
+#----------------------------------------------
+#todo 删除组织信息
+#是否需要考虑将组织成员内的组织信息删除
+def deleteOrganization(_organization_id):
+		organization = Organization.query.filter_by(id=_organization_id).first()
+		db.session.delete(organization)
+		db.session.commit()
 
-	
+#-----------------------------------------------
+#todo 按名字搜索组织
+def queryOrganizationByName(_organization_name):
+	organization = Organization.query.filter_by(name=_organization_name).first()
+	return organization
+
+#--------------------------------------------------
+#todo 改变组织信息
+def modify_orgfile(_organization_id,_organization_name,_organization_bio, _image_file):
+
+    organization = Organization.query.filter_by(id = _organization_id).first()
+
+    organization.name = _organization_name
+    organization.bio = _organization_bio
+    organization.image_file = _image_file
+
+    db.session.commit()
 
 # ===============================================================
 # Organization Member
@@ -88,6 +111,22 @@ def queryRecord(_user_id, _organization_id):
 	record = Organization_Member.query.filter_by(user_id=_user_id, organization_id=_organization_id).first()
 	if record:
 		return record
+#--------------------------------------------------------------------
+#todo
+#判断用户是否接收了该任务
+def queryReceiverTask(_user_id,_task_id):
+    record = Receiver_Task.query.filter_by(user_id=_user_id,task_id=_task_id).first()
+    if record:
+        return record
+#--------------------------------------------------------
+
+#--------------------------------------------------
+#todo
+#设置管理员:
+def addManager(_user_id,_organization_id):
+    organization_member = Organization_Member.query.filter_by(user_id=_user_id , organization_id = _organization_id).first()
+    organization_member.status = 'manager'
+    db.session.commit()
 
 
 # ====================================================================
@@ -105,8 +144,29 @@ def createTaskOrganization(_organization_id, _user_id, _money, _tag, _number, _a
 	organization = Organization.query.filter_by(id=_organization_id).first()
 	organization.balance -= float(_money)
 	db.session.add(task)
-	db.session.commit()
+	db.session.commit()#-----------------------------------------------------------------
 
+#todo 
+#delete task user
+def deleteTask(_user_id,_task_id):
+    task = Task.query.filter_by(id=_task_id).first()
+    money = task.money
+    user = User.query.filter_by(id=_user_id).first()
+    user.balance += float(money)
+    db.session.delete(task)
+    db.session.commit()
+
+#----------------------------------------------------------------
+#todo 
+#delete task organization
+
+def deleteTaskOrganization(_organization_id,_task_id):
+    task = Task.query.filter_by(id=_task_id).first()
+    money = task.money
+    organization = Organization.query.filter_by(id=_organization_id).first()
+    organization.balance += float(money)
+    db.session.delete(task)
+    db.session.commit()
 
 # ======================================================
 # Receiver_Task
@@ -124,9 +184,49 @@ def checkBalance(_user_id, _organization_id, _money):
 	elif _user_id:
 		user = queryUserById(_user_id)
 		return user.balance >= _money
+#---------------------------------------
+#todo 给个人账号充值
+def chargeForUser(_user_id,_money):
+	transaction = Transaction(user_id=_user_id,money=_money)
+	user = User.query.filter_by(id = _user_id).first()
+	user.balance += float(_money)
+	db.session.add(transaction)
+	db.session.commit()
 
+#--------------------------------------------
+#todo
+#按照tag搜索task
+def queryTaskByTag(_tag):
+    task = Task.query.filter_by(tag=_tag).first()
+    return task
+#------------------------------------------------------
+#todo
+#按照user_id和task_id 搜索是否存在该task
+def queryTaskById(_user_id,_id):
+    # task = None
+    task = Task.query.filter_by(id=_id,user_id=_user_id).first()
+    return task
+#---------------------------------------------------------
+#todo
+#改变status
+def changTaskStatus(_id,_status):
+    task = Task.query.filter_by(id = _id).first()
+    task.status = _status
+    db.session.commit()
+#---------------------------------------------------------
+#todo
+#用户修改任务完成状态
+def userChangeReceiveTask(_user_id,_task_id,_status):
+    task = Receiver_Task.query.filter_by(user_id=_user_id,task_id=_task_id).first()
+    task.status = _status
+    db.session.commit()
 
-
+#----------------------------------------------------------
+#todo 
+#按照user_id和organization 搜索组织成员
+def queryMemberById(_user_id,_organization_id):
+    organization_member = Organization_Member.query.filter_by(user_id=_user_id , organization_id =_organization_id).first()
+    return organization_member
 
 
 
