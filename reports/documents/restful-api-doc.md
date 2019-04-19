@@ -25,18 +25,26 @@
   - [参考](#%E5%8F%82%E8%80%83)
   - [目录](#%E7%9B%AE%E5%BD%95)
   - [API](#api)
-    - [用户创建](#%E7%94%A8%E6%88%B7%E5%88%9B%E5%BB%BA)
-    - [用户登陆](#%E7%94%A8%E6%88%B7%E7%99%BB%E9%99%86)
-    - [用户登陆注销](#%E7%94%A8%E6%88%B7%E7%99%BB%E9%99%86%E6%B3%A8%E9%94%80)
-    - [用户信息](#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)
-    - [用户信息修改](#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E4%BF%AE%E6%94%B9)
-    - [组织创建](#%E7%BB%84%E7%BB%87%E5%88%9B%E5%BB%BA)
-    - [组织信息](#%E7%BB%84%E7%BB%87%E4%BF%A1%E6%81%AF)
-    - [组织信息修改](#%E7%BB%84%E7%BB%87%E4%BF%A1%E6%81%AF%E4%BF%AE%E6%94%B9)
-    - [组织成员添加](#%E7%BB%84%E7%BB%87%E6%88%90%E5%91%98%E6%B7%BB%E5%8A%A0)
-    - [组织成员权限变更](#%E7%BB%84%E7%BB%87%E6%88%90%E5%91%98%E6%9D%83%E9%99%90%E5%8F%98%E6%9B%B4)
-    - [组织成员删除](#%E7%BB%84%E7%BB%87%E6%88%90%E5%91%98%E5%88%A0%E9%99%A4)
-    - [组织删除](#%E7%BB%84%E7%BB%87%E5%88%A0%E9%99%A4)
+    - [用户与组织系统](#%E7%94%A8%E6%88%B7%E4%B8%8E%E7%BB%84%E7%BB%87%E7%B3%BB%E7%BB%9F)
+      - [用户创建](#%E7%94%A8%E6%88%B7%E5%88%9B%E5%BB%BA)
+      - [用户登陆](#%E7%94%A8%E6%88%B7%E7%99%BB%E9%99%86)
+      - [用户登陆注销](#%E7%94%A8%E6%88%B7%E7%99%BB%E9%99%86%E6%B3%A8%E9%94%80)
+      - [用户信息](#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)
+      - [用户信息修改](#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E4%BF%AE%E6%94%B9)
+      - [组织创建](#%E7%BB%84%E7%BB%87%E5%88%9B%E5%BB%BA)
+      - [组织信息](#%E7%BB%84%E7%BB%87%E4%BF%A1%E6%81%AF)
+      - [组织信息修改](#%E7%BB%84%E7%BB%87%E4%BF%A1%E6%81%AF%E4%BF%AE%E6%94%B9)
+      - [组织成员添加](#%E7%BB%84%E7%BB%87%E6%88%90%E5%91%98%E6%B7%BB%E5%8A%A0)
+      - [组织成员权限变更](#%E7%BB%84%E7%BB%87%E6%88%90%E5%91%98%E6%9D%83%E9%99%90%E5%8F%98%E6%9B%B4)
+      - [组织成员删除](#%E7%BB%84%E7%BB%87%E6%88%90%E5%91%98%E5%88%A0%E9%99%A4)
+      - [组织删除](#%E7%BB%84%E7%BB%87%E5%88%A0%E9%99%A4)
+    - [任务系统](#%E4%BB%BB%E5%8A%A1%E7%B3%BB%E7%BB%9F)
+      - [用户/组织创建任务](#%E7%94%A8%E6%88%B7%E7%BB%84%E7%BB%87%E5%88%9B%E5%BB%BA%E4%BB%BB%E5%8A%A1)
+      - [撤回任务](#%E6%92%A4%E5%9B%9E%E4%BB%BB%E5%8A%A1)
+      - [任务查询](#%E4%BB%BB%E5%8A%A1%E6%9F%A5%E8%AF%A2)
+      - [任务接受](#%E4%BB%BB%E5%8A%A1%E6%8E%A5%E5%8F%97)
+      - [任务完成](#%E4%BB%BB%E5%8A%A1%E5%AE%8C%E6%88%90)
+      - [任务审核](#%E4%BB%BB%E5%8A%A1%E5%AE%A1%E6%A0%B8)
 
 ## API
 
@@ -78,8 +86,8 @@ Content-Type: application/json
     "error_msg": "Unauthorized"
 }
 ```
-
-### 用户创建
+### 用户与组织系统
+#### 用户创建
 
 ```json
 //request: creating user 
@@ -97,7 +105,7 @@ Content-Type: application/json
 HTTP/1.1 201 Created  //redirect to /
 Content-Type: application/json
 {
-    "user_id":"123456",
+    "user_id":123456,
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6MSwiaWF0IjoxNDQ0OTE3NjQwLCJuYmYiOjE0NDQ5MTc2NDAsImV4cCI6MTQ0NDkxNzk0MH0.KPmI6WSjRjlpzecPvs3q_T3cJQvAgJvaQAPtk1abC_E"
 }
 //about access_token, see Flask-JWT doc(https://pythonhosted.org/Flask-JWT/) for further information.
@@ -111,7 +119,7 @@ Content-Type: application/json
 }
 ```
 
-### 用户登陆
+#### 用户登陆
 
 ```json
 //request: login by email
@@ -146,7 +154,7 @@ Content-Type: application/json
 }
 ```
 
-### 用户登陆注销
+#### 用户登陆注销
 
 ```json
 //request: delete user session
@@ -164,7 +172,7 @@ HTTP/1.1 404 Not Found
 ```
 
 
-### 用户信息
+#### 用户信息
 
 ```json
 //request: get user info
@@ -183,12 +191,11 @@ Content-Type: application/json
     "profile_photo_path": "",
     "student_id": "",
     "name": "",
-    "age": "",
+    "age": 0,
     "sex": "",
     "grade": "",
     "school": "",
     "bio": "",
-    "age": "",
     "balance": 0,
     "avg_comment": 0
 }
@@ -210,7 +217,7 @@ Content-Type: application/json
 }
 ```
 
-### 用户信息修改
+#### 用户信息修改
 
 分段更新。
 
@@ -240,7 +247,7 @@ Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
     "name": "name",
-    "age": "age",
+    "age": 0,
     "sex": "sex"
 }
 
@@ -284,7 +291,7 @@ Content-Type: application/json
 }
 ```
 
-### 组织创建
+#### 组织创建
 
 ```json
 //request: creating organization 
@@ -322,7 +329,7 @@ Content-Type: application/json
 }
 ```
 
-### 组织信息
+#### 组织信息
 ```json
 //request: get organization info. All registered user can see it.
 GET /users/:user_id/organization/:organization_id HTTP/1.1
@@ -380,7 +387,7 @@ Content-Type: application/json
 }
 ```
 
-### 组织信息修改
+#### 组织信息修改
 
 ```json
 //request: update organization info
@@ -428,7 +435,7 @@ Content-Type: application/json
 }
 ```
 
-### 组织成员添加
+#### 组织成员添加
 ```json
 //request: add organization member
 POST /users/:user_id/organization/:organization_id/members HTTP/1.1
@@ -470,7 +477,7 @@ Content-Type: application/json
 }
 ```
 
-### 组织成员权限变更
+#### 组织成员权限变更
 ```json
 //request: modify organization member status
 PUT /users/:user_id/organization/:organization_id/members/:user_id HTTP/1.1
@@ -506,7 +513,7 @@ Content-Type: application/json
 }
 ```
 
-### 组织成员删除
+#### 组织成员删除
 ```json
 //request: delete organization member
 DELETE /users/:user_id/organization/:organization_id/members/:user_id HTTP/1.1
@@ -538,7 +545,7 @@ Content-Type: application/json
 }
 ```
 
-### 组织删除
+#### 组织删除
 ```json
 //request: delete organization, only creator
 DELETE /users/:user_id/organization/:organization_id HTTP/1.1
@@ -567,3 +574,173 @@ Content-Type: application/json
     "error_msg": "organization Not Found"
 }
 ```
+
+### 任务系统
+
+#### 用户/组织创建任务
+
+```json
+//request: user creating task 
+POST /users/:user_id/tasks HTTP/1.1
+//or request: organization creating task 
+POST /users/:user_id/organization/:organization_id/tasks HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+Content-Type: application/json
+{
+    "title": "string",
+    "description": "string",
+    "tags": ["tag1", "tag2", "tag3"],
+    "participant_number_limit": 10,
+    "reward_for_one_participant": 0,
+    "post_time": "date_obj",
+    "receive_end_time": "date_obj",
+    "finish_deadline_time": "date_obj",
+    "user_limit": {
+        "age_upper": 0,
+        "age_lower": 1,
+        "grades": ["grade1", "grade1"],
+        "sexes": ["sex_type1", "sex_type2", "sex_type3"],
+        "schools": ["school_name1", "school_name2"]
+    },
+    "steps": [
+        {
+            "title": "string",
+            "description": "string"
+        },
+        {
+            "title": "string",
+            "description": "string"
+        }
+    ]
+}
+```
+```json
+//response: create task successfully, show created task
+HTTP/1.1 201 Created
+// NOTE return created task obj.
+// NOTE would be better if return a list of users' name/nickname to avoid N+1 problem 
+{
+    "task_id": 123,
+    "creator_user_id": 123,
+    "creator_organization_id": 123,
+    "status": "ongoing",
+    "title": "string",
+    "description": "string",
+    "tags": ["tag1", "tag2", "tag3"],
+    "participant_number_limit": 10,
+    "reward_for_one_participant": 0,
+    "post_time": "date_obj",
+    "receive_end_time": "date_obj",
+    "finish_deadline_time": "date_obj",
+    "user_limit": {
+        "age_upper": 0,
+        "age_lower": 1,
+        "grades": ["grade1", "grade1"],
+        "sexes": ["sex_type1", "sex_type2", "sex_type3"],
+        "schools": ["school_name1", "school_name2"]
+    },
+    "steps": [
+        {
+            "title": "string",
+            "description": "string"
+        },
+        {
+            "title": "string",
+            "description": "string"
+        }
+    ],
+    "participant_ids": [123, 124, 125, 126],
+    "ongoing_participant_ids": [123, 124],
+    "waiting_examine_participant_ids": [125],
+    "finished_participant_ids": [126]
+}
+
+//response: no this user/organization in users/organizations
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+{
+    "error_code": 404,
+    "error_msg": "user/organization Not Found"
+}
+```
+
+#### 撤回任务
+
+#### 任务查询
+
+```json
+//request: user query tasks
+// NOTE front-end should design a default query according to user's status
+// NOTE if some value leave blank, the default will be sent.
+GET /users/:user_id/tasks HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+Content-Type: application/json
+{
+    "task_id": 123,
+    "creator_user_id": 123,
+    "creator_organization_id": 123,
+    "status": "ongoing",
+    "title": "sub_string",
+    "tags": ["tag1", "tag2", "tag3"],
+    "reward_for_one_participant_upper": 3,
+    "reward_for_one_participant_lower": 1,
+    "receive_end_time": "date_obj",
+    "finish_deadline_time": "date_obj",
+    "user_limit": {
+        "age_upper": 0,
+        "age_lower": 1,
+        "grades": ["grade1", "grade1"],
+        "sexes": ["sex_type1", "sex_type2", "sex_type3"],
+        "schools": ["school_name1", "school_name2"]
+    },
+    "steps_number_upper": 5,
+    "steps_number_lower": 1
+}
+```
+
+```json
+//response: show all queried tasks. 
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "tasks":[
+        {
+            "task_id": 123,
+            "creator_user_id": 123,
+            "creator_organization_id": 123,
+            "status": "ongoing",
+            "title": "string",
+            "description": "string",
+            "tags": ["tag1", "tag2", "tag3"],
+            "current_participant_number": 3,
+            "participant_number_limit": 10,
+            "reward_for_one_participant": 2,
+            "post_time": "date_obj",
+            "receive_end_time": "date_obj",
+            "finish_deadline_time": "date_obj",
+            "user_limit": {
+                "age_upper": 0,
+                "age_lower": 1,
+                "grades": ["grade1", "grade1"],
+                "sexes": ["sex_type1", "sex_type2", "sex_type3"],
+                "schools": ["school_name1", "school_name2"]
+            },
+            "steps": [
+                {
+                    "title": "string",
+                    "description": "string"
+                },
+                {
+                    "title": "string",
+                    "description": "string"
+                }
+            ]
+        },
+    ]
+}
+```
+#### 任务接受
+
+#### 任务完成
+
+#### 任务审核
