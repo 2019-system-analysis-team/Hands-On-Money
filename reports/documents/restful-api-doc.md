@@ -51,7 +51,8 @@
     - 对于不在文档列表中的 request HTTP verb，一律返回 405 Method Not Allowed
     - 除部分注册、登陆可访问的 API 之外，未经正确验证 JWT 的 API 访问一律返回 401 Unauthorized
 ```json
-//response: Bad Request. This post is SOMEHOW WRONG. e.g. key is not correct, or value contain not-allowed characters (just like attacker)
+//response: Bad Request. This post is SOMEHOW WRONG. 
+//e.g. key is not correct, or value contain not-allowed characters (just like attacker)
 HTTP/1.1 400 Bad Request
 Content-Type: application/json
 {
@@ -128,8 +129,8 @@ Content-Type: application/json
 ```
 
 ```json
-//response: login successfully
-HTTP/1.1 200 OK //redirect to /
+//response: login successfully, redirect to homepage
+HTTP/1.1 200 OK
 Content-Type: application/json
 {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6MSwiaWF0IjoxNDQ0OTE3NjQwLCJuYmYiOjE0NDQ5MTc2NDAsImV4cCI6MTQ0NDkxNzk0MH0.KPmI6WSjRjlpzecPvs3q_T3cJQvAgJvaQAPtk1abC_E"
@@ -137,7 +138,7 @@ Content-Type: application/json
 //about access_token, see Flask-JWT doc(https://pythonhosted.org/Flask-JWT/) for further information.
 
 //response: login failed, account not found/password incorrect
-HTTP/1.1 404 Not Found //redirect to login page
+HTTP/1.1 404 Not Found
 Content-Type: application/json
 {
     "error_code": 404,
@@ -156,8 +157,10 @@ Authorization: JWT eyJhbGciOiJIUzI
 ```json
 //response: delete session successfully, redirect to login page
 HTTP/1.1 200 OK
-//response: Unauthorized JWT, do not delete session, but redirect to login page
+//response: Unauthorized JWT, do not delete any session and redirect to login page
 HTTP/1.1 401 Unauthorized
+//response: user Not Found, do not delete any session and redirect to login page
+HTTP/1.1 404 Not Found
 ```
 
 
@@ -310,7 +313,7 @@ Content-Type: application/json
     "error_msg": "Unauthorized"
 }
 
-//response: create conflicted, duplicate email or phone_number
+//response: create conflicted, duplicate name
 HTTP/1.1 409 Conflict
 Content-Type: application/json
 {
@@ -333,7 +336,8 @@ Authorization: JWT eyJhbGciOiJIUzI
 ```json
 //response: get organization info successfully. 
 //user profile_photo will be downloaded independently from API
-// NOTE: If you want member list to show more info of members, it will lead to N+1 problem, see also (https://restfulapi.net/rest-api-n-1-problem/). Try server side solutions.
+// NOTE: If you want member list to show more info of members, it will lead to N+1 problem, 
+// see also (https://restfulapi.net/rest-api-n-1-problem/). Try server side solutions.
 HTTP/1.1 200 OK
 Content-Type: application/json
 {
