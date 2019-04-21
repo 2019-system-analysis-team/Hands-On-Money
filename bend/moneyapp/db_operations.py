@@ -9,6 +9,7 @@ def addUser(_username, _email, _hashed_password, _telephone, _image_file):
 	user = User(username=_username, email=_email, password=_hashed_password, telephone=_telephone, image_file=_image_file)
 	db.session.add(user)
 	db.session.commit()
+	return user.id
 
 
 # 一开始就填详细信息成为用户

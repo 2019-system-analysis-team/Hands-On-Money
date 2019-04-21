@@ -1,16 +1,47 @@
 import os, datetime
 import json
+import re
 import uuid
+import jwt
 from werkzeug.utils import secure_filename
-from flask import render_template, url_for, request, flash, jsonify
+from flask import render_template, url_for, request, flash, jsonify, make_response
 from moneyapp import app, db, bcrypt
 from moneyapp.models import User, Organization, Task, Receiver_Task, Organization_Member, Transaction
 from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization, checkBalance,queryUserById,chargeForUser,queryOrganizationByID,deleteOrganization
 from moneyapp.db_operations import queryOrganizationByName,addManager,queryTaskByTag,userChangeReceiveTask,queryReceiverTask,changTaskStatus,queryTaskById
+from flask_jwt import JWT, jwt_required, current_identity
+from functools import wraps
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/profile_pics')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['SECRET_KEY'] = 'thisisansecretkey'
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization']
+
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            current_user = queryUserById(data['id']) #???
+        except:
+            return jsonify({'message': 'Token is invalid'}), 401
+
+def authenticate(username, password):
+    user = queryUser(username)
+    if user and safe_str_cmp(user.password.encode('utf-8'), password.encode('utf-8')):
+        return user
+
+def identity(payload):
+    user_id = payload['identity']
+    return userid_table.get(user_id, None)
 
 
 
@@ -71,6 +102,8 @@ def userLogin():
 
         return result
 
+
+
 # 注册
 @app.route('/users/register_test', methods=['POST', 'GET'])
 def test_regis():
@@ -122,6 +155,52 @@ def test_regis():
         }
 
         return jsonify({'result': result})
+
+
+# 还未考虑 conflict！！！！
+@app.route('/users', methods=['POST'])
+def creating_user():
+    if request.method == 'POST':
+        username = request.get_json()['username']
+        email = request.get_json()['email']
+        telephone = request.get_json()['phone_number']
+        password = request.get_json()['password']
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+       
+
+        if request.files and request.files['file'] :
+            file = request.files['file']
+            filename = secure_filename(file.filename)
+
+            # Gen GUUID File Name
+            fileExt = filename.split('.')[1]
+            autoGenFileName = uuid.uuid4()
+
+            newFileName = str(autoGenFileName) + '.' + fileExt
+
+            target = UPLOAD_FOLDER
+            print(target)
+
+            if not os.path.isdir(target):
+                os.mkdir(target)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFileName))
+
+        else:
+            filename = 'default.jpg'
+            newFileName = 'default.jpg'
+
+        try:
+            user_id = addUser(username, email, hashed_password, telephone, newFileName)
+            return jsonify({'user_id': user_id,
+                        'access_token': 'xxxxx'})
+        
+        except Exception as e:
+            err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
+            print("illustate sqlalchemy exception raised: %s" % e)
+            return jsonify({'user_id': err_msg,
+                        'access_token': 'xxxxx'})
+        
+
 
 # 修改信息
 @app.route('/users/modify_profile_test', methods=['POST', 'GET'])
@@ -194,6 +273,32 @@ def search_user():
 
 
         return jsonify({'result': result})
+
+# RESTful 查找用户
+@app.route('/users/<user_id>', methods=['GET'])
+def get_user_info(user_id):
+    user = queryUserById(user_id)
+    if user:
+        return jsonify({'email': user.email,
+                        'phone_number': user.telephone,
+                        'profile_photo_path': user.image_file,
+                        'student_id': user.student_id,
+                        'name': user.username,
+                        'age': user.age,
+                        'sex': user.sex,
+                        'grade': user.grade,
+                        'school': user.school,
+                        'bio': user.bio,
+                        'balance': user.balance,
+                        'avg_comment': user.average_comment
+                        })
+    else:
+        to_return = jsonify({'error_code': 404,
+                         'error_msg': 'User Not Found'})
+        return make_response(to_return, 404)
+
+
+
 
 # TODO 给个人账号充值
 @app.route('/users/charge', methods=['POST'])
