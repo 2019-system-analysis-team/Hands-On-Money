@@ -617,8 +617,9 @@ Content-Type: application/json
 ```json
 //response: create task successfully, show created task
 HTTP/1.1 201 Created
-// NOTE return created task obj.
-// NOTE would be better if return a list of users' name/nickname to avoid N+1 problem 
+// NOTE would be better if return a list of users' name/nickname to avoid N+1 
+// NOTE if create by person, OMIT creator_organization_name
+problem 
 {
     "task_id": 123,
     "creator_user_id": 123,
@@ -655,6 +656,9 @@ HTTP/1.1 201 Created
     "finished_participant_ids": [126]
 }
 
+// NOTE if some necessary thing missing, return 400
+// TODO
+
 //response: no this user/organization in users/organizations
 HTTP/1.1 404 Not Found
 Content-Type: application/json
@@ -670,15 +674,13 @@ Content-Type: application/json
 
 ```json
 //request: user query tasks
-// NOTE front-end should design a default query according to user's status
-// NOTE if some value leave blank, the default will be sent.
 GET /users/:user_id/tasks HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
-    "task_id": 123,
-    "creator_user_id": 123,
-    "creator_organization_id": 123,
+    "creator_user_email": "i@sirius.com",
+    "creator_user_phone_number": "13123456789",
+    "creator_organization_name": "name",
     "status": "ongoing",
     "title": "sub_string",
     "tags": ["tag1", "tag2", "tag3"],
@@ -696,18 +698,47 @@ Content-Type: application/json
     "steps_number_upper": 5,
     "steps_number_lower": 1
 }
+// NOTE if user do not set a particular value of some key, 
+// just OMIT the entire key-value pair, and send the rest.
+// Let us see some examples.
+// Example 1: query tasks from a org without any limits.
+{
+    "creator_organization_name": "name"
+} 
+// should return all tasks created by org with name:"name"  
+// AND satisfied user limit of /users/:user_id
+
+// Example 2: query tasks for girls(even if you are a boy(ew~))
+{
+    "user_limit": {
+        "sexes": ["female"]
+    } 
+}
+// should return all tasks with user_limit:sexes:girl
+// THAT'S SAY, if query json contain "user_limit", 
+// it will OVERRIDE user_limit inherit from /users/:user_id
+
+// Example 3: query task with no more than 3 steps
+{
+    "steps_number_upper": 3
+}
+// should return all tasks with tasks:len(tasks)<=3
+// THAT'S SAY, all bound(upper/lower) is INCLUDE,
+// if only one bound is set, the return will be [-INF, bound] or [bound, +INF]
 ```
 
 ```json
 //response: show all queried tasks. 
+// NOTE only show some of the json, not all of them.
 HTTP/1.1 200 OK
 Content-Type: application/json
 {
     "tasks":[
         {
-            "task_id": 123,
-            "creator_user_id": 123,
-            "creator_organization_id": 123,
+            "task_id": 123456,
+            "creator_user_email": "i@sirius.com",
+            "creator_user_phone_number": "13123456789",
+            "creator_organization_name": "name",
             "status": "ongoing",
             "title": "string",
             "description": "string",
