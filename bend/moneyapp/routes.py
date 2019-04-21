@@ -27,12 +27,21 @@ def token_required(f):
 
         if not token:
             return jsonify({'message': 'Token is missing!'}), 401
-
+      
         try:
+            print(token)
+            print(token[4:])  # 去掉前面的JWT
+            token = token[4:]
             data = jwt.decode(token, app.config['SECRET_KEY'])
-            current_user = queryUserById(data['id']) #???
+            current_user = queryUserById(data['id']) 
+            print(current_user.username)
         except:
+            print(token)
             return jsonify({'message': 'Token is invalid'}), 401
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated
 
 def authenticate(username, password):
     user = queryUser(username)
@@ -156,8 +165,7 @@ def test_regis():
 
         return jsonify({'result': result})
 
-
-# 还未考虑 conflict！！！！
+# RESTful  注册
 @app.route('/users', methods=['POST'])
 def creating_user():
     if request.method == 'POST':
@@ -165,6 +173,8 @@ def creating_user():
         email = request.get_json()['email']
         telephone = request.get_json()['phone_number']
         password = request.get_json()['password']
+       
+  
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
        
 
@@ -190,15 +200,24 @@ def creating_user():
             newFileName = 'default.jpg'
 
         try:
+
             user_id = addUser(username, email, hashed_password, telephone, newFileName)
-            return jsonify({'user_id': user_id,
-                        'access_token': 'xxxxx'})
+            
+            token = jwt.encode({'id': user_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5)}, app.config['SECRET_KEY'])
+
+
+            to_return = jsonify({'user_id': user_id,
+                         'access_token': token.decode('UTF-8')})
+            return make_response(to_return, 201)
+
         
         except Exception as e:
             err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
-            print("illustate sqlalchemy exception raised: %s" % e)
-            return jsonify({'user_id': err_msg,
-                        'access_token': 'xxxxx'})
+            to_return = jsonify({'error_code': 409,
+                         'error_msg': str(e)})
+            return make_response(to_return, 409)
+            
+
         
 
 
@@ -276,7 +295,8 @@ def search_user():
 
 # RESTful 查找用户
 @app.route('/users/<user_id>', methods=['GET'])
-def get_user_info(user_id):
+@token_required
+def get_user_info(current_user, user_id):
     user = queryUserById(user_id)
     if user:
         return jsonify({'email': user.email,
