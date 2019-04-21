@@ -40,11 +40,13 @@
       - [组织删除](#%E7%BB%84%E7%BB%87%E5%88%A0%E9%99%A4)
     - [任务系统](#%E4%BB%BB%E5%8A%A1%E7%B3%BB%E7%BB%9F)
       - [用户/组织创建任务](#%E7%94%A8%E6%88%B7%E7%BB%84%E7%BB%87%E5%88%9B%E5%BB%BA%E4%BB%BB%E5%8A%A1)
-      - [撤回任务](#%E6%92%A4%E5%9B%9E%E4%BB%BB%E5%8A%A1)
+      - [用户/组织查询自己创建的任务](#%E7%94%A8%E6%88%B7%E7%BB%84%E7%BB%87%E6%9F%A5%E8%AF%A2%E8%87%AA%E5%B7%B1%E5%88%9B%E5%BB%BA%E7%9A%84%E4%BB%BB%E5%8A%A1)
       - [任务查询](#%E4%BB%BB%E5%8A%A1%E6%9F%A5%E8%AF%A2)
       - [任务接受](#%E4%BB%BB%E5%8A%A1%E6%8E%A5%E5%8F%97)
       - [任务完成](#%E4%BB%BB%E5%8A%A1%E5%AE%8C%E6%88%90)
       - [任务审核](#%E4%BB%BB%E5%8A%A1%E5%AE%A1%E6%A0%B8)
+      - [撤回任务](#%E6%92%A4%E5%9B%9E%E4%BB%BB%E5%8A%A1)
+      - [修改未发布任务](#%E4%BF%AE%E6%94%B9%E6%9C%AA%E5%8F%91%E5%B8%83%E4%BB%BB%E5%8A%A1)
 
 ## API
 
@@ -618,8 +620,7 @@ Content-Type: application/json
 //response: create task successfully, show created task
 HTTP/1.1 201 Created
 // NOTE would be better if return a list of users' name/nickname to avoid N+1 
-// NOTE if create by person, OMIT creator_organization_name
-problem 
+// NOTE if create by person, OMIT creator_organization_name problem 
 {
     "task_id": 123,
     "creator_user_id": 123,
@@ -668,7 +669,20 @@ Content-Type: application/json
 }
 ```
 
-#### 撤回任务
+#### 用户/组织查询自己创建的任务
+
+```json
+//request: get user created tasks 
+GET /users/:user_id/tasks HTTP/1.1
+//or request: get organization created tasks 
+GET /users/:user_id/organization/:organization_id/tasks HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+```
+
+```json
+//response: almost the same as 201 in 用户/组织创建任务,
+//but may be more information. TODO
+```
 
 #### 任务查询
 
@@ -771,7 +785,63 @@ Content-Type: application/json
 }
 ```
 #### 任务接受
+```json
+//request: user accepting task 
+POST /users/:user_id/tasks/:task_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+```
+```json
+//response: accept task successfully, show updated task
+HTTP/1.1 201 Created
+//TODO return a updated task info
+```
 
 #### 任务完成
+```json
+//request: user finishing a step of task 
+PUT /users/:user_id/tasks/:task_id/steps/:step_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+```
+```json
+//response: finish step successfully, show updated task
+HTTP/1.1 200 OK
+//TODO return a updated task info
+```
 
 #### 任务审核
+```json
+//request: user finishing a step of task 
+PUT /users/:user_id/tasks/:task_id/finishers/:user_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+```
+```json
+//response: task finish accepted successfully
+HTTP/1.1 200 OK
+//TODO should return a new doing-er, done-er, finished-er list
+```
+
+#### 撤回任务
+```json
+//request: user change task status into pending
+//NOTE only for ongoing tasks 
+PUT /users/:user_id/tasks/:task_id HTTP/1.1
+//or request: organization creating task 
+PUT /users/:user_id/organization/:organization_id/tasks/:task_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+Content-Type: application/json
+{
+    "status": "pending"
+}
+```
+
+#### 修改未发布任务
+```json
+//request: user editing task
+//NOTE only for not published(waiting/pending) tasks 
+PUT /users/:user_id/tasks/:task_id HTTP/1.1
+//or request: organization creating task 
+PUT /users/:user_id/organization/:organization_id/tasks/:task_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+Content-Type: application/json
+//TODO the same json as create task
+```
