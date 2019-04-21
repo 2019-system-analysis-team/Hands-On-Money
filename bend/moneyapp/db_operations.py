@@ -43,6 +43,10 @@ def queryUserById(_id):
 	user = User.query.filter_by(id=_id).first()
 	return user
 
+def queryUserByEmail(_email):
+	user = User.query.filter_by(email=_email).first()
+	return user
+
 
 
 

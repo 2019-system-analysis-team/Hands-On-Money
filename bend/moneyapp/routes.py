@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from flask import render_template, url_for, request, flash, jsonify, make_response
 from moneyapp import app, db, bcrypt
 from moneyapp.models import User, Organization, Task, Receiver_Task, Organization_Member, Transaction
-from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization, checkBalance,queryUserById,chargeForUser,queryOrganizationByID,deleteOrganization
+from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization, checkBalance,queryUserById,chargeForUser,queryOrganizationByID,deleteOrganization, queryUserByEmail
 from moneyapp.db_operations import queryOrganizationByName,addManager,queryTaskByTag,userChangeReceiveTask,queryReceiverTask,changTaskStatus,queryTaskById
 from flask_jwt import JWT, jwt_required, current_identity
 from functools import wraps
@@ -17,6 +17,8 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/profile_pics')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = 'thisisansecretkey'
 
+blacklist = set()
+
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -25,7 +27,7 @@ def token_required(f):
         if 'Authorization' in request.headers:
             token = request.headers['Authorization']
 
-        if not token:
+        if not token or token in blacklist:
             return jsonify({'message': 'Token is missing!'}), 401
       
         try:
@@ -80,36 +82,117 @@ def get_all_users():
 
 
 ##=========== Users ============
-@app.route('/users/search', methods=['POST'])
-def search():
-    username = request.get_json()['username2']
+# RESTful 用户登录
+@app.route('/sessions', methods=['POST'])
+def login():
+    email = request.get_json()['email']
+    password = request.get_json()['password']
 
-    user = queryUser(username)
+    user = queryUser(email)
 
     if user:
-        result = jsonify({"username": user.username, "email": user.email, "image_file": user.image_file})
-    else:
-        result = jsonify({"error": "No such user"})
-
-    return result
-
-# 登录
-@app.route('/users/login', methods=['POST', 'GET'])
-def userLogin():
-    if request.method == 'GET':
-        # 暂时先考虑只用username进行登录，以后再修改
-        username = request.form['username']
-        password = request.form['password']
-        user = queryUser(username)
-        if user:
-            if bcrypt.check_password_hash(user.password, password):
-                result = jsonify({"status": "success", "message": "Successfully login!"})
-            else:
-                result = jsonify({"status": "fail", "message": "password incorrect"})
+        if bcrypt.check_password_hash(user.password, password):
+            token = jwt.encode({'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5)}, app.config['SECRET_KEY'])
+            return jsonify({"access_token": token.decode('UTF-8')}), 200
         else:
-            result = jsonify({"status": "fail", "message": "no such user"})
+            return jsonify({"error_code": "404", "error_msg": "account not found/password incorrect"}), 404
+    else:
+        return jsonify({"error_code": "404", "error_msg": "account not found/password incorrect"}), 404
 
-        return result
+ 
+# RESTful 查找用户
+@app.route('/users/<user_id>', methods=['GET'])
+@token_required
+def get_user_info(current_user, user_id):
+    user = queryUserById(user_id)
+    if user:
+        return jsonify({'email': user.email,
+                        'phone_number': user.telephone,
+                        'profile_photo_path': user.image_file,
+                        'student_id': user.student_id,
+                        'name': user.username,
+                        'age': user.age,
+                        'sex': user.sex,
+                        'grade': user.grade,
+                        'school': user.school,
+                        'bio': user.bio,
+                        'balance': user.balance,
+                        'avg_comment': user.average_comment
+                        })
+    else:
+        to_return = jsonify({'error_code': 404,
+                         'error_msg': 'User Not Found'})
+        return make_response(to_return, 404)
+
+# RESTful  注册
+@app.route('/users', methods=['POST'])
+def creating_user():
+    if request.method == 'POST':
+        username = request.get_json()['username']
+        email = request.get_json()['email']
+        telephone = request.get_json()['phone_number']
+        password = request.get_json()['password']
+       
+  
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+       
+
+        if request.files and request.files['file'] :
+            file = request.files['file']
+            filename = secure_filename(file.filename)
+
+            # Gen GUUID File Name
+            fileExt = filename.split('.')[1]
+            autoGenFileName = uuid.uuid4()
+
+            newFileName = str(autoGenFileName) + '.' + fileExt
+
+            target = UPLOAD_FOLDER
+            print(target)
+
+            if not os.path.isdir(target):
+                os.mkdir(target)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFileName))
+
+        else:
+            filename = 'default.jpg'
+            newFileName = 'default.jpg'
+
+        try:
+
+            user_id = addUser(username, email, hashed_password, telephone, newFileName)
+            
+            token = jwt.encode({'id': user_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5)}, app.config['SECRET_KEY'])
+
+
+            to_return = jsonify({'user_id': user_id,
+                         'access_token': token.decode('UTF-8')})
+            return make_response(to_return, 201)
+
+        
+        except Exception as e:
+            err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
+            to_return = jsonify({'error_code': 409,
+                         'error_msg': str(e)})
+            return make_response(to_return, 409)
+  
+# RESTful 登录注销
+@app.route('/users/<user_id>/session', methods=['DELETE'])    
+@token_required
+def logout(current_user, user_id):
+    print(current_user.id)
+    print(user_id)
+
+    if current_user.id == int(user_id):
+        token = request.headers['Authorization']
+        # print(token)
+        # 加入黑名单 不能再使用该token
+        blacklist.add(token)
+        return jsonify({"message": current_user.username + " logged out successfully."}), 200
+
+    else:
+        return jsonify({"err_msg": "Not Found"}), 404
+
 
 
 
@@ -165,58 +248,7 @@ def test_regis():
 
         return jsonify({'result': result})
 
-# RESTful  注册
-@app.route('/users', methods=['POST'])
-def creating_user():
-    if request.method == 'POST':
-        username = request.get_json()['username']
-        email = request.get_json()['email']
-        telephone = request.get_json()['phone_number']
-        password = request.get_json()['password']
-       
-  
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-       
 
-        if request.files and request.files['file'] :
-            file = request.files['file']
-            filename = secure_filename(file.filename)
-
-            # Gen GUUID File Name
-            fileExt = filename.split('.')[1]
-            autoGenFileName = uuid.uuid4()
-
-            newFileName = str(autoGenFileName) + '.' + fileExt
-
-            target = UPLOAD_FOLDER
-            print(target)
-
-            if not os.path.isdir(target):
-                os.mkdir(target)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFileName))
-
-        else:
-            filename = 'default.jpg'
-            newFileName = 'default.jpg'
-
-        try:
-
-            user_id = addUser(username, email, hashed_password, telephone, newFileName)
-            
-            token = jwt.encode({'id': user_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5)}, app.config['SECRET_KEY'])
-
-
-            to_return = jsonify({'user_id': user_id,
-                         'access_token': token.decode('UTF-8')})
-            return make_response(to_return, 201)
-
-        
-        except Exception as e:
-            err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
-            to_return = jsonify({'error_code': 409,
-                         'error_msg': str(e)})
-            return make_response(to_return, 409)
-            
 
         
 
@@ -267,55 +299,7 @@ def test_modify():
 
     return result
 
-# 查找用户信息
-@app.route('/users/search_user', methods=['POST', 'GET'])
-def search_user():
-    if request.method == 'GET':
-        username = request.form['username']
-        user = queryUser(username)
-        if user:
-            task_titles = []
-            for task in user.tasks:
-                task_titles.append(task.title)
-            result = {
-                'status': 'true',
-                'username': user.username,
-                'bio': user.bio,
-                'tasks': task_titles
-            }
-        else:
-            result = {
-                'status': 'false',
-                'message': 'no such user'
-            }
 
-
-
-        return jsonify({'result': result})
-
-# RESTful 查找用户
-@app.route('/users/<user_id>', methods=['GET'])
-@token_required
-def get_user_info(current_user, user_id):
-    user = queryUserById(user_id)
-    if user:
-        return jsonify({'email': user.email,
-                        'phone_number': user.telephone,
-                        'profile_photo_path': user.image_file,
-                        'student_id': user.student_id,
-                        'name': user.username,
-                        'age': user.age,
-                        'sex': user.sex,
-                        'grade': user.grade,
-                        'school': user.school,
-                        'bio': user.bio,
-                        'balance': user.balance,
-                        'avg_comment': user.average_comment
-                        })
-    else:
-        to_return = jsonify({'error_code': 404,
-                         'error_msg': 'User Not Found'})
-        return make_response(to_return, 404)
 
 
 
