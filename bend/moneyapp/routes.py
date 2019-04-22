@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from flask import render_template, url_for, request, flash, jsonify, make_response
 from moneyapp import app, db, bcrypt
 from moneyapp.models import User, Organization, Task, Receiver_Task, Organization_Member, Transaction
-from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization, checkBalance,queryUserById,chargeForUser,queryOrganizationByID,deleteOrganization, queryUserByEmail
+from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization, checkBalance,queryUserById,chargeForUser,queryOrganizationByID,deleteOrganization, queryUserByEmail, deleteTask, queryUserByTelephone
 from moneyapp.db_operations import queryOrganizationByName,addManager,queryTaskByTag,userChangeReceiveTask,queryReceiverTask,changTaskStatus,queryTaskById
 from flask_jwt import JWT, jwt_required, current_identity
 from functools import wraps
@@ -92,7 +92,7 @@ def login():
 
     if user:
         if bcrypt.check_password_hash(user.password, password):
-            token = jwt.encode({'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5)}, app.config['SECRET_KEY'])
+            token = jwt.encode({'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
             return jsonify({"access_token": token.decode('UTF-8')}), 200
         else:
             return jsonify({"error_code": "404", "error_msg": "account not found/password incorrect"}), 404
@@ -162,7 +162,7 @@ def creating_user():
 
             user_id = addUser(username, email, hashed_password, telephone, newFileName)
             
-            token = jwt.encode({'id': user_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5)}, app.config['SECRET_KEY'])
+            token = jwt.encode({'id': user_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
 
 
             to_return = jsonify({'user_id': user_id,
@@ -380,6 +380,51 @@ def test_org_create():
 
     return result
 
+# RESTful 创建组织
+@app.route('/users/<user_id>/organization', methods=['POST'])
+@token_required
+def create_organization(current_user, user_id):
+    name = request.get_json()['name']
+    bio = request.get_json()['bio']
+
+    if request.files and request.files['file'] :
+            file = request.files['file']
+            filename = secure_filename(file.filename)
+
+            # Gen GUUID File Name
+            fileExt = filename.split('.')[1]
+            autoGenFileName = uuid.uuid4()
+
+            newFileName = str(autoGenFileName) + '.' + fileExt
+
+            target = UPLOAD_FOLDER
+            print(target)
+
+            if not os.path.isdir(target):
+                os.mkdir(target)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], newFileName))
+
+    else:
+        #filename = 'default.jpg'
+        newFileName = 'default2.jpg'
+
+    try:
+        organization_id = addOrganization(name, newFileName, bio)
+
+        addMember(user_id, organization_id, "owner")
+
+        return jsonify({"organization_id": organization_id}), 201
+
+    except Exception as e:
+            err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
+            to_return = jsonify({'error_code': 409,
+                         'error_msg': str(e)})
+            return make_response(to_return, 409)
+
+
+
+
+
 # TODO owner删除组织
 @app.route('/organizations/delete', methods=['POST'])
 def delete_organization():
@@ -537,7 +582,7 @@ def set_member_status():
         owner = queryRecord(owner_id,organization_id)
         member = queryRecord(member_id,organization_id)
         if owner and member:
-            if owner.status == 'owner' and member.status == 'ordinary':
+            if owner.status == 'owner' and member.status == 'member':
                 addManager(member_id,organization_id)
                 result = {'status':'success',
                           'message' : 'change'}
@@ -554,28 +599,70 @@ def set_member_status():
 
 
 # 群主管理员添加成员
-@app.route('/organizations/add_member', methods=['POST'])
-def add_organization_member():
-    if request.method == 'POST':
-        user_id = request.form['user_id']
-        organization_id = request.form['organization_id']
-        status = request.form['status']
+# @app.route('/organizations/add_member', methods=['POST'])
+# def add_organization_member():
+#     if request.method == 'POST':
+
+
+
+#         user_id = request.form['user_id']
+#         organization_id = request.form['organization_id']
+#         status = request.form['status']
         
-        record = queryRecord(user_id, organization_id)
+#         record = queryRecord(user_id, organization_id)
 
-        if record and record.status != 'ordinary member':
+#         if record and record.status != 'ordinary member':
 
-            addMember(user_id, organization_id, "ordinary member")
+#             addMember(user_id, organization_id, "ordinary member")
 
-            result = jsonify({"result": "add!"})
+#             result = jsonify({"result": "add!"})
 
-        else:
-            result = jsonify({"result": "Permission denied!"})
+#         else:
+#             result = jsonify({"result": "Permission denied!"})
 
+#     else:
+#         result = jsonify({"result": "not add!"})
+
+#     return result
+
+# RESTful 群主管理员添加成员
+@app.route('/users/<user_id>/organization/<organization_id>/members', methods=['POST'])
+@token_required
+def add_organization_member(current_user, user_id, organization_id):
+    
+    status = request.get_json()['status']
+    # email, telephone任意有一个就好
+    try:
+        email = request.get_json()['email']
+        telephone = request.get_json()['phone_number']
+        
+    except:
+        pass
+        
+    if email:
+        user = queryUserByEmail(email)
     else:
-        result = jsonify({"result": "not add!"})
+        user = queryUserByTelephone(telephone)
 
-    return result
+    user_operator = queryUserById(int(user_id))
+    organization = queryOrganizationByID(int(organization_id))
+
+    if not user_operator or not user:
+        return jsonify({"error_code": "404",
+                        "error_msg": "user Not Found"}), 404
+    if not organization:
+        return jsonify({"error_code": "404",
+                        "error_msg": "organization Not Found"}), 404
+
+    record = queryRecord(current_user.id, organization_id)
+    if not record or record.status == 'member':
+        return jsonify({"error_code": "401",
+                        "error_msg": "insufficient permission"}), 401
+    else:
+        addMember(user.id, organization_id, "member")
+        return jsonify({"msg": "Added successfully."}), 201
+
+
 
 
 ##================ Task =======================
@@ -624,35 +711,50 @@ def delete_user_task():
     return jsonify(result)
 
 # 组织创建
-@app.route('/task/create_organization', methods=['POST'])
-def organization_create_task():
-    if request.method == 'POST':
-        user_id = request.form['user_id']
-        organization_id = request.form['organization_id']
-        record = queryRecord(user_id, organization_id)
+# @app.route('/task/create_organization', methods=['POST'])
+# def organization_create_task():
+#     if request.method == 'POST':
+#         user_id = request.form['user_id']
+#         organization_id = request.form['organization_id']
+#         record = queryRecord(user_id, organization_id)
         
-        # 群主或管理员才可以新建任务
-        if record and record.status != 'ordinary member':
-            money = request.form['money']
-            tag = request.form['tag']
-            number = request.form['number']
-            applicapable_user = request.form['applicapable_user']
-            title = request.form['title']
-            description = request.form['description']
-            status = request.form['status']
-            if checkBalance(user_id, organization_id, float(money)):
-                createTaskOrganization(organization_id, user_id, money, tag, number, applicapable_user, title, description, status)
-                result = jsonify({"result": "add!"})
-            else:
-                result = jsonify({"status":"fail", "message":"no enough money"})
-        else:
-            result = jsonify({"result": "Permission denied!"})
+#         # 群主或管理员才可以新建任务
+#         if record and record.status != 'member':
+#             money = request.form['money']
+#             tag = request.form['tag']
+#             number = request.form['number']
+#             applicapable_user = request.form['applicapable_user']
+#             title = request.form['title']
+#             description = request.form['description']
+#             status = request.form['status']
+#             if checkBalance(user_id, organization_id, float(money)):
+#                 createTaskOrganization(organization_id, user_id, money, tag, number, applicapable_user, title, description, status)
+#                 result = jsonify({"result": "add!"})
+#             else:
+#                 result = jsonify({"status":"fail", "message":"no enough money"})
+#         else:
+#             result = jsonify({"result": "Permission denied!"})
 
-    else:
-        result = jsonify({"result": "not add!"})
+#     else:
+#         result = jsonify({"result": "not add!"})
 
-    return result
+#     return result
 
+# RESTful 组织创建任务
+@app.route('/users/<user_id>/organization/<organization_id>/tasks', methods=['POST'])
+@token_required
+def organization_create_task(current_user, user_id, organization_id):
+    # 检查user, organization是否存在
+    user = queryUserById(user_id)
+    if not user:
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+
+    organization = queryOrganizationByID(organization_id)
+    if not organization:
+        return jsonify({"error_code": "404", "error_msg": "organization Not Found"}), 404
+
+    title = request.get_json()['title']
+    #description = request.get_json()
 # TODO 组织管理员删除任务
 @app.route('/task/organization_delete', methods=['POST'])
 def delete_organization_task():
@@ -671,7 +773,7 @@ def delete_organization_task():
         task_id = request.form['task_id']
         organization_id = request.form['organization_id']
         organization_member = queryMemberById(user_id,organization_id)
-        if organization_member.status != 'ordinary':
+        if organization_member.status != 'member':
             deleteTaskOrganization(organization_id,task_id)
             result = {'status':'true',
                       'message':'successfully delete!'}

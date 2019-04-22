@@ -47,6 +47,10 @@ def queryUserByEmail(_email):
 	user = User.query.filter_by(email=_email).first()
 	return user
 
+def queryUserByTelephone(_telephone):
+	user = User.query.filter_by(telephone=_telephone).first()
+	return user
+
 
 
 
@@ -155,9 +159,18 @@ def createTaskOrganization(_organization_id, _user_id, _money, _tag, _number, _a
 #delete task user
 def deleteTask(_user_id,_task_id):
     task = Task.query.filter_by(id=_task_id).first()
+    
+    # 删除和任务相关的Receiver_Task里面的记录
+    # backref！
+    for rec in task.received_tasks:
+    	db.session.delete(rec)
+
     money = task.money
     user = User.query.filter_by(id=_user_id).first()
-    user.balance += float(money)
+    user.balance += float(money) # 钱返还
+    
+
+
     db.session.delete(task)
     db.session.commit()
 
@@ -167,6 +180,10 @@ def deleteTask(_user_id,_task_id):
 
 def deleteTaskOrganization(_organization_id,_task_id):
     task = Task.query.filter_by(id=_task_id).first()
+    
+    for rec in task.received_tasks:
+    	db.session.delete(rec)
+
     money = task.money
     organization = Organization.query.filter_by(id=_organization_id).first()
     organization.balance += float(money)
