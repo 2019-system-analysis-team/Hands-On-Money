@@ -38,6 +38,7 @@
       - [组织成员权限变更](#%E7%BB%84%E7%BB%87%E6%88%90%E5%91%98%E6%9D%83%E9%99%90%E5%8F%98%E6%9B%B4)
       - [组织成员删除](#%E7%BB%84%E7%BB%87%E6%88%90%E5%91%98%E5%88%A0%E9%99%A4)
       - [组织删除](#%E7%BB%84%E7%BB%87%E5%88%A0%E9%99%A4)
+      - [用户参加的组织](#%E7%94%A8%E6%88%B7%E5%8F%82%E5%8A%A0%E7%9A%84%E7%BB%84%E7%BB%87)
     - [任务系统](#%E4%BB%BB%E5%8A%A1%E7%B3%BB%E7%BB%9F)
       - [用户/组织创建任务](#%E7%94%A8%E6%88%B7%E7%BB%84%E7%BB%87%E5%88%9B%E5%BB%BA%E4%BB%BB%E5%8A%A1)
       - [用户/组织查询自己创建的任务](#%E7%94%A8%E6%88%B7%E7%BB%84%E7%BB%87%E6%9F%A5%E8%AF%A2%E8%87%AA%E5%B7%B1%E5%88%9B%E5%BB%BA%E7%9A%84%E4%BB%BB%E5%8A%A1)
@@ -47,6 +48,7 @@
       - [任务审核](#%E4%BB%BB%E5%8A%A1%E5%AE%A1%E6%A0%B8)
       - [撤回任务](#%E6%92%A4%E5%9B%9E%E4%BB%BB%E5%8A%A1)
       - [修改未发布任务](#%E4%BF%AE%E6%94%B9%E6%9C%AA%E5%8F%91%E5%B8%83%E4%BB%BB%E5%8A%A1)
+      - [组织/个人删除任务](#%E7%BB%84%E7%BB%87%E4%B8%AA%E4%BA%BA%E5%88%A0%E9%99%A4%E4%BB%BB%E5%8A%A1)
 
 ## API
 
@@ -576,6 +578,15 @@ Content-Type: application/json
     "error_msg": "organization Not Found"
 }
 ```
+#### 用户参加的组织
+```json
+//request: get user's organization
+GET /users/:user_id/organization HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+```
+```json
+TODO return organization list
+```
 
 ### 任务系统
 
@@ -844,4 +855,16 @@ PUT /users/:user_id/organization/:organization_id/tasks/:task_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 //TODO the same json as create task
+```
+
+#### 组织/个人删除任务
+
+```json
+//request: delete tasks
+DELETE /users/:user_id/tasks/:task_id HTTP/1.1
+DELETE /users/:user_id/organization/:organization_id/tasks/:task_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+```
+```json
+//TODO
 ```
