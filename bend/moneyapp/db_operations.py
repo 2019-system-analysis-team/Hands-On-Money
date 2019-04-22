@@ -87,6 +87,19 @@ def queryOrganizationByID(_organization_id):
 #是否需要考虑将组织成员内的组织信息删除
 def deleteOrganization(_organization_id):
 		organization = Organization.query.filter_by(id=_organization_id).first()
+		
+		# 删除organization member
+		for record in organization.organization_members:
+			db.session.delete(record)
+
+		# 删除organization名下的task
+		for task in organization.tasks:
+			# 删除接受了该组织的任务的记录
+			for received_record in task.received_tasks:
+				db.session.delete(received_record)
+
+			db.session.delete(task)
+
 		db.session.delete(organization)
 		db.session.commit()
 
@@ -141,12 +154,21 @@ def addManager(_user_id,_organization_id):
 # ====================================================================
 # Task
 # no organization
-def createTask(_user_id, _money, _tag, _number, _applicapable_user, _title, _description, _status):
-	task = Task(user_id=_user_id, money=_money, tag=_tag, number=_number, applicapable_user=_applicapable_user, title=_title, description=_description, status=_status)
-	user = User.query.filter_by(id=_user_id).first()
-	user.balance -= float(_money)
+# def createTask(_user_id, _money, _tag, _number, _applicapable_user, _title, _description, _status):
+# 	task = Task(user_id=_user_id, money=_money, tag=_tag, number=_number, applicapable_user=_applicapable_user, title=_title, description=_description, status=_status)
+# 	user = User.query.filter_by(id=_user_id).first()
+# 	user.balance -= float(_money)
+# 	db.session.add(task)
+# 	db.session.commit()
+
+def createTask(_user_id, _organization_id, _money, _tags, _number, _post_time, _receive_end_time, _finish_deadline_time, _title, _description, _user_limit, _steps):
+	task = Task(user_id=_user_id, organization_id=_organization_id, money=_money, tags=_tags, number=_number, post_time=_post_time, 
+			receive_end_time=_receive_end_time, finish_deadline_time=_finish_deadline_time, title=_title, description=_description, 
+			user_limit=_user_limit, steps = _steps)
 	db.session.add(task)
 	db.session.commit()
+
+	return task
 
 def createTaskOrganization(_organization_id, _user_id, _money, _tag, _number, _applicapable_user, _title, _description, _status):
 	task = Task(organization_id=_organization_id, user_id=_user_id, money=_money, tag=_tag, number=_number, applicapable_user=_applicapable_user, title=_title, description=_description, status=_status)
@@ -224,9 +246,9 @@ def queryTaskByTag(_tag):
 #------------------------------------------------------
 #todo
 #按照user_id和task_id 搜索是否存在该task
-def queryTaskById(_user_id,_id):
+def queryTaskById(_id):
     # task = None
-    task = Task.query.filter_by(id=_id,user_id=_user_id).first()
+    task = Task.query.filter_by(id=_id).first()
     return task
 #---------------------------------------------------------
 #todo

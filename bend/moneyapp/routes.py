@@ -16,6 +16,7 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static/profile_pics')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = 'thisisansecretkey'
+app.config['JSON_SORT_KEYS'] = False
 
 blacklist = set()
 
@@ -54,7 +55,29 @@ def identity(payload):
     user_id = payload['identity']
     return userid_table.get(user_id, None)
 
+@app.route("/test", methods=['POST'])
+def test_json():
+    # jsontest = jsonify([{"item": 1}, {"item": 2}])
+    #jsontest2 = jsonify([{"item": 1}, {"item": 2}])
+    jsonsss = request.get_json()
+    user_limit = jsonsss['user_limit']
+    steps = jsonsss['steps']
+    json_dump_userlimit = json.dumps(user_limit)
+    json_dump_steps = json.dumps(steps)
+    createTask(1, None, 10, None, 10, None,\
+                None, None, "deliver1",\
+                "description", json_dump_userlimit, json_dump_steps)
+    #response = jsonify([{"item": 1}, {"item": 2}])
+    # response.status_code = 200 # or 400 or whatever
+    # return response
+    return jsonify(jsonsss['user_limit']['schools']),200
 
+@app.route("/test2", methods=['GET'])
+def test_json2():
+    task = queryTaskById(1, 1)
+    task_steps_json = json.loads(task.steps)
+    print(task_steps_json)
+    return jsonify(task_steps_json), 200
 
 @app.route("/", methods=['GET','POST'])
 def home():
@@ -85,6 +108,15 @@ def get_all_users():
 # RESTful 用户登录
 @app.route('/sessions', methods=['POST'])
 def login():
+    
+    try:
+        token = request.headers['Authorization']
+    except:
+        pass
+    else:
+        blacklist.add(token)
+
+
     email = request.get_json()['email']
     password = request.get_json()['password']
 
@@ -460,6 +492,29 @@ def delete_organization():
                   "message": "no post"}
     return jsonify(result)
 
+
+# RESTful 群主删除组织
+@app.route('/users/<user_id>/organization/<organization_id>', methods=['DELETE'])
+@token_required
+def organization_delete(current_user, user_id, organization_id):
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+
+    organization = queryOrganizationByID(organization_id)
+
+    if not organization:
+        return jsonify({"error_code": "404", "error_msg": "organization Not Found"}), 404
+
+    record = queryRecord(current_user.id, int(organization_id))
+    
+    if not record or record.status != 'owner':
+        return jsonify({"error_code": "401",
+                        "error_msg": "insufficient permission"}), 401
+
+    deleteOrganization(organization_id)
+    return jsonify({"name": organization.name, "bio": organization.bio}), 200
+    
+
 # TODO 组织信息的录入和修改
 @app.route('/organizations/modify_profile', methods=['POST'])
 def organization_modify_profile():
@@ -634,15 +689,17 @@ def add_organization_member(current_user, user_id, organization_id):
     # email, telephone任意有一个就好
     try:
         email = request.get_json()['email']
+        user = queryUserByEmail(email)
+    except:
+        pass
+
+    try:
         telephone = request.get_json()['phone_number']
-        
+        user = queryUserByTelephone(telephone)
     except:
         pass
         
-    if email:
-        user = queryUserByEmail(email)
-    else:
-        user = queryUserByTelephone(telephone)
+        
 
     user_operator = queryUserById(int(user_id))
     organization = queryOrganizationByID(int(organization_id))
@@ -746,14 +803,97 @@ def delete_user_task():
 def organization_create_task(current_user, user_id, organization_id):
     # 检查user, organization是否存在
     user = queryUserById(user_id)
-    if not user:
+    if not user or int(user_id) != current_user.id:
         return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
 
     organization = queryOrganizationByID(organization_id)
     if not organization:
         return jsonify({"error_code": "404", "error_msg": "organization Not Found"}), 404
 
-    title = request.get_json()['title']
+
+    record = queryRecord(current_user.id, organization_id)
+    if not record or record.status == 'member':
+        return jsonify({"error_code": "401",
+                        "error_msg": "insufficient permission"}), 401
+
+    title = None
+    description = None
+    tags = None
+    number = None
+    money = None
+    post_time = None
+    receive_end_time = None
+    finish_deadline_time = None
+    user_limit = None
+    steps = None
+    json_dump_userlimit = None
+    json_dump_steps = None
+
+
+    try:
+        user_limit = request.get_json()['user_limit']
+        steps = request.get_json()['steps']
+        tags = request.get_json()['tags']
+
+
+        json_dump_userlimit = json.dumps(user_limit)
+        json_dump_steps = json.dumps(steps)
+        json_dump_tags = json.dumps(tags)
+
+        title = request.get_json()['title']
+        description = request.get_json()['description']
+        number = request.get_json()['participant_number_limit']
+        money = request.get_json()['reward_for_one_participant']
+        
+        post_time = request.get_json()['post_time']
+        receive_end_time = request.get_json()['receive_end_time']
+        finish_deadline_time = request.get_json()['finish_deadline_time']
+        
+    except:
+        pass
+
+    task = createTask(user_id, organization_id, money, json_dump_tags, number, post_time,\
+                receive_end_time, finish_deadline_time, title,\
+                description, json_dump_userlimit, json_dump_steps)
+
+    # 判断是否在规定时间内
+    # 可能要进一步改
+    status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
+    
+    participant_ids = []
+    ongoing_participant_ids = []
+    waiting_examine_participant_ids = []
+    finished_participant_ids = []
+
+    for record in task.received_tasks:
+        par_user_id = par.user_id
+        participant_ids.append(par_user_id)
+        if par.status == 'on going':
+            ongoing_participant_ids.append(par_user_id)
+        elif par.status == 'waiting examine':
+            waiting_examine_participant_ids.append(par_user_id)
+        elif par.status == 'finished':
+            finished_participant_ids.append(par_user_id)
+   
+    return jsonify({"task_id": task.id, 
+                    "creator_user_id": task.user_id,
+                    "creator_organization_id": task.organization_id,
+                    "status": status,
+                    "title": task.title,
+                    "description": task.description,
+                    "tags": json.loads(task.tags),
+                    "participant_number_limit": task.number,
+                    "reward_for_one_participant": task.money,
+                    "post_time": task.post_time,
+                    "receive_end_time": task.receive_end_time,
+                    "finish_deadline_time": task.finish_deadline_time,
+                    "user_limit": json.loads(task.user_limit),
+                    "steps": json.loads(task.steps),
+                    "participant_ids": participant_ids,
+                    "ongoing_participant_ids": ongoing_participant_ids,
+                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
+                    "finished_participant_ids": finished_participant_ids
+                    }), 201
     #description = request.get_json()
 # TODO 组织管理员删除任务
 @app.route('/task/organization_delete', methods=['POST'])
@@ -780,17 +920,37 @@ def delete_organization_task():
     return jsonify(result)
 
 # 接收任务
-@app.route('/task/receive_task', methods=['POST'])
-def receive_task():
-    if request.method == 'POST':
-        user_id = request.form['user_id']
-        task_id = request.form['task_id']
+# @app.route('/task/receive_task', methods=['POST'])
+# def receive_task():
+#     if request.method == 'POST':
+#         user_id = request.form['user_id']
+#         task_id = request.form['task_id']
 
-        receiveTask(user_id, task_id)
+#         receiveTask(user_id, task_id)
 
-        result = jsonify({"result": "add!"})
+#         result = jsonify({"result": "add!"})
 
-        return result
+#         return result
+
+# RESTful 接受任务
+@app.route('/users/<user_id>/tasks/<task_id>', methods=['POST'])
+@token_required
+def receive_task(current_user, user_id, task_id):
+    user = queryUserById(user_id)
+    if not user or current_user.id != int(user_id):
+        return jsonify({"error_code": "404",
+                        "error_msg": "user Not Found"}), 404
+
+    task = queryTaskById(task_id)
+    if not task:
+        return jsonify({"error_code": "404",
+                        "error_msg": "task Not Found"}), 404
+
+    receiveTask(user_id, task_id)
+    return jsonify({"msg": "Receive task successfully."}), 201
+
+
+
 
 # TODO 任务搜索 （对tag进行搜索）
 @app.route('/task/filter', methods=['GET'])

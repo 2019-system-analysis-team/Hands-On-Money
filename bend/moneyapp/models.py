@@ -1,5 +1,5 @@
 from moneyapp import db
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -35,14 +35,28 @@ class Task(db.Model):
 	organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=True)
 	organization = db.relationship('Organization', backref=db.backref('tasks', lazy='dynamic'))
 	money = db.Column(db.Float, nullable=False)
-	tag = db.Column(db.String(30), nullable=True)
+	tags = db.Column(db.Text, nullable=True)
 	number = db.Column(db.Integer, nullable=False)
-	applicapable_user = db.Column(db.String(100), nullable=True)
+	#applicapable_user = db.Column(db.String(100), nullable=True)
 	post_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-	deadline = db.Column(db.DateTime, nullable=True, default=datetime.utcnow()) # 日期怎么传
+	receive_end_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow() + timedelta(hours=1))
+	finish_deadline_time = db.Column(db.DateTime, nullable=True, default=datetime.utcnow() + timedelta(hours=24)) # 日期怎么传
 	title = db.Column(db.String(100), nullable=False)
 	description = db.Column(db.Text, nullable=True, default='No description')
-	status = db.Column(db.String(50), nullable=False, default='On going')
+	
+	# Restriction
+	user_limit = db.Column(db.Text, nullable=True)
+	
+	# age_upper = db.Column(db.Integer, nullable=True)
+	# age_lower = db.Column(db.Integer, nullable=True)
+	# grades = db.Column(db.Text, nullable=True)
+	# sexes = db.Column(db.Text, nullable=True)
+	# schools = db.Column(db.Text, nullable=True)
+	steps = db.Column(db.Text, nullable=True)
+
+
+
+	# status = db.Column(db.String(50), nullable=False, default='On going')
 
 class Receiver_Task(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
