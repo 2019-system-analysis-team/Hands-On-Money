@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from flask import render_template, url_for, request, flash, jsonify, make_response
 from moneyapp import app, db, bcrypt
 from moneyapp.models import User, Organization, Task, Receiver_Task, Organization_Member, Transaction
-from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization, checkBalance,queryUserById,chargeForUser,queryOrganizationByID,deleteOrganization, queryUserByEmail, deleteTask, queryUserByTelephone
+from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization, checkBalance,queryUserById,chargeForUser,queryOrganizationByID,deleteOrganization, queryUserByEmail, deleteTask, queryUserByTelephone, finishUserTask
 from moneyapp.db_operations import queryOrganizationByName,addManager,queryTaskByTag,userChangeReceiveTask,queryReceiverTask,changTaskStatus,queryTaskById
 from flask_jwt import JWT, jwt_required, current_identity
 from functools import wraps
@@ -205,7 +205,7 @@ def creating_user():
         except Exception as e:
             err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
             to_return = jsonify({'error_code': 409,
-                         'error_msg': str(e)})
+                         'error_msg': err_msg})
             return make_response(to_return, 409)
   
 # RESTful 登录注销
@@ -946,6 +946,12 @@ def check_organization_tasks(current_user, user_id, organization_id):
     return jsonify(task_info), 200
 
 
+
+
+
+
+
+
 # TODO 用户个人删除自己发布的任务
 @app.route('/task/delete', methods=['POST'])
 def delete_user_task():
@@ -1147,9 +1153,12 @@ def receive_task(current_user, user_id, task_id):
     if not task:
         return jsonify({"error_code": "404",
                         "error_msg": "task Not Found"}), 404
-
-    receiveTask(user_id, task_id)
-    return jsonify({"msg": "Receive task successfully."}), 201
+    try:
+        receiveTask(user_id, task_id)
+    except Exception as e:
+        return jsonify({"error_code": "500", "error_msg": str(e)}), 500
+    else:   
+        return jsonify({"msg": "Receive task successfully."}), 201
 
 
 
@@ -1294,3 +1303,97 @@ def uploadFile():
         }
 
         return jsonify({'result': result})
+
+
+
+
+
+# RESTful 任务完成
+@app.route('/users/<user_id>/tasks/<task_id>/steps/<step_id>', methods=['PUT'])
+@token_required
+def mark_task_step(current_user, user_id, task_id, step_id):
+    
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+    
+    task = queryTaskById(task_id)
+    if not task:
+        return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
+    try:
+        task_record = userChangeReceiveTask(int(user_id), int(task_id), int(step_id))
+    except Exception as e:
+        return jsonify({"error_code": "500",
+                        "error_msg": str(e)}), 500 
+    else:
+        return jsonify({"user_id": current_user.id,
+                        "task_id": task_record.task.id,
+                        "task_title": task_record.task.title,
+                        "task_status": task_record.status,
+                        "task_total_steps": json.loads(task_record.task.steps),
+                        "task_finished_steps": task_record.step}), 200
+        
+
+# RESTful 任务审核
+@app.route('/users/<user_id>/tasks/<task_id>/finisher/<finisher_id>', methods=['PUT'])
+@token_required
+def mark_task_finished(current_user, user_id, task_id, finisher_id):
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+    
+    task = queryTaskById(task_id)
+    if not task or task.user.id != current_user.id:
+        return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
+    
+    try:
+        task = finishUserTask(task_id, finisher_id)
+
+    except Exception as e:
+        return jsonify({"error_code": "500",
+                        "error_msg": str(e)}), 500 
+    else:
+        status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
+    
+        participant_ids = []
+        ongoing_participant_ids = []
+        waiting_examine_participant_ids = []
+        finished_participant_ids = []
+
+        for par in task.received_tasks:
+            par_user_id = par.user_id
+            participant_ids.append(par_user_id)
+            if par.status == 'on going':
+                ongoing_participant_ids.append(par_user_id)
+            elif par.status == 'waiting examine':
+                waiting_examine_participant_ids.append(par_user_id)
+            elif par.status == 'finished':
+                finished_participant_ids.append(par_user_id)
+       
+        return jsonify({"task_id": task.id, 
+                        "creator_user_id": task.user_id,
+                        "creator_organization_id": task.organization_id,
+                        "status": status,
+                        "title": task.title,
+                        "description": task.description,
+                        "tags": json.loads(task.tags),
+                        "participant_number_limit": task.number,
+                        "reward_for_one_participant": task.money,
+                        "post_time": task.post_time,
+                        "receive_end_time": task.receive_end_time,
+                        "finish_deadline_time": task.finish_deadline_time,
+                        "user_limit": json.loads(task.user_limit),
+                        "steps": json.loads(task.steps),
+                        "participant_ids": participant_ids,
+                        "ongoing_participant_ids": ongoing_participant_ids,
+                        "waiting_examine_participant_ids": waiting_examine_participant_ids,
+                        "finished_participant_ids": finished_participant_ids
+                        }), 200
+
+
+
+
+
+
+
+
+
+

@@ -64,8 +64,8 @@ class Receiver_Task(db.Model):
 	task_id = db.Column(db.Integer, db.ForeignKey('task.id'), primary_key=True)
 	task = db.relationship('Task', backref=db.backref('received_tasks', lazy='dynamic'))
 	received_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow()) # 时间以后再修改
-	status = db.Column(db.String(50), nullable=False, default='On going') # 自己完成的情况
-	
+	status = db.Column(db.String(50), nullable=False, default='on going') # 自己完成的情况
+	step = db.Column(db.Integer, nullable=False, default=0)
 
 class Organization_Member(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
