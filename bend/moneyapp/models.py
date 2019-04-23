@@ -38,8 +38,8 @@ class Task(db.Model):
 	tags = db.Column(db.Text, nullable=True)
 	number = db.Column(db.Integer, nullable=False)
 	#applicapable_user = db.Column(db.String(100), nullable=True)
-	post_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-	receive_end_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow() + timedelta(hours=1))
+	post_time = db.Column(db.DateTime, nullable=True, default=datetime.utcnow())
+	receive_end_time = db.Column(db.DateTime, nullable=True, default=datetime.utcnow() + timedelta(hours=1))
 	finish_deadline_time = db.Column(db.DateTime, nullable=True, default=datetime.utcnow() + timedelta(hours=24)) # 日期怎么传
 	title = db.Column(db.String(100), nullable=False)
 	description = db.Column(db.Text, nullable=True, default='No description')

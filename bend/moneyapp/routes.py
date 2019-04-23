@@ -7,8 +7,8 @@ from werkzeug.utils import secure_filename
 from flask import render_template, url_for, request, flash, jsonify, make_response
 from moneyapp import app, db, bcrypt
 from moneyapp.models import User, Organization, Task, Receiver_Task, Organization_Member, Transaction
-from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization, checkBalance,queryUserById,chargeForUser,queryOrganizationByID,deleteOrganization, queryUserByEmail, deleteTask, queryUserByTelephone, finishUserTask
-from moneyapp.db_operations import queryOrganizationByName,addManager,queryTaskByTag,userChangeReceiveTask,queryReceiverTask,changTaskStatus,queryTaskById
+from moneyapp.db_operations import addUser, queryUser, addUser_detailed, addOrganization, createTask, createTaskOrganization, modify_profile, receiveTask, addMember, queryRecord, chargeForOrganization, checkBalance,queryUserById,chargeForUser,queryOrganizationByID,deleteOrganization, queryUserByEmail, deleteTask, queryUserByTelephone, finishUserTask, changeTaskStatus
+from moneyapp.db_operations import queryOrganizationByName,addManager,queryTaskByTag,userChangeReceiveTask,queryReceiverTask,queryTaskById, modifyTask
 from flask_jwt import JWT, jwt_required, current_identity
 from functools import wraps
 
@@ -787,7 +787,7 @@ def user_create_task(current_user, user_id):
     except:
         pass
 
-    # 到后面要把这个去掉 为了方便测试先注释掉
+    # !!! 到后面要把这个去掉 为了方便测试先注释掉
     #if checkBalance(user_id, None, float(money) * float(number)):
     task = createTask(user_id, None, money, json_dump_tags, number, post_time,\
         receive_end_time, finish_deadline_time, title,\
@@ -844,8 +844,12 @@ def check_user_tasks(current_user, user_id):
     task_info = []
 
     for task in current_user.tasks:
-
-        status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
+        if task.post_time == None:
+            status = "pending"
+        else:
+            status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
+    
+        #status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
     
         participant_ids = []
         ongoing_participant_ids = []
@@ -904,8 +908,12 @@ def check_organization_tasks(current_user, user_id, organization_id):
     task_info = []
 
     for task in organization.tasks:
-
-        status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
+        if task.post_time == None:
+            status = "pending"
+        else:
+            status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
+    
+        #status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
     
         participant_ids = []
         ongoing_participant_ids = []
@@ -953,27 +961,63 @@ def check_organization_tasks(current_user, user_id, organization_id):
 
 
 # TODO 用户个人删除自己发布的任务
-@app.route('/task/delete', methods=['POST'])
-def delete_user_task():
-    """
-    需要首先在db_operations.py里面实现一个删除函数
-    然后在这里调用
-    :param request.form['user_id'] 用户id
-    :param request.form['task_id'] 任务id
-    :rtype: json {"status": "", "message": ""}
-    """
-    if request.method == 'POST':
-        user_id = request.form['user_id'];
-        task_id = request.form['task_id'];
-        deleteTask(user_id,task_id);
-        result = {'status':"successfully",
-                  'message':'delete!'}
+# @app.route('/task/delete', methods=['POST'])
+# def delete_user_task():
+#     """
+#     需要首先在db_operations.py里面实现一个删除函数
+#     然后在这里调用
+#     :param request.form['user_id'] 用户id
+#     :param request.form['task_id'] 任务id
+#     :rtype: json {"status": "", "message": ""}
+#     """
+#     if request.method == 'POST':
+#         user_id = request.form['user_id'];
+#         task_id = request.form['task_id'];
+#         deleteTask(user_id,task_id);
+#         result = {'status':"successfully",
+#                   'message':'delete!'}
 
-    else:
-        result = {'status': 'fail',
-                  'message':'no post'}
+#     else:
+#         result = {'status': 'fail',
+#                   'message':'no post'}
     
-    return jsonify(result)
+#     return jsonify(result)
+
+# RESTful 删除个人任务
+@app.route('/users/<user_id>/tasks/<task_id>', methods=['DELETE'])
+@token_required
+def delete_user_task(current_user, user_id, task_id):
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+
+    task = queryTaskById(task_id)
+    if not task or task.organization != None:
+        return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
+
+    
+    if not task.user.id == int(current_user.id):
+        return jsonify({"error_code":"500", "error_msg": "insufficient permission"}), 500
+
+    deleteTask(user_id, task_id, None)
+    return jsonify({"msg": "Delete " + str(task.title) + " successfully."}), 200
+
+# RESTful 删除组织任务
+@app.route('/users/<user_id>/organization/<organization_id>/tasks/<task_id>', methods=['DELETE'])
+@token_required
+def delete_organization_task(current_user, user_id, task_id, organization_id):
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+
+    task = queryTaskById(task_id)
+    if not task or task.organization.id != int(organization_id):
+        return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
+
+    record = queryRecord(user_id, organization_id)
+    if not record or record.status == "member":
+        return jsonify({"error_code":"500", "error_msg": "insufficient permission"}), 500
+
+    deleteTask(user_id, task_id, organization_id)
+    return jsonify({"msg": "Delete " + str(task.title) + " successfully."}), 200
 
 # 组织创建
 # @app.route('/task/create_organization', methods=['POST'])
@@ -1104,28 +1148,28 @@ def organization_create_task(current_user, user_id, organization_id):
                     }), 201
     #description = request.get_json()
 # TODO 组织管理员删除任务
-@app.route('/task/organization_delete', methods=['POST'])
-def delete_organization_task():
-    """
-    需要首先在db_operations.py里面实现一个删除函数
-    需要判断操作者是否为组织的管理员
-    可以使用queryRecord来获得user和organization的记录
-    利用status判断是否为管理员
-    :param request.form['user_id'] 用户id
-    :param request.form['task_id'] 任务id
-    :param request.form['organization_id'] 组织id
-    :rtype: json {"status": "", "message": ""}
-    """
-    if request.method == 'POST':
-        user_id = request.form['user_id']
-        task_id = request.form['task_id']
-        organization_id = request.form['organization_id']
-        organization_member = queryMemberById(user_id,organization_id)
-        if organization_member.status != 'member':
-            deleteTaskOrganization(organization_id,task_id)
-            result = {'status':'true',
-                      'message':'successfully delete!'}
-    return jsonify(result)
+# @app.route('/task/organization_delete', methods=['POST'])
+# def delete_organization_task():
+#     """
+#     需要首先在db_operations.py里面实现一个删除函数
+#     需要判断操作者是否为组织的管理员
+#     可以使用queryRecord来获得user和organization的记录
+#     利用status判断是否为管理员
+#     :param request.form['user_id'] 用户id
+#     :param request.form['task_id'] 任务id
+#     :param request.form['organization_id'] 组织id
+#     :rtype: json {"status": "", "message": ""}
+#     """
+#     if request.method == 'POST':
+#         user_id = request.form['user_id']
+#         task_id = request.form['task_id']
+#         organization_id = request.form['organization_id']
+#         organization_member = queryMemberById(user_id,organization_id)
+#         if organization_member.status != 'member':
+#             deleteTaskOrganization(organization_id,task_id)
+#             result = {'status':'true',
+#                       'message':'successfully delete!'}
+#     return jsonify(result)
 
 # 接收任务
 # @app.route('/task/receive_task', methods=['POST'])
@@ -1243,7 +1287,7 @@ def owner_set_status():
         result = {'status':'successfully'}
         
         if task:
-            changTaskStatus(task_id,status)
+            changeTaskStatus(task_id,status)
             result = {'status':'successfully',
             'message':'change!'}
         else:
@@ -1389,8 +1433,255 @@ def mark_task_finished(current_user, user_id, task_id, finisher_id):
                         }), 200
 
 
+# RESTful 个人撤回任务 + 修改任务
+# 有点乱emm
+@app.route('/users/<user_id>/tasks/<task_id>', methods=['PUT'])
+@token_required
+def set_user_task_pending(current_user, user_id, task_id):
+    # 是否登录者操作
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+    
+    # 是否有该任务
+    task = queryTaskById(task_id)
+    if not task:
+        return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
+    
+    # 撤回任务 有status项即撤回
+    try:
+        # 撤回任务
+        status = request.get_json()['status']
+        # set status
+        try:
+            changeTaskStatus(int(user_id), int(task_id), status, None)
+        except Exception as e:
+            return jsonify({"error_code": "500", "error_msg": str(e)}), 500
+
+    # 修改信息
+    except:
+        # task不处在pending的状态
+        if task.post_time:
+            return jsonify({"error_code": "500", "error_msg": "The task is not pended, can't be modified."}), 500
 
 
+
+        title = None
+        description = None
+        tags = None
+        number = None
+        money = None
+        post_time = None
+        receive_end_time = None
+        finish_deadline_time = None
+        user_limit = None
+        steps = None
+        json_dump_userlimit = None
+        json_dump_steps = None
+
+        # 可能还需要修改
+        try:
+            user_limit = request.get_json()['user_limit']
+            steps = request.get_json()['steps']
+            tags = request.get_json()['tags']
+
+
+            json_dump_userlimit = json.dumps(user_limit)
+            json_dump_steps = json.dumps(steps)
+            json_dump_tags = json.dumps(tags)
+
+            title = request.get_json()['title']
+            description = request.get_json()['description']
+            number = request.get_json()['participant_number_limit']
+            money = request.get_json()['reward_for_one_participant']
+            
+            post_time = request.get_json()['post_time']
+            receive_end_time = request.get_json()['receive_end_time']
+            finish_deadline_time = request.get_json()['finish_deadline_time']
+            
+        except:
+            pass
+
+        
+        try:
+            # !!! 到后面要把这个注释去掉 为了方便测试先注释掉
+            #if checkBalance(user_id, None, float(money) * float(number)):
+            modifyTask(int(task_id), int(user_id), None, int(money), json_dump_tags, int(number), post_time,\
+                         receive_end_time, finish_deadline_time, title, description, json_dump_userlimit,\
+                         json_dump_steps)
+            # else:
+            #     return jsonify({"error_code":"500", "error_msg":"no enough money"}), 500
+        except Exception as e:
+            return jsonify({"error_code": "500", "error_msg": str(e)}), 500
+
+    
+    # 不管是pending还是修改信息，都返回任务的信息
+    if task.post_time == None:
+        status = "pending"
+    else:
+        status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
+    
+
+
+    participant_ids = []
+    ongoing_participant_ids = []
+    waiting_examine_participant_ids = []
+    finished_participant_ids = []
+
+    for par in task.received_tasks:
+        par_user_id = par.user_id
+        participant_ids.append(par_user_id)
+        if par.status == 'on going':
+            ongoing_participant_ids.append(par_user_id)
+        elif par.status == 'waiting examine':
+            waiting_examine_participant_ids.append(par_user_id)
+        elif par.status == 'finished':
+            finished_participant_ids.append(par_user_id)
+
+    return jsonify({"task_id": task.id, 
+                    "creator_user_id": task.user_id,
+                    "creator_organization_id": task.organization_id,
+                    "status": status,
+                    "title": task.title,
+                    "description": task.description,
+                    "tags": json.loads(task.tags),
+                    "participant_number_limit": task.number,
+                    "reward_for_one_participant": task.money,
+                    "post_time": task.post_time,
+                    "receive_end_time": task.receive_end_time,
+                    "finish_deadline_time": task.finish_deadline_time,
+                    "user_limit": json.loads(task.user_limit),
+                    "steps": json.loads(task.steps),
+                    "participant_ids": participant_ids,
+                    "ongoing_participant_ids": ongoing_participant_ids,
+                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
+                    "finished_participant_ids": finished_participant_ids
+                    }), 200
+       
+        
+
+# RESTful 组织撤回任务 + 修改任务
+# 有点乱emm
+@app.route('/users/<user_id>/organization/<organization_id>/tasks/<task_id>', methods=['PUT'])
+@token_required
+def set_org_task_pending(current_user, user_id, organization_id, task_id):
+    # 是否登录者操作
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+    
+    # 是否有该任务
+    task = queryTaskById(task_id)
+    if not task:
+        return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
+    
+    # 撤回任务 有status项即撤回
+    try:
+        # 撤回任务
+        status = request.get_json()['status']
+        # set status
+        try:
+            changeTaskStatus(int(user_id), int(task_id), status, int(organization_id))
+        except Exception as e:
+            return jsonify({"error_code": "500", "error_msg": str(e)}), 500
+
+    # 修改信息
+    except:
+        # task不处在pending的状态
+        if task.post_time:
+            return jsonify({"error_code": "500", "error_msg": "The task is not pended, can't be modified."}), 500
+
+
+
+        title = None
+        description = None
+        tags = None
+        number = None
+        money = None
+        post_time = None
+        receive_end_time = None
+        finish_deadline_time = None
+        user_limit = None
+        steps = None
+        json_dump_userlimit = None
+        json_dump_steps = None
+
+        # 可能还需要修改
+        try:
+            user_limit = request.get_json()['user_limit']
+            steps = request.get_json()['steps']
+            tags = request.get_json()['tags']
+
+
+            json_dump_userlimit = json.dumps(user_limit)
+            json_dump_steps = json.dumps(steps)
+            json_dump_tags = json.dumps(tags)
+
+            title = request.get_json()['title']
+            description = request.get_json()['description']
+            number = request.get_json()['participant_number_limit']
+            money = request.get_json()['reward_for_one_participant']
+            
+            post_time = request.get_json()['post_time']
+            receive_end_time = request.get_json()['receive_end_time']
+            finish_deadline_time = request.get_json()['finish_deadline_time']
+            
+        except:
+            pass
+
+        
+        try:
+            # !!! 到后面要把这个注释去掉 为了方便测试先注释掉
+            #if checkBalance(user_id, None, float(money) * float(number)):
+            modifyTask(int(task_id), int(user_id), int(organization_id), int(money), json_dump_tags, int(number), post_time,\
+                         receive_end_time, finish_deadline_time, title, description, json_dump_userlimit,\
+                         json_dump_steps)
+            # else:
+            #     return jsonify({"error_code":"500", "error_msg":"no enough money"}), 500
+        except Exception as e:
+            return jsonify({"error_code": "500", "error_msg": str(e)}), 500
+
+    
+    # 不管是pending还是修改信息，都返回任务的信息
+    if task.post_time == None:
+        status = "pending"
+    else:
+        status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
+    
+
+
+    participant_ids = []
+    ongoing_participant_ids = []
+    waiting_examine_participant_ids = []
+    finished_participant_ids = []
+
+    for par in task.received_tasks:
+        par_user_id = par.user_id
+        participant_ids.append(par_user_id)
+        if par.status == 'on going':
+            ongoing_participant_ids.append(par_user_id)
+        elif par.status == 'waiting examine':
+            waiting_examine_participant_ids.append(par_user_id)
+        elif par.status == 'finished':
+            finished_participant_ids.append(par_user_id)
+
+    return jsonify({"task_id": task.id, 
+                    "creator_user_id": task.user_id,
+                    "creator_organization_id": task.organization_id,
+                    "status": status,
+                    "title": task.title,
+                    "description": task.description,
+                    "tags": json.loads(task.tags),
+                    "participant_number_limit": task.number,
+                    "reward_for_one_participant": task.money,
+                    "post_time": task.post_time,
+                    "receive_end_time": task.receive_end_time,
+                    "finish_deadline_time": task.finish_deadline_time,
+                    "user_limit": json.loads(task.user_limit),
+                    "steps": json.loads(task.steps),
+                    "participant_ids": participant_ids,
+                    "ongoing_participant_ids": ongoing_participant_ids,
+                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
+                    "finished_participant_ids": finished_participant_ids
+                    }), 200
 
 
 

@@ -180,7 +180,7 @@ def createTaskOrganization(_organization_id, _user_id, _money, _tag, _number, _a
 
 #todo 
 #delete task user
-def deleteTask(_user_id,_task_id):
+def deleteTask(_user_id,_task_id, _organization_id):
     task = Task.query.filter_by(id=_task_id).first()
     
     # 删除和任务相关的Receiver_Task里面的记录
@@ -188,14 +188,20 @@ def deleteTask(_user_id,_task_id):
     for rec in task.received_tasks:
         db.session.delete(rec)
 
-    money = task.money
-    user = User.query.filter_by(id=_user_id).first()
-    user.balance += float(money) # 钱返还
+    money = task.money * task.number
+
+    if _organization_id == None:
+        user = User.query.filter_by(id=_user_id).first()
+        user.balance += float(money) # 钱返还
+    else:
+        organization = queryOrganizationByID(_organization_id)
+        organization.balance += float(money)
     
 
 
     db.session.delete(task)
     db.session.commit()
+
 
 #----------------------------------------------------------------
 #todo 
@@ -262,9 +268,30 @@ def queryTaskById(_id):
 #---------------------------------------------------------
 #todo
 #改变status
-def changTaskStatus(_id,_status):
-    task = Task.query.filter_by(id = _id).first()
-    task.status = _status
+# 可能之后要考虑别人任务列表里面删除任务
+def changeTaskStatus(_user_id, _task_id, _status, _organization_id):
+    task = Task.query.filter_by(id = _task_id).first()
+    if not _organization_id:
+        if task.user.id != _user_id:
+            raise AssertionError("Insufficient permission")
+        elif task.post_time == None:
+            raise AssertionError("Already pended")
+        else:
+            task.post_time = None
+            task.receive_end_time = None
+            task.finish_deadline_time = None
+    else:
+        if task.organization.id != _organization_id:
+            raise AssertionError("Insufficient permission")
+        else:
+            record = queryRecord(_user_id, _organization_id)
+            if record.status == 'member':
+                raise AssertionError("Insufficient permission")
+            else:
+                task.post_time = None
+                task.receive_end_time = None
+                task.finish_deadline_time = None
+    
     db.session.commit()
 #---------------------------------------------------------
 #todo
@@ -321,7 +348,38 @@ def queryMemberById(_user_id,_organization_id):
     return organization_member
 
 
+# 修改任务信息
 
+def modifyTask(_task_id, _user_id, _organization_id, _money, _tags, _number, _post_time, _receive_end_time, _finish_deadline_time, _title, _description, _user_limit, _steps):
+    
+    
+    task = Task.query.filter_by(id = _task_id).first()
+    if not _organization_id:
+        if task.user.id != _user_id:
+            print("task user id", task.user.id)
+            print("_user_id", _user_id)
+            raise AssertionError("Insufficient permission")
+        
+    else:
+        if task.organization.id != _organization_id:
+            raise AssertionError("Insufficient permission")
+        else:
+            record = queryRecord(_user_id, _organization_id)
+            if record.status == 'member':
+                raise AssertionError("Insufficient permission")
+
+    task.money = _money
+    task.tag = _tags
+    task.number = _number
+    task.post_time = _post_time
+    task.receive_end_time = _receive_end_time
+    task.finish_deadline_time = _finish_deadline_time
+    task.title = _title
+    task.description = _description
+    task.user_limit = _user_limit
+    task.steps = _steps
+
+    db.session.commit()
 
 
 
