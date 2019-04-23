@@ -1,7 +1,6 @@
 [TOC]
---------------------
 
-#####注册个人账户
+##### 注册个人账户
 
 @app.route('/users', methods=['POST'])
 
@@ -27,7 +26,7 @@ POST http://localhost:5000/users
 }
 ```
 
-#####登录
+##### 登录
 
 @app.route('/sessions', methods=['POST'])
 
@@ -50,7 +49,7 @@ POST http://localhost:5000/sessions
 }
 ```
 
-#####群主管理员添加成员
+##### 群主管理员添加成员
 
 @app.route('/users/<user_id>/organization/<organization_id>/members', methods=['POST'])
 
@@ -121,7 +120,7 @@ POST http://localhost:5000/users/1/organization
 
 
 
-#####个人创建任务
+##### 个人创建任务
 
 @app.route('/users/<user_id>/task', methods=['POST'])
 
@@ -210,7 +209,7 @@ POST http://localhost:5000/users/9/task
 }
 ```
 
-#####组织创建任务
+##### 组织创建任务
 
 @app.route('/users/<user_id>/organization/<organization_id>/tasks', methods=['POST'])
 
@@ -299,7 +298,7 @@ POST http://localhost:5000/users/1/organization/1/tasks
 }
 ```
 
-#####群主删除组织
+##### 群主删除组织
 
 @app.route('/users/<user_id>/organization/<organization_id>', methods=['DELETE'])
 
@@ -579,7 +578,7 @@ POST http://localhost:5000/users/2/tasks/8
 
 @app.route('/users/<user_id>/tasks/<task_id>/steps/<step_id>', methods=['PUT'])
 
-######test case 1：正常改变step
+###### test case 1：正常改变step
 
 ```
 PUT http://localhost:5000/users/2/tasks/1/steps/1
@@ -726,7 +725,7 @@ PUT http://localhost:5000/users/1/tasks/1/finisher/4
 }
 ```
 
-######test case 2：该用户已经被标记完成
+###### test case 2：该用户已经被标记完成
 
 ```
 PUT http://localhost:5000/users/1/tasks/1/finisher/2
@@ -929,7 +928,7 @@ PUT http://localhost:5000/users/1/tasks/1
 
 @app.route('/users/<user_id>/organization/<organization_id>/tasks/<task_id>', methods=['PUT'])
 
-######test case 1：修改未经撤回的任务
+###### test case 1：修改未经撤回的任务
 
 ```
 PUT http://localhost:5000/users/1/organization/1/tasks/3
