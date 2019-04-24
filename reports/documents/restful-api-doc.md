@@ -41,8 +41,10 @@
       - [用户参加的组织](#%E7%94%A8%E6%88%B7%E5%8F%82%E5%8A%A0%E7%9A%84%E7%BB%84%E7%BB%87)
     - [任务系统](#%E4%BB%BB%E5%8A%A1%E7%B3%BB%E7%BB%9F)
       - [用户/组织创建任务](#%E7%94%A8%E6%88%B7%E7%BB%84%E7%BB%87%E5%88%9B%E5%BB%BA%E4%BB%BB%E5%8A%A1)
-      - [用户/组织查询自己创建的任务](#%E7%94%A8%E6%88%B7%E7%BB%84%E7%BB%87%E6%9F%A5%E8%AF%A2%E8%87%AA%E5%B7%B1%E5%88%9B%E5%BB%BA%E7%9A%84%E4%BB%BB%E5%8A%A1)
+      - [用户/组织查询自己创建的任务列表](#%E7%94%A8%E6%88%B7%E7%BB%84%E7%BB%87%E6%9F%A5%E8%AF%A2%E8%87%AA%E5%B7%B1%E5%88%9B%E5%BB%BA%E7%9A%84%E4%BB%BB%E5%8A%A1%E5%88%97%E8%A1%A8)
+      - [查询自己的任务详情](#%E6%9F%A5%E8%AF%A2%E8%87%AA%E5%B7%B1%E7%9A%84%E4%BB%BB%E5%8A%A1%E8%AF%A6%E6%83%85)
       - [任务查询](#%E4%BB%BB%E5%8A%A1%E6%9F%A5%E8%AF%A2)
+      - [任务详情](#%E4%BB%BB%E5%8A%A1%E8%AF%A6%E6%83%85)
       - [任务接受](#%E4%BB%BB%E5%8A%A1%E6%8E%A5%E5%8F%97)
       - [任务完成](#%E4%BB%BB%E5%8A%A1%E5%AE%8C%E6%88%90)
       - [任务审核](#%E4%BB%BB%E5%8A%A1%E5%AE%A1%E6%A0%B8)
@@ -299,7 +301,7 @@ Content-Type: application/json
 
 ```json
 //request: creating organization 
-POST /users/:user_id/organization HTTP/1.1
+POST /users/:user_id/organizations HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
@@ -310,7 +312,7 @@ Content-Type: application/json
 
 ```json
 //response: create successfully
-HTTP/1.1 201 Created  //redirect to /organization/:organization_id
+HTTP/1.1 201 Created  //redirect to /organizations/:organization_id
 Content-Type: application/json
 {
     "organization_id":"123456"
@@ -336,11 +338,11 @@ Content-Type: application/json
 #### 组织信息
 ```json
 //request: get organization info. All registered user can see it.
-GET /users/:user_id/organization/:organization_id HTTP/1.1
+GET /users/:user_id/organizations/:organization_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 
 //request: get organization balance. Only admin can see it.
-GET /users/:user_id/organization/:organization_id/balance HTTP/1.1
+GET /users/:user_id/organizations/:organization_id/balance HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 ```
 
@@ -395,7 +397,7 @@ Content-Type: application/json
 
 ```json
 //request: update organization info
-PUT /users/:user_id/organization/:organization_id HTTP/1.1
+PUT /users/:user_id/organizations/:organization_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
@@ -403,7 +405,7 @@ Content-Type: application/json
     "bio": "bio"
 }
 //request: update organization photo, after update, pull photo to client
-POST /users/:user_id/organization/:organization_id/profile_photo HTTP/1.1
+POST /users/:user_id/organizations/:organization_id/profile_photo HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: image/jpeg
 ```
@@ -442,7 +444,7 @@ Content-Type: application/json
 #### 组织成员添加
 ```json
 //request: add organization member
-POST /users/:user_id/organization/:organization_id/members HTTP/1.1
+POST /users/:user_id/organizations/:organization_id/members HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
@@ -472,19 +474,19 @@ or
     "error_code": 401,
     "error_msg": "insufficient permission"
 }
-//response: no this user/organization in users
+//response: no this user/organizations in users
 HTTP/1.1 404 Not Found
 Content-Type: application/json
 {
     "error_code": 404,
-    "error_msg": "user/organization Not Found"
+    "error_msg": "user/organizations Not Found"
 }
 ```
 
 #### 组织成员权限变更
 ```json
 //request: modify organization member status
-PUT /users/:user_id/organization/:organization_id/members/:user_id HTTP/1.1
+PUT /users/:user_id/organizations/:organization_id/members/:user_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
@@ -508,19 +510,19 @@ or
     "error_code": 401,
     "error_msg": "insufficient permission"
 }
-//response: no this user/organization in users
+//response: no this user/organizations in users
 HTTP/1.1 404 Not Found
 Content-Type: application/json
 {
     "error_code": 404,
-    "error_msg": "user/organization Not Found"
+    "error_msg": "user/organizations Not Found"
 }
 ```
 
 #### 组织成员删除
 ```json
 //request: delete organization member
-DELETE /users/:user_id/organization/:organization_id/members/:user_id HTTP/1.1
+DELETE /users/:user_id/organizations/:organization_id/members/:user_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 ```
 ```json
@@ -540,19 +542,19 @@ or
     "error_code": 401,
     "error_msg": "insufficient permission"
 }
-//response: no this user/organization in users
+//response: no this user/organizations in users
 HTTP/1.1 404 Not Found
 Content-Type: application/json
 {
     "error_code": 404,
-    "error_msg": "user/organization Not Found"
+    "error_msg": "user/organizations Not Found"
 }
 ```
 
 #### 组织删除
 ```json
 //request: delete organization, only creator
-DELETE /users/:user_id/organization/:organization_id HTTP/1.1
+DELETE /users/:user_id/organizations/:organization_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 ```
 ```json
@@ -581,11 +583,29 @@ Content-Type: application/json
 #### 用户参加的组织
 ```json
 //request: get user's organization
-GET /users/:user_id/organization HTTP/1.1
+GET /users/:user_id/organizations HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 ```
 ```json
-TODO return organization list
+//response: show organizations list.
+//NOTE front end should get organization img via oid
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+   "organizations": [
+        {
+            "organization_id": 123,
+            "organization_name": "name",
+            "status": "member"
+        },
+        {
+            "organization_id": 124,
+            "organization_name": "name2",
+            "status": "creator"
+        }
+   ] 
+}
+    
 ```
 
 ### 任务系统
@@ -596,7 +616,7 @@ TODO return organization list
 //request: user creating task 
 POST /users/:user_id/tasks HTTP/1.1
 //or request: organization creating task 
-POST /users/:user_id/organization/:organization_id/tasks HTTP/1.1
+POST /users/:user_id/organizations/:organization_id/tasks HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
@@ -661,17 +681,13 @@ HTTP/1.1 201 Created
             "title": "string",
             "description": "string"
         }
-    ],
-    "participant_ids": [123, 124, 125, 126],
-    "ongoing_participant_ids": [123, 124],
-    "waiting_examine_participant_ids": [125],
-    "finished_participant_ids": [126]
+    ]
 }
 
 // NOTE if some necessary thing missing, return 400
 // TODO
 
-//response: no this user/organization in users/organizations
+//response: no this user/organizations in users/organizations
 HTTP/1.1 404 Not Found
 Content-Type: application/json
 {
@@ -680,29 +696,100 @@ Content-Type: application/json
 }
 ```
 
-#### 用户/组织查询自己创建的任务
+#### 用户/组织查询自己创建的任务列表
 
 ```json
 //request: get user created tasks 
-GET /users/:user_id/tasks HTTP/1.1
+GET /users/:user_id/my_tasks HTTP/1.1
 //or request: get organization created tasks 
-GET /users/:user_id/organization/:organization_id/tasks HTTP/1.1
+GET /users/:user_id/organizations/:organization_id/my_tasks HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
+Content-Type: application/json
 ```
 
 ```json
-//response: almost the same as 201 in 用户/组织创建任务,
-//but may be more information. TODO
+//response: just a list of tasks brief info
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "tasks":[
+        {
+            "task_id": 123,
+            "task_name": "name",
+            "status": "status"
+        },
+        {
+            "task_id": 123,
+            "task_name": "name",
+            "status": "status"
+        }
+    ]
+}
+```
+
+#### 查询自己的任务详情
+```json
+//request: get user created tasks 
+GET /users/:user_id/my_tasks/:tasks_id HTTP/1.1
+//or request: get organization created tasks 
+GET /users/:user_id/organizations/:organization_id/my_tasks/:tasks_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+```
+```json
+//response: task's detail TODO
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "task_id": 123456,
+    "creator_user_email": "i@sirius.com",
+    "creator_user_phone_number": "13123456789",
+    "creator_organization_name": "name",
+    "status": "ongoing",
+    "title": "string",
+    "description": "string",
+    "tags": ["tag1", "tag2", "tag3"],
+    "current_participant_number": 3,
+    "participant_number_limit": 10,
+    "reward_for_one_participant": 2,
+    "post_time": "date_obj",
+    "receive_end_time": "date_obj",
+    "finish_deadline_time": "date_obj",
+    "user_limit": {
+        "age_upper": 0,
+        "age_lower": 1,
+        "grades": ["grade1", "grade1"],
+        "sexes": ["sex_type1", "sex_type2", "sex_type3"],
+        "schools": ["school_name1", "school_name2"]
+    },
+    "steps": [
+        {
+            "title": "string",
+            "description": "string"
+        },
+        {
+            "title": "string",
+            "description": "string"
+        }
+    ],
+    "participant_ids": [123, 124, 125, 126],
+    "ongoing_participant_ids": [123, 124],
+    "waiting_examine_participant_ids": [125],
+    "finished_participant_ids": [126]
+}
 ```
 
 #### 任务查询
 
 ```json
 //request: user query tasks
+//NOTE never return all tasks in one query
+//TODO maybe we can set an size and RETURN_SIZE(like 20), 
+//each query only return size-RETURN_SIZE tasks.
 GET /users/:user_id/tasks HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
+    "size": 20,
     "creator_user_email": "i@sirius.com",
     "creator_user_phone_number": "13123456789",
     "creator_organization_name": "name",
@@ -795,6 +882,52 @@ Content-Type: application/json
     ]
 }
 ```
+
+#### 任务详情
+```json
+//request: detail of a tasks/:task_id
+GET /users/:user_id/tasks/:task_id HTTP/1.1
+Authorization: JWT eyJhbGciOiJIUzI
+```
+```json
+//response: detail of that task
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "task_id": 123456,
+    "creator_user_email": "i@sirius.com",
+    "creator_user_phone_number": "13123456789",
+    "creator_organization_name": "name",
+    "status": "ongoing",
+    "title": "string",
+    "description": "string",
+    "tags": ["tag1", "tag2", "tag3"],
+    "current_participant_number": 3,
+    "participant_number_limit": 10,
+    "reward_for_one_participant": 2,
+    "post_time": "date_obj",
+    "receive_end_time": "date_obj",
+    "finish_deadline_time": "date_obj",
+    "user_limit": {
+        "age_upper": 0,
+        "age_lower": 1,
+        "grades": ["grade1", "grade1"],
+        "sexes": ["sex_type1", "sex_type2", "sex_type3"],
+        "schools": ["school_name1", "school_name2"]
+    },
+    "steps": [
+        {
+            "title": "string",
+            "description": "string"
+        },
+        {
+            "title": "string",
+            "description": "string"
+        }
+    ]
+}
+```
+
 #### 任务接受
 ```json
 //request: user accepting task 
@@ -837,7 +970,7 @@ HTTP/1.1 200 OK
 //NOTE only for ongoing tasks 
 PUT /users/:user_id/tasks/:task_id HTTP/1.1
 //or request: organization creating task 
-PUT /users/:user_id/organization/:organization_id/tasks/:task_id HTTP/1.1
+PUT /users/:user_id/organizations/:organization_id/tasks/:task_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
@@ -851,7 +984,7 @@ Content-Type: application/json
 //NOTE only for not published(waiting/pending) tasks 
 PUT /users/:user_id/tasks/:task_id HTTP/1.1
 //or request: organization creating task 
-PUT /users/:user_id/organization/:organization_id/tasks/:task_id HTTP/1.1
+PUT /users/:user_id/organizations/:organization_id/tasks/:task_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 //TODO the same json as create task
@@ -862,7 +995,7 @@ Content-Type: application/json
 ```json
 //request: delete tasks
 DELETE /users/:user_id/tasks/:task_id HTTP/1.1
-DELETE /users/:user_id/organization/:organization_id/tasks/:task_id HTTP/1.1
+DELETE /users/:user_id/organizations/:organization_id/tasks/:task_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 ```
 ```json
