@@ -52,7 +52,8 @@
 
 ```
 POST http://localhost:5000/users
-
+```
+```
 // Request
 {
     "password":"test6",
@@ -60,7 +61,8 @@ POST http://localhost:5000/users
     "phone_number": "test6",
     "username": "test6"
 }
-
+```
+```
 // Response
 {
     "user_id": 6,
