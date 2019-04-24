@@ -258,6 +258,110 @@ def chargeForUser(_user_id,_money):
 def queryTaskByTag(_tag):
     task = Task.query.filter_by(tag=_tag).first()
     return task
+
+# def searchTask(_creator_user_email, _creator_user_phone_number,\
+#                 _creator_organization_name, _status, _title, _tags,\
+#                 _reward_for_one_participant_upper, \
+#                 _reward_for_one_participant_lower,\
+#                 _receive_end_time, _finish_deadline_time,\
+#                 _user_limit, _steps_number_upper, _steps_number_lower):
+ 
+def searchTask(d):
+    # 先用status title finish_deadline_time 找一波
+    #if d['']
+    for arg in d:
+        print(arg)
+    task_2 = queryTaskById(2)
+    task_2_limitation = json.loads(task_2.user_limit)
+    print(task_2_limitation['schools'])
+
+    task_temp = Task.query
+    if d['status'] != None:
+        task_temp = task_temp.filter_by(status=d['status'])
+
+    if d['title'] != None:
+        task_temp = task_temp.filter(Task.title.like('%' + d['title'] + '%'))
+
+    # 时间筛选还要再思考一下
+    if d['receive_end_time'] != None:
+        task_temp = task_temp.filter(Task.receive_end_time == d['receive_end_time'])
+
+    if d['finish_deadline_time'] != None:
+        task_temp = task_temp.filter(Task.finish_deadline_time == d['finish_deadline_time'])
+
+    if d['reward_for_one_participant_upper'] != None:
+        task_temp = task_temp.filter(Task.money <= d['reward_for_one_participant_upper'])
+
+    if d['reward_for_one_participant_lower'] != None:
+        task_temp = task_temp.filter(Task.money >= d['reward_for_one_participant_lower'])
+
+    task_temp = set(task_temp)
+    task_temp_difference_set = set()
+    task_not_satisfy = set()
+    
+    for task in task_temp:
+        steps_number_of_task = len(json.loads(task.steps))
+        if d['steps_number_lower'] != None:
+            if not steps_number_of_task >= d['steps_number_lower']:
+                task_not_satisfy.add(task)
+                continue
+        if d['steps_number_upper'] != None:
+            if not steps_number_of_task <= d['steps_number_upper']:
+                task_not_satisfy.add(task)
+                continue
+        if d['tags'] != None:
+            if not d['tags'].issubset(json.loads(task.tags)):
+                task_not_satisfy.add(task)
+                continue
+        
+        creator_user = task.user
+        if d['creator_user_email'] != None:
+            if not d['creator_user_email'] == creator_user.email:
+                task_not_satisfy.add(task)
+                continue
+
+        if d['creator_user_phone_number'] != None:
+            if not d['creator_user_phone_number'] == creator_user.telephone:
+                task_not_satisfy.add(task)
+                continue
+
+        # 模糊匹配还没有设置
+        if d['creator_organization_name'] != None:
+            creator_organization = task.organization
+            if not creator_organization or not d['creator_organization_name'] in creator_organization:
+                task_not_satisfy.add(task)
+                continue
+
+        if d['user_limit'] != None:
+            user_limit_task = json.loads(task.user_limit)
+            for arg in d['user_limit']:
+                try:
+                    limit_temp = user_limit_task[arg]
+                except:
+                    task_not_satisfy.add(task)
+                    break
+                else:
+                    if arg == 'age_upper':
+                        if not limit_temp <= d['user_limit'][arg]:
+                            task_not_satisfy.add(task)
+                            break
+                    elif arg == 'age_lower':
+                        if not limit_temp >= d['user_limit'][arg]:
+                            task_not_satisfy.add(task)
+                            break
+                    elif arg == 'grades' or arg == 'sexes' or arg == 'schools':
+                        set_task = set(limit_temp)
+                        set_search = set(d['user_limit'][arg])
+                        if not set_search.issubset(set_task):
+                            task_not_satisfy.add(task)
+                            break
+            continue
+
+    task_temp_difference_set = task_temp - task_not_satisfy
+    # for task in task_temp_difference_set:
+    #     print(task.title)
+    return task_temp_difference_set
+
 #------------------------------------------------------
 #todo
 #按照user_id和task_id 搜索是否存在该task

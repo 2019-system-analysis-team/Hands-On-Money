@@ -1,12 +1,29 @@
-[TOC]
+-   [注册个人账户](#注册个人账户)
+-   [登录](#登录)
+-   [登录注销](#登录注销)
+-   [查找用户](#查找用户)
+-   [群主管理员添加成员](#群主管理员添加成员)
+-   [创建组织](#创建组织)
+-   [个人创建任务](#个人创建任务)
+-   [组织创建任务](#组织创建任务)
+-   [群主删除组织](#群主删除组织)
+-   [用户查询自己创建的任务](#用户查询自己创建的任务)
+-   [组织查询自己创建的任务](#组织查询自己创建的任务)
+-   [任务接受](#任务接受)
+-   [任务完成](#任务完成)
+-   [任务审核](#任务审核)
+-   [撤回任务](#撤回任务)
+-   [修改个人未发布任务](#修改个人未发布任务)
+-   [修改组织未发布任务](#修改组织未发布任务)
+-   [删除个人任务](#删除个人任务)
+-   [删除组织任务](#删除组织任务)
 
-#### 用户与组织系统
-##### 用户创建
+##### 注册个人账户
 
 @app.route('/users', methods=\['POST'\])
 
     POST http://localhost:5000/users
-    
+
     // Request
     {
         "password":"test6",
@@ -14,132 +31,98 @@
         "phone_number": "test6",
         "username": "test6"
     }
-    
+
     // Response
     {
         "user_id": 6,
         "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NiwiZXhwIjoxNTU1OTI2NDc0fQ.DbbZWZ2feBmRbgYpPMPy8elIN2egFv84NAOGJcKQ040"
     }
 
-##### 用户登录
+##### 登录
 
 @app.route('/sessions', methods=\['POST'\])
 
     POST http://localhost:5000/sessions
-    
+
     // Request
     {
         "password":"test1",
         "email": "test1"
     }
-    
+
     // Response
     {
         "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZXhwIjoxNTU1OTI2NjM5fQ.FZcD0-iLJITyaqllxNh45oCGS1N0fKl-33YDNaJEsyg"
     }
 
-##### 用户登录注销
+##### 登录注销
 
-@app.route('/users/<user_id>/session', methods=['DELETE'])
+@app.route('/users/<user_id>/session', methods=\['DELETE'\])
 
-######test case 1：成功注销
+###### test case 1：成功注销
 
-```
-DELETE http://localhost:5000/users/1/session
-```
+    DELETE http://localhost:5000/users/1/session
 
-```
-// Request
-// ...
-```
+    // Request
+    // ...
 
-```
-// Response 200 OK
-{
-    "message": "test1 logged out successfully."
-}
-```
+    // Response 200 OK
+    {
+        "message": "test1 logged out successfully."
+    }
 
 ###### test case 2：注销非登录者（非token记录）的账号
 
-```
-DELETE http://localhost:5000/users/2/session
-```
+    DELETE http://localhost:5000/users/2/session
 
-```
-// Request
-// ...
-```
-
-```
-// Response 404 NOT FOUND
-{
-    "err_msg": "Not Found"
-}
-```
-
-##### 用户信息
-
-@app.route('/users/<user_id>', methods=['GET'])
-
-```
-GET http://localhost:5000/users/2
-```
-
-```
-// Request
-// ...
-```
-
-```
-// Response 200 OK
-{
-    "email": "test2",
-    "phone_number": "test2",
-    "profile_photo_path": "default.jpg",
-    "student_id": null,
-    "name": "test2",
-    "age": null,
-    "sex": null,
-    "grade": null,
-    "school": null,
-    "bio": "this person is very lazy",
-    "balance": 0,
-    "avg_comment": 5
-}
-```
-##### 用户信息修改 (Todo)
-##### 组织创建
-@app.route('/users/<user_id>/organization', methods=\['POST'\])
-
-    POST http://localhost:5000/users/1/organization
-    
     // Request
+    // ...
+
+    // Response 404 NOT FOUND
     {
-        "name":"test1-org",
-        "bio": "test1"
+        "err_msg": "Not Found"
     }
-    
-    // Response 201 CREATED
+
+##### 查找用户
+
+@app.route('/users/<user_id>', methods=\['GET'\])
+
+    GET http://localhost:5000/users/2
+
+    // Request
+    // ...
+
+    // Response 200 OK
     {
-        "organization_id": 1
+        "email": "test2",
+        "phone_number": "test2",
+        "profile_photo_path": "default.jpg",
+        "student_id": null,
+        "name": "test2",
+        "age": null,
+        "sex": null,
+        "grade": null,
+        "school": null,
+        "bio": "this person is very lazy",
+        "balance": 0,
+        "avg_comment": 5
     }
-##### 组织信息 (Todo)
-##### 组织信息修改 (Todo)
+
 ##### 群主管理员添加成员
+
 @app.route('/users/<user_id>/organization/<organization_id>/members',
 methods=\['POST'\])
 
 test 1 使用email
 
     POST http://localhost:5000/users/1/organization/1/members
-    
+
     // Request
     {
         "email": "test2",
         "status": "member"
     }
-    
+
     // Response
     {
         "msg": "Added successfully."
@@ -148,49 +131,41 @@ test 1 使用email
 test2 使用phone\_number
 
     POST http://localhost:5000/users/1/organization/1/members
-    
+
     // Request
     {
         "phone_number": "test4",
         "status": "member"
     }
-    
+
     // Response
     {
         "msg": "Added successfully."
     }
 
+##### 创建组织
 
+@app.route('/users/<user_id>/organization', methods=\['POST'\])
 
-##### 组织成员权限变更 (Todo)
-##### 组织成员删除 (Todo)
-##### 群主删除组织
+    POST http://localhost:5000/users/1/organization
 
-@app.route('/users/<user_id>/organization/<organization_id>',
-methods=\['DELETE'\])
-
-    DELETE http://localhost:5000/users/1/organization/1
-    
     // Request
-    // Token required
-    // ...
-    
-    // Response
     {
-        "name": "test1-org",
+        "name":"test1-org",
         "bio": "test1"
     }
 
-##### 用户参加的组织 (Todo)
-
-#### 任务系统
+    // Response 201 CREATED
+    {
+        "organization_id": 1
+    }
 
 ##### 个人创建任务
 
 @app.route('/users/<user_id>/task', methods=\['POST'\])
 
     POST http://localhost:5000/users/9/task
-    
+
     // Request
     {
         "title": "task9",
@@ -216,7 +191,7 @@ methods=\['DELETE'\])
             }
         ]
     }
-    
+
     // Response
     {
         "task_id": 5,
@@ -274,7 +249,7 @@ methods=\['DELETE'\])
 methods=\['POST'\])
 
     POST http://localhost:5000/users/1/organization/1/tasks
-    
+
     // Request
     {
         "title": "task1",
@@ -300,7 +275,7 @@ methods=\['POST'\])
             }
         ]
     }
-    
+
     // Response
     {
         "task_id": 11,
@@ -352,96 +327,32 @@ methods=\['POST'\])
         "finished_participant_ids": []
     }
 
+##### 群主删除组织
 
-##### 撤回任务
+@app.route('/users/<user_id>/organization/<organization_id>',
+methods=\['DELETE'\])
 
-@app.route('/users/<user_id>/tasks/<task_id>', methods=\[‘PUT’\])
+    DELETE http://localhost:5000/users/1/organization/1
 
-###### test case 1：正常撤回
-
-    PUT http://localhost:5000/users/1/tasks/2
-    
     // Request
-    {
-        "status":"pending"
-    }
-    
-    // Response 200 OK
-    {
-        "task_id": 2,
-        "creator_user_id": 1,
-        "creator_organization_id": null,
-        "status": "pending",
-        "title": "task2",
-        "description": "task2",
-        "tags": [
-            "tag1",
-            "tag2",
-            "tag3"
-        ],
-        "participant_number_limit": 10,
-        "reward_for_one_participant": 10,
-        "post_time": null,
-        "receive_end_time": null,
-        "finish_deadline_time": null,
-        "user_limit": {
-            "age_upper": 0,
-            "age_lower": 1,
-            "grades": [
-                "grade1",
-                "grade1"
-            ],
-            "sexes": [
-                "sex_type1",
-                "sex_type2",
-                "sex_type3"
-            ],
-            "schools": [
-                "school_name1",
-                "school_name2"
-            ]
-        },
-        "steps": [
-            {
-                "title": "step1",
-                "description": "string"
-            },
-            {
-                "title": "step2",
-                "description": "string"
-            }
-        ],
-        "participant_ids": [],
-        "ongoing_participant_ids": [],
-        "waiting_examine_participant_ids": [],
-        "finished_participant_ids": []
-    }
+    // Token required
+    // ...
 
-###### test case 2：撤回已经处于pending状态的任务
-
-    PUT http://localhost:5000/users/1/tasks/2
-    
-    // Request
+    // Response
     {
-        "status":"pending"
+        "name": "test1-org",
+        "bio": "test1"
     }
-    
-    // Response 500 INTERNAL SERVER ERROR
-    {
-        "error_code": "500",
-        "error_msg": "Already pended"
-    }
-
 
 ##### 用户查询自己创建的任务
 
 @app.route('/users/<user_id>/tasks', methods=\['GET'\])
 
     POST http://localhost:5000/users/9/tasks
-    
+
     // Request
     // ...
-    
+
     // Response
     [
         {
@@ -599,10 +510,10 @@ methods=\['POST'\])
 methods=\['GET'\])
 
     POST http://localhost:5000/users/9/organization/1/tasks
-    
+
     // Request
     // ...
-    
+
     // Response
     [
         {
@@ -661,10 +572,10 @@ methods=\['GET'\])
 @app.route('/users/<user_id>/tasks/<task_id>', methods=\['POST'\])
 
     POST http://localhost:5000/users/2/tasks/8
-    
+
     // Request
     // ...
-    
+
     // Response 201 CREARTED
     {
         "msg": "Receive task successfully."
@@ -678,10 +589,10 @@ methods=\['PUT'\])
 ###### test case 1：正常改变step
 
     PUT http://localhost:5000/users/2/tasks/1/steps/1
-    
+
     // Request
     // ...
-    
+
     // Response 200 OK
     {
         "user_id": 2,
@@ -704,10 +615,10 @@ methods=\['PUT'\])
 ###### test case 2：step\_id超过任务本身设定的step/step之前已经标记过了
 
     PUT http://localhost:5000/users/2/tasks/1/steps/1
-    
+
     // Request
     // ...
-    
+
     // Response 500 INTERNAL SERVER ERROR
     {
         "error_code": "500",
@@ -717,10 +628,10 @@ methods=\['PUT'\])
 ###### test case 3：该用户没有接受该任务
 
     PUT http://localhost:5000/users/1/tasks/1/steps/1
-    
+
     // Request
     // ...
-    
+
     // Response 500 INTERNAL SERVER ERROR
     {
         "error_code": "500",
@@ -735,10 +646,10 @@ methods=\['PUT'\])
 ###### test case 1：正常标记用户完成任务
 
     PUT http://localhost:5000/users/1/tasks/1/finisher/4
-    
+
     // Request
     // ...
-    
+
     // Response 200 OK
     {
         "task_id": 1,
@@ -802,23 +713,101 @@ methods=\['PUT'\])
 ###### test case 2：该用户已经被标记完成
 
     PUT http://localhost:5000/users/1/tasks/1/finisher/2
-    
+
     // Request
     // ...
-    
+
     // Response 500 INTERNAL SERVER ERROR
     {
         "error_code": "500",
         "error_msg": "Task has already finished!"
     }
 
+##### 撤回任务
+
+@app.route('/users/<user_id>/tasks/<task_id>', methods=\[‘PUT’\])
+
+###### test case 1：正常撤回
+
+    PUT http://localhost:5000/users/1/tasks/2
+
+    // Request
+    {
+        "status":"pending"
+    }
+
+    // Response 200 OK
+    {
+        "task_id": 2,
+        "creator_user_id": 1,
+        "creator_organization_id": null,
+        "status": "pending",
+        "title": "task2",
+        "description": "task2",
+        "tags": [
+            "tag1",
+            "tag2",
+            "tag3"
+        ],
+        "participant_number_limit": 10,
+        "reward_for_one_participant": 10,
+        "post_time": null,
+        "receive_end_time": null,
+        "finish_deadline_time": null,
+        "user_limit": {
+            "age_upper": 0,
+            "age_lower": 1,
+            "grades": [
+                "grade1",
+                "grade1"
+            ],
+            "sexes": [
+                "sex_type1",
+                "sex_type2",
+                "sex_type3"
+            ],
+            "schools": [
+                "school_name1",
+                "school_name2"
+            ]
+        },
+        "steps": [
+            {
+                "title": "step1",
+                "description": "string"
+            },
+            {
+                "title": "step2",
+                "description": "string"
+            }
+        ],
+        "participant_ids": [],
+        "ongoing_participant_ids": [],
+        "waiting_examine_participant_ids": [],
+        "finished_participant_ids": []
+    }
+
+###### test case 2：撤回已经处于pending状态的任务
+
+    PUT http://localhost:5000/users/1/tasks/2
+
+    // Request
+    {
+        "status":"pending"
+    }
+
+    // Response 500 INTERNAL SERVER ERROR
+    {
+        "error_code": "500",
+        "error_msg": "Already pended"
+    }
 
 ##### 修改个人未发布任务
 
 @app.route('/users/<user_id>/tasks/<task_id>', methods=\[‘PUT’\])
 
     PUT http://localhost:5000/users/1/tasks/1
-    
+
     // Request
     {
         "title": "task1-modify",
@@ -844,7 +833,7 @@ methods=\['PUT'\])
             }
         ]
     }
-    
+
     // Request 200 OK
     {
         "task_id": 1,
@@ -904,7 +893,7 @@ methods=\['PUT'\])
 ###### test case 1：修改未经撤回的任务
 
     PUT http://localhost:5000/users/1/organization/1/tasks/3
-    
+
     // Request
     {
         "title": "task-org1-modify",
@@ -930,7 +919,7 @@ methods=\['PUT'\])
             }
         ]
     }
-    
+
     // Response 500 INTERNAL SERVER ERROR
     {
         "error_code": "500",
@@ -940,7 +929,7 @@ methods=\['PUT'\])
 ###### test case 2：正常修改组织创建任务
 
     PUT http://localhost:5000/users/1/organization/1/tasks/3
-    
+
     // Request
     {
         "title": "task-org1-modify",
@@ -966,7 +955,7 @@ methods=\['PUT'\])
             }
         ]
     }
-    
+
     // Response 200 OK
     {
         "task_id": 3,
@@ -1025,10 +1014,10 @@ methods=\['PUT'\])
 ###### test case 1：正常删除任务
 
     DELETE http://localhost:5000/users/1/tasks/1
-    
+
     // Request
     // ...
-    
+
     // Response 200 OK
     {
         "msg": "Delete task1-modify successfully."
@@ -1037,10 +1026,10 @@ methods=\['PUT'\])
 ###### test case 2：删除不属于自己的任务
 
     DELETE http://localhost:5000/users/1/tasks/4
-    
+
     // Request
     // ...
-    
+
     // Response 404 NOT FOUND
     {
         "error_code": "404",
@@ -1055,10 +1044,10 @@ methods=\['DELETE'\])
 ###### test case 1：正常删除任务
 
     DELETE http://localhost:5000/users/1/organization/1/tasks/3
-    
+
     // Request
     // ...
-    
+
     // Response 200 OK
     {
         "msg": "Delete task1-org successfully."
