@@ -528,88 +528,20 @@ def user_create_task(current_user, user_id):
     if current_user.id != int(user_id):
         return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
 
-    title = None
-    description = None
-    tags = None
-    number = None
-    money = None
-    post_time = None
-    receive_end_time = None
-    finish_deadline_time = None
-    user_limit = None
-    steps = None
-    json_dump_userlimit = None
-    json_dump_steps = None
+    #if checkBalance(user_id, None, float(reward_for_one_participant) * float(participant_number_limit)):
+    d = request.get_json()
+
+    d['user_id'] = int(user_id)
 
 
-    try:
-        user_limit = request.get_json()['user_limit']
-        steps = request.get_json()['steps']
-        tags = request.get_json()['tags']
+    task = createTask(request.get_json())
 
+   
+    return_msg = printSingleTask(task)
 
-        json_dump_userlimit = json.dumps(user_limit)
-        json_dump_steps = json.dumps(steps)
-        json_dump_tags = json.dumps(tags)
-
-        title = request.get_json()['title']
-        description = request.get_json()['description']
-        number = request.get_json()['participant_number_limit']
-        money = request.get_json()['reward_for_one_participant']
-        
-        post_time = request.get_json()['post_time']
-        receive_end_time = request.get_json()['receive_end_time']
-        finish_deadline_time = request.get_json()['finish_deadline_time']
-        
-    except:
-        pass
-
-    # !!! 到后面要把这个去掉 为了方便测试先注释掉
-    #if checkBalance(user_id, None, float(money) * float(number)):
-    task = createTask(user_id, None, money, json_dump_tags, number, post_time,\
-        receive_end_time, finish_deadline_time, title,\
-        description, json_dump_userlimit, json_dump_steps)
-
-    # 判断是否在规定时间内
-    # 可能要进一步改
-    status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
+    return jsonify(return_msg), 200
     
-    participant_ids = []
-    ongoing_participant_ids = []
-    waiting_examine_participant_ids = []
-    finished_participant_ids = []
-
-    for par in task.received_tasks:
-        par_user_id = par.user_id
-        participant_ids.append(par_user_id)
-        if par.status == 'on going':
-            ongoing_participant_ids.append(par_user_id)
-        elif par.status == 'waiting examine':
-            waiting_examine_participant_ids.append(par_user_id)
-        elif par.status == 'finished':
-            finished_participant_ids.append(par_user_id)
-
-    return jsonify({"task_id": task.id, 
-                    "creator_user_id": task.user_id,
-                    "creator_organization_id": task.organization_id,
-                    "status": status,
-                    "title": task.title,
-                    "description": task.description,
-                    "tags": json.loads(task.tags),
-                    "participant_number_limit": task.number,
-                    "reward_for_one_participant": task.money,
-                    "post_time": task.post_time,
-                    "receive_end_time": task.receive_end_time,
-                    "finish_deadline_time": task.finish_deadline_time,
-                    "user_limit": json.loads(task.user_limit),
-                    "steps": json.loads(task.steps),
-                    "participant_ids": participant_ids,
-                    "ongoing_participant_ids": ongoing_participant_ids,
-                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
-                    "finished_participant_ids": finished_participant_ids
-                    }), 201
-    # else:
-    #     return jsonify({"error_code": "400", "error_msg": "Not enough money"}), 400
+    
 
 # RESTful 组织创建任务
 @app.route('/users/<user_id>/organization/<organization_id>/tasks', methods=['POST'])
@@ -630,85 +562,20 @@ def organization_create_task(current_user, user_id, organization_id):
         return jsonify({"error_code": "401",
                         "error_msg": "insufficient permission"}), 401
 
-    title = None
-    description = None
-    tags = None
-    number = None
-    money = None
-    post_time = None
-    receive_end_time = None
-    finish_deadline_time = None
-    user_limit = None
-    steps = None
-    json_dump_userlimit = None
-    json_dump_steps = None
-
-
-    try:
-        user_limit = request.get_json()['user_limit']
-        steps = request.get_json()['steps']
-        tags = request.get_json()['tags']
-
-
-        json_dump_userlimit = json.dumps(user_limit)
-        json_dump_steps = json.dumps(steps)
-        json_dump_tags = json.dumps(tags)
-
-        title = request.get_json()['title']
-        description = request.get_json()['description']
-        number = request.get_json()['participant_number_limit']
-        money = request.get_json()['reward_for_one_participant']
-        
-        post_time = request.get_json()['post_time']
-        receive_end_time = request.get_json()['receive_end_time']
-        finish_deadline_time = request.get_json()['finish_deadline_time']
-        
-    except:
-        pass
-
-    task = createTask(user_id, organization_id, money, json_dump_tags, number, post_time,\
-                receive_end_time, finish_deadline_time, title,\
-                description, json_dump_userlimit, json_dump_steps)
-
-    # 判断是否在规定时间内
-    # 可能要进一步改
-    status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
     
-    participant_ids = []
-    ongoing_participant_ids = []
-    waiting_examine_participant_ids = []
-    finished_participant_ids = []
+    d = request.get_json()
+    d['user_id'] = int(user_id)
+    d['organization_id'] = int(organization_id)
+    
+    # !!! balance判断
+    #if checkBalance(user_id, None, float(reward_for_one_participant) * float(participant_number_limit)):
+    task = createTask(d)
 
-    for par in task.received_tasks:
-        par_user_id = par.user_id
-        participant_ids.append(par_user_id)
-        if par.status == 'on going':
-            ongoing_participant_ids.append(par_user_id)
-        elif par.status == 'waiting examine':
-            waiting_examine_participant_ids.append(par_user_id)
-        elif par.status == 'finished':
-            finished_participant_ids.append(par_user_id)
-   
-    return jsonify({"task_id": task.id, 
-                    "creator_user_id": task.user_id,
-                    "creator_organization_id": task.organization_id,
-                    "status": status,
-                    "title": task.title,
-                    "description": task.description,
-                    "tags": json.loads(task.tags),
-                    "participant_number_limit": task.number,
-                    "reward_for_one_participant": task.money,
-                    "post_time": task.post_time,
-                    "receive_end_time": task.receive_end_time,
-                    "finish_deadline_time": task.finish_deadline_time,
-                    "user_limit": json.loads(task.user_limit),
-                    "steps": json.loads(task.steps),
-                    "participant_ids": participant_ids,
-                    "ongoing_participant_ids": ongoing_participant_ids,
-                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
-                    "finished_participant_ids": finished_participant_ids
-                    }), 201
-    #description = request.get_json()
+    return_msg = printSingleTask(task)
+
+    return jsonify(return_msg), 200
+
+
 
 
 # RESTful 用户查询自己创建的任务
@@ -721,50 +588,10 @@ def check_user_tasks(current_user, user_id):
     task_info = []
 
     for task in current_user.tasks:
-        if task.post_time == None:
-            status = "pending"
-        else:
-            status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
-    
-        #status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
-    
-        participant_ids = []
-        ongoing_participant_ids = []
-        waiting_examine_participant_ids = []
-        finished_participant_ids = []
-
-        for par in task.received_tasks:
-            par_user_id = par.user_id
-            participant_ids.append(par_user_id)
-            if par.status == 'on going':
-                ongoing_participant_ids.append(par_user_id)
-            elif par.status == 'waiting examine':
-                waiting_examine_participant_ids.append(par_user_id)
-            elif par.status == 'finished':
-                finished_participant_ids.append(par_user_id)
-
-
-        task_info.append({"task_id": task.id, 
-                    "creator_user_id": task.user_id,
-                    "creator_organization_id": task.organization_id,
-                    "status": status,
-                    "title": task.title,
-                    "description": task.description,
-                    "tags": json.loads(task.tags),
-                    "participant_number_limit": task.number,
-                    "reward_for_one_participant": task.money,
-                    "post_time": task.post_time,
-                    "receive_end_time": task.receive_end_time,
-                    "finish_deadline_time": task.finish_deadline_time,
-                    "user_limit": json.loads(task.user_limit),
-                    "steps": json.loads(task.steps),
-                    "participant_ids": participant_ids,
-                    "ongoing_participant_ids": ongoing_participant_ids,
-                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
-                    "finished_participant_ids": finished_participant_ids
-        })
+        task_info.append(printSingleTask(task))
 
     return jsonify(task_info), 200
+
 
 # RESTful 组织查询自己创建的任务
 @app.route('/users/<user_id>/organization/<organization_id>/tasks', methods=['GET'])
@@ -785,50 +612,10 @@ def check_organization_tasks(current_user, user_id, organization_id):
     task_info = []
 
     for task in organization.tasks:
-        if task.post_time == None:
-            status = "pending"
-        else:
-            status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
-    
-        #status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
-    
-        participant_ids = []
-        ongoing_participant_ids = []
-        waiting_examine_participant_ids = []
-        finished_participant_ids = []
-
-        for par in task.received_tasks:
-            par_user_id = par.user_id
-            participant_ids.append(par_user_id)
-            if par.status == 'on going':
-                ongoing_participant_ids.append(par_user_id)
-            elif par.status == 'waiting examine':
-                waiting_examine_participant_ids.append(par_user_id)
-            elif par.status == 'finished':
-                finished_participant_ids.append(par_user_id)
-
-
-        task_info.append({"task_id": task.id, 
-                    "creator_user_id": task.user_id,
-                    "creator_organization_id": task.organization_id,
-                    "status": status,
-                    "title": task.title,
-                    "description": task.description,
-                    "tags": json.loads(task.tags),
-                    "participant_number_limit": task.number,
-                    "reward_for_one_participant": task.money,
-                    "post_time": task.post_time,
-                    "receive_end_time": task.receive_end_time,
-                    "finish_deadline_time": task.finish_deadline_time,
-                    "user_limit": json.loads(task.user_limit),
-                    "steps": json.loads(task.steps),
-                    "participant_ids": participant_ids,
-                    "ongoing_participant_ids": ongoing_participant_ids,
-                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
-                    "finished_participant_ids": finished_participant_ids
-        })
+        task_info.append(printSingleTask(task))
 
     return jsonify(task_info), 200
+
 
 # RESTful 删除个人任务
 @app.route('/users/<user_id>/tasks/<task_id>', methods=['DELETE'])
@@ -895,8 +682,10 @@ def mark_task_step(current_user, user_id, task_id, step_id):
         return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
     
     task = queryTaskById(task_id)
+    
     if not task:
         return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
+    
     try:
         task_record = userChangeReceiveTask(int(user_id), int(task_id), int(step_id))
     except Exception as e:
@@ -929,46 +718,49 @@ def mark_task_finished(current_user, user_id, task_id, finisher_id):
         return jsonify({"error_code": "500",
                         "error_msg": str(e)}), 500 
     else:
-        status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
-    
-        participant_ids = []
-        ongoing_participant_ids = []
-        waiting_examine_participant_ids = []
-        finished_participant_ids = []
+        result_msg = printSingleTask(task)
 
-        for par in task.received_tasks:
-            par_user_id = par.user_id
-            participant_ids.append(par_user_id)
-            if par.status == 'on going':
-                ongoing_participant_ids.append(par_user_id)
-            elif par.status == 'waiting examine':
-                waiting_examine_participant_ids.append(par_user_id)
-            elif par.status == 'finished':
-                finished_participant_ids.append(par_user_id)
+        return jsonify(result_msg), 200
+
+        # status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
+    
+        # participant_ids = []
+        # ongoing_participant_ids = []
+        # waiting_examine_participant_ids = []
+        # finished_participant_ids = []
+
+        # for par in task.received_tasks:
+        #     par_user_id = par.user_id
+        #     participant_ids.append(par_user_id)
+        #     if par.status == 'on going':
+        #         ongoing_participant_ids.append(par_user_id)
+        #     elif par.status == 'waiting examine':
+        #         waiting_examine_participant_ids.append(par_user_id)
+        #     elif par.status == 'finished':
+        #         finished_participant_ids.append(par_user_id)
        
-        return jsonify({"task_id": task.id, 
-                        "creator_user_id": task.user_id,
-                        "creator_organization_id": task.organization_id,
-                        "status": status,
-                        "title": task.title,
-                        "description": task.description,
-                        "tags": json.loads(task.tags),
-                        "participant_number_limit": task.number,
-                        "reward_for_one_participant": task.money,
-                        "post_time": task.post_time,
-                        "receive_end_time": task.receive_end_time,
-                        "finish_deadline_time": task.finish_deadline_time,
-                        "user_limit": json.loads(task.user_limit),
-                        "steps": json.loads(task.steps),
-                        "participant_ids": participant_ids,
-                        "ongoing_participant_ids": ongoing_participant_ids,
-                        "waiting_examine_participant_ids": waiting_examine_participant_ids,
-                        "finished_participant_ids": finished_participant_ids
-                        }), 200
+        # return jsonify({"task_id": task.id, 
+        #                 "creator_user_id": task.user_id,
+        #                 "creator_organization_id": task.organization_id,
+        #                 "status": status,
+        #                 "title": task.title,
+        #                 "description": task.description,
+        #                 "tags": json.loads(task.tags),
+        #                 "participant_number_limit": task.participant_number_limit,
+        #                 "reward_for_one_participant": task.reward_for_one_participant,
+        #                 "post_time": task.post_time,
+        #                 "receive_end_time": task.receive_end_time,
+        #                 "finish_deadline_time": task.finish_deadline_time,
+        #                 "user_limit": json.loads(task.user_limit),
+        #                 "steps": json.loads(task.steps),
+        #                 "participant_ids": participant_ids,
+        #                 "ongoing_participant_ids": ongoing_participant_ids,
+        #                 "waiting_examine_participant_ids": waiting_examine_participant_ids,
+        #                 "finished_participant_ids": finished_participant_ids
+        #                 }), 200
 
 
 # RESTful 个人撤回任务 + 修改任务
-# 有点乱emm
 @app.route('/users/<user_id>/tasks/<task_id>', methods=['PUT'])
 @token_required
 def set_user_task_pending(current_user, user_id, task_id):
@@ -981,120 +773,35 @@ def set_user_task_pending(current_user, user_id, task_id):
     if not task:
         return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
     
+    
+    d = request.get_json()
+
     # 撤回任务 有status项即撤回
-    try:
-        # 撤回任务
-        status = request.get_json()['status']
-        # set status
+    if 'status' in d:
         try:
-            changeTaskStatus(int(user_id), int(task_id), status, None)
+            changeTaskStatus(int(user_id), int(task_id), d['status'], None)
         except Exception as e:
             return jsonify({"error_code": "500", "error_msg": str(e)}), 500
+        #changeTaskStatus(int(user_id), int(task_id), d['status'], None)
+    
+    # 修改
+    else:
 
-    # 修改信息
-    except:
-        # task不处在pending的状态
-        if task.post_time:
-            return jsonify({"error_code": "500", "error_msg": "The task is not pended, can't be modified."}), 500
-
-
-
-        title = None
-        description = None
-        tags = None
-        number = None
-        money = None
-        post_time = None
-        receive_end_time = None
-        finish_deadline_time = None
-        user_limit = None
-        steps = None
-        json_dump_userlimit = None
-        json_dump_steps = None
-
-        # 可能还需要修改
-        try:
-            user_limit = request.get_json()['user_limit']
-            steps = request.get_json()['steps']
-            tags = request.get_json()['tags']
-
-
-            json_dump_userlimit = json.dumps(user_limit)
-            json_dump_steps = json.dumps(steps)
-            json_dump_tags = json.dumps(tags)
-
-            title = request.get_json()['title']
-            description = request.get_json()['description']
-            number = request.get_json()['participant_number_limit']
-            money = request.get_json()['reward_for_one_participant']
-            
-            post_time = request.get_json()['post_time']
-            receive_end_time = request.get_json()['receive_end_time']
-            finish_deadline_time = request.get_json()['finish_deadline_time']
-            
-        except:
-            pass
-
-        
+    
         try:
             # !!! 到后面要把这个注释去掉 为了方便测试先注释掉
             #if checkBalance(user_id, None, float(money) * float(number)):
-            modifyTask(int(task_id), int(user_id), None, int(money), json_dump_tags, int(number), post_time,\
-                         receive_end_time, finish_deadline_time, title, description, json_dump_userlimit,\
-                         json_dump_steps)
-            # else:
-            #     return jsonify({"error_code":"500", "error_msg":"no enough money"}), 500
+            modifyTask(int(task_id), int(user_id), None, d)
+        
         except Exception as e:
             return jsonify({"error_code": "500", "error_msg": str(e)}), 500
 
-    
-    # 不管是pending还是修改信息，都返回任务的信息
-    if task.post_time == None:
-        status = "pending"
-    else:
-        status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
-    
 
-
-    participant_ids = []
-    ongoing_participant_ids = []
-    waiting_examine_participant_ids = []
-    finished_participant_ids = []
-
-    for par in task.received_tasks:
-        par_user_id = par.user_id
-        participant_ids.append(par_user_id)
-        if par.status == 'on going':
-            ongoing_participant_ids.append(par_user_id)
-        elif par.status == 'waiting examine':
-            waiting_examine_participant_ids.append(par_user_id)
-        elif par.status == 'finished':
-            finished_participant_ids.append(par_user_id)
-
-    return jsonify({"task_id": task.id, 
-                    "creator_user_id": task.user_id,
-                    "creator_organization_id": task.organization_id,
-                    "status": status,
-                    "title": task.title,
-                    "description": task.description,
-                    "tags": json.loads(task.tags),
-                    "participant_number_limit": task.number,
-                    "reward_for_one_participant": task.money,
-                    "post_time": task.post_time,
-                    "receive_end_time": task.receive_end_time,
-                    "finish_deadline_time": task.finish_deadline_time,
-                    "user_limit": json.loads(task.user_limit),
-                    "steps": json.loads(task.steps),
-                    "participant_ids": participant_ids,
-                    "ongoing_participant_ids": ongoing_participant_ids,
-                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
-                    "finished_participant_ids": finished_participant_ids
-                    }), 200
-       
-        
+    return_msg = printSingleTask(task)
+    return jsonify(return_msg), 200
+         
 
 # RESTful 组织撤回任务 + 修改任务
-# 有点乱emm
 @app.route('/users/<user_id>/organization/<organization_id>/tasks/<task_id>', methods=['PUT'])
 @token_required
 def set_org_task_pending(current_user, user_id, organization_id, task_id):
@@ -1107,115 +814,30 @@ def set_org_task_pending(current_user, user_id, organization_id, task_id):
     if not task:
         return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
     
+    
+    d = request.get_json()
+
     # 撤回任务 有status项即撤回
-    try:
-        # 撤回任务
-        status = request.get_json()['status']
-        # set status
+    if 'status' in d:
         try:
-            changeTaskStatus(int(user_id), int(task_id), status, int(organization_id))
+            changeTaskStatus(int(user_id), int(task_id), d['status'], None)
         except Exception as e:
             return jsonify({"error_code": "500", "error_msg": str(e)}), 500
-
-    # 修改信息
-    except:
-        # task不处在pending的状态
-        if task.post_time:
-            return jsonify({"error_code": "500", "error_msg": "The task is not pended, can't be modified."}), 500
-
-
-
-        title = None
-        description = None
-        tags = None
-        number = None
-        money = None
-        post_time = None
-        receive_end_time = None
-        finish_deadline_time = None
-        user_limit = None
-        steps = None
-        json_dump_userlimit = None
-        json_dump_steps = None
-
-        # 可能还需要修改
-        try:
-            user_limit = request.get_json()['user_limit']
-            steps = request.get_json()['steps']
-            tags = request.get_json()['tags']
-
-
-            json_dump_userlimit = json.dumps(user_limit)
-            json_dump_steps = json.dumps(steps)
-            json_dump_tags = json.dumps(tags)
-
-            title = request.get_json()['title']
-            description = request.get_json()['description']
-            number = request.get_json()['participant_number_limit']
-            money = request.get_json()['reward_for_one_participant']
-            
-            post_time = request.get_json()['post_time']
-            receive_end_time = request.get_json()['receive_end_time']
-            finish_deadline_time = request.get_json()['finish_deadline_time']
-            
-        except:
-            pass
-
-        
+        #changeTaskStatus(int(user_id), int(task_id), d['status'], None)
+    
+    # 修改
+    else:
         try:
             # !!! 到后面要把这个注释去掉 为了方便测试先注释掉
             #if checkBalance(user_id, None, float(money) * float(number)):
-            modifyTask(int(task_id), int(user_id), int(organization_id), int(money), json_dump_tags, int(number), post_time,\
-                         receive_end_time, finish_deadline_time, title, description, json_dump_userlimit,\
-                         json_dump_steps)
-            # else:
-            #     return jsonify({"error_code":"500", "error_msg":"no enough money"}), 500
+            modifyTask(int(task_id), int(user_id), int(organization_id), d)
+        
         except Exception as e:
             return jsonify({"error_code": "500", "error_msg": str(e)}), 500
 
-    
-    # 不管是pending还是修改信息，都返回任务的信息
-    if task.post_time == None:
-        status = "pending"
-    else:
-        status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
-    
 
-
-    participant_ids = []
-    ongoing_participant_ids = []
-    waiting_examine_participant_ids = []
-    finished_participant_ids = []
-
-    for par in task.received_tasks:
-        par_user_id = par.user_id
-        participant_ids.append(par_user_id)
-        if par.status == 'on going':
-            ongoing_participant_ids.append(par_user_id)
-        elif par.status == 'waiting examine':
-            waiting_examine_participant_ids.append(par_user_id)
-        elif par.status == 'finished':
-            finished_participant_ids.append(par_user_id)
-
-    return jsonify({"task_id": task.id, 
-                    "creator_user_id": task.user_id,
-                    "creator_organization_id": task.organization_id,
-                    "status": status,
-                    "title": task.title,
-                    "description": task.description,
-                    "tags": json.loads(task.tags),
-                    "participant_number_limit": task.number,
-                    "reward_for_one_participant": task.money,
-                    "post_time": task.post_time,
-                    "receive_end_time": task.receive_end_time,
-                    "finish_deadline_time": task.finish_deadline_time,
-                    "user_limit": json.loads(task.user_limit),
-                    "steps": json.loads(task.steps),
-                    "participant_ids": participant_ids,
-                    "ongoing_participant_ids": ongoing_participant_ids,
-                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
-                    "finished_participant_ids": finished_participant_ids
-                    }), 200
+    return_msg = printSingleTask(task)
+    return jsonify(return_msg), 200
 
 
 
@@ -1313,7 +935,71 @@ def owner_set_status():
     return jsonify(result)
 
 
+# RESTful 任务查询
+@app.route('/users/<user_id>/tasks/search', methods=['GET'])
+@token_required
+def search_all_tasks(current_user, user_id):
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+
+    d = request.get_json()
+
+    
+    task_diff_set = searchTask(d)
+
+    task_info = []
+
+    for task in task_diff_set:
+        task_info.append(printSingleTask(task))
+        
+    return jsonify(task_info), 200
+
+
+
 #############################################################
+
+
+
+
+
+
+# util func
+def printSingleTask(task):
+    participant_ids = []
+    ongoing_participant_ids = []
+    waiting_examine_participant_ids = []
+    finished_participant_ids = []
+
+    for par in task.received_tasks:
+        par_user_id = par.user_id
+        participant_ids.append(par_user_id)
+        if par.status == 'on going':
+            ongoing_participant_ids.append(par_user_id)
+        elif par.status == 'waiting examine':
+            waiting_examine_participant_ids.append(par_user_id)
+        elif par.status == 'finished':
+            finished_participant_ids.append(par_user_id)
+
+    return {"task_id": task.id, 
+                    "creator_user_id": task.user_id,
+                    "creator_organization_id": task.organization_id,
+                    "status": task.status,
+                    "title": task.title,
+                    "description": task.description,
+                    "tags": json.loads(task.tags),
+                    "participant_number_limit": task.participant_number_limit,
+                    "reward_for_one_participant": task.reward_for_one_participant,
+                    "post_time": task.post_time,
+                    "receive_end_time": task.receive_end_time,
+                    "finish_deadline_time": task.finish_deadline_time,
+                    "user_limit": json.loads(task.user_limit),
+                    "steps": json.loads(task.steps),
+                    "participant_ids": participant_ids,
+                    "ongoing_participant_ids": ongoing_participant_ids,
+                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
+                    "finished_participant_ids": finished_participant_ids
+                    }
+
 
 @app.route('/users/register', methods=['POST', 'GET'])
 def uploadFile():
@@ -1357,196 +1043,6 @@ def uploadFile():
         }
 
         return jsonify({'result': result})
-
-
-
-# RESTful 任务查询
-@app.route('/users/<user_id>/tasks/search', methods=['GET'])
-@token_required
-def search_all_tasks(current_user, user_id):
-    if current_user.id != int(user_id):
-        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
-
-    d = {}
-
-    
-    d['status'] = None
-    d['title'] = None
-    d['receive_end_time'] = None
-    d['finish_deadline_time'] = None
-    d['reward_for_one_participant_upper'] = None
-    d['reward_for_one_participant_lower'] = None
-    d['steps_number_upper'] = None
-    d['steps_number_lower'] = None
-
-    d['tags'] = None
-    d['creator_user_email'] = None
-    d['creator_user_phone_number'] = None
-    d['creator_organization_name'] = None
-    d['user_limit'] = None
-    
-
-    
-    
-    try:
-        creator_user_email = request.get_json()['creator_user_email']
-    except:
-        pass
-    else:
-        d['creator_user_email'] = creator_user_email
-    
-    
-    try:    
-        creator_user_phone_number = request.get_json()['creator_user_phone_number']
-    except:
-        pass
-    else:
-        d['creator_user_phone_number'] = creator_user_phone_number
-    
-    
-    try:
-        creator_organization_name = request.get_json(0['creator_organization_name'])
-    except:
-        pass
-    else:
-        d['creator_organization_name'] = creator_organization_name
-    
-    
-    try:
-        status = request.get_json()['status']
-    except:
-        pass
-    else:
-        d['status'] = status
-
-
-    try:
-        title = request.get_json()['title']
-    except:
-        pass
-    else:
-        d['title'] = title
-
-
-    try:
-        tags = request.get_json()['tags']
-    except:
-        pass
-    else:
-        d['tags'] = tags
-
-
-    try:
-        reward_for_one_participant_upper = request.get_json()['reward_for_one_participant_upper']
-    except:
-         pass
-    else:
-         d['reward_for_one_participant_upper'] = reward_for_one_participant_upper
-    
-
-    try:  
-        reward_for_one_participant_lower = request.get_json()['reward_for_one_participant_lower']
-    except:
-        pass
-    else:
-         d['reward_for_one_participant_lower'] = int(reward_for_one_participant_lower)
-    
-
-
-    try:
-        receive_end_time = request.get_json()['receive_end_time']
-    except:
-        pass
-    else:
-         d['receive_end_time'] = receive_end_time
-    
-
-    try:
-        finish_deadline_time = request.get_json()['finish_deadline_time']
-    except:
-        pass
-    else:
-         d['finish_deadline_time'] = finish_deadline_time
-    
-
-    try:
-        user_limit = request.get_json()['user_limit']
-    except:
-        pass
-    else:
-         d['user_limit'] = user_limit
-    
-
-    try:
-        steps_number_upper = request.get_json()['steps_number_upper']
-    except:
-        pass
-    else:
-         d['reward_for_one_participant_upper'] = int(steps_number_upper)
-    
-    
-    try:
-        steps_number_lower = request.get_json()['steps_number_lower']
-    except:
-        pass
-    else:
-         d['steps_number_upper'] = int(steps_number_upper)
-    
-    task_diff_set = searchTask(d)
-
-    task_info = []
-    
-    for task in task_diff_set:
-        if task.post_time == None:
-            status = "pending"
-        else:
-            status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
-    
-        #status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
-    
-        participant_ids = []
-        ongoing_participant_ids = []
-        waiting_examine_participant_ids = []
-        finished_participant_ids = []
-
-        for par in task.received_tasks:
-            par_user_id = par.user_id
-            participant_ids.append(par_user_id)
-            if par.status == 'on going':
-                ongoing_participant_ids.append(par_user_id)
-            elif par.status == 'waiting examine':
-                waiting_examine_participant_ids.append(par_user_id)
-            elif par.status == 'finished':
-                finished_participant_ids.append(par_user_id)
-
-
-        task_info.append({"task_id": task.id, 
-                    "creator_user_id": task.user_id,
-                    "creator_organization_id": task.organization_id,
-                    "status": status,
-                    "title": task.title,
-                    "description": task.description,
-                    "tags": json.loads(task.tags),
-                    "participant_number_limit": task.number,
-                    "reward_for_one_participant": task.money,
-                    "post_time": task.post_time,
-                    "receive_end_time": task.receive_end_time,
-                    "finish_deadline_time": task.finish_deadline_time,
-                    "user_limit": json.loads(task.user_limit),
-                    "steps": json.loads(task.steps),
-                    "participant_ids": participant_ids,
-                    "ongoing_participant_ids": ongoing_participant_ids,
-                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
-                    "finished_participant_ids": finished_participant_ids
-        })
-
-    return jsonify(task_info), 200
-
-    #return jsonify({"msg":"testing"}), 200
-
-
-
-
 
 
 

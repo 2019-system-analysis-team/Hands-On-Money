@@ -34,9 +34,9 @@ class Task(db.Model):
 	user = db.relationship('User', backref=db.backref('tasks', lazy='dynamic'))
 	organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=True)
 	organization = db.relationship('Organization', backref=db.backref('tasks', lazy='dynamic'))
-	money = db.Column(db.Float, nullable=False)
+	reward_for_one_participant = db.Column(db.Float, nullable=False)
 	tags = db.Column(db.Text, nullable=True)
-	number = db.Column(db.Integer, nullable=False)
+	participant_number_limit = db.Column(db.Integer, nullable=False)
 	#applicapable_user = db.Column(db.String(100), nullable=True)
 	post_time = db.Column(db.DateTime, nullable=True, default=datetime.utcnow())
 	receive_end_time = db.Column(db.DateTime, nullable=True, default=datetime.utcnow() + timedelta(hours=1))
@@ -53,6 +53,8 @@ class Task(db.Model):
 	# sexes = db.Column(db.Text, nullable=True)
 	# schools = db.Column(db.Text, nullable=True)
 	steps = db.Column(db.Text, nullable=True)
+	steps_number = db.Column(db.Integer, nullable=True)
+	status = db.Column(db.String(100), nullable=True)
 
 
 
