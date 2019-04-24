@@ -43,6 +43,8 @@
   - [test case 2：删除不属于自己的任务](#test-case-2删除不属于自己的任务)
 - [删除组织任务](#删除组织任务)
   - [test case 1：正常删除任务](#test-case-1正常删除任务-1)
+  
+![_Entity Relationship Diagram Example -4.25.png](https://i.loli.net/2019/04/25/5cc0a9bb69c5e.png)
 
 #### 用户与组织系统
 
