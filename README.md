@@ -74,13 +74,15 @@ POST http://localhost:5000/users
 
 ```
 POST http://localhost:5000/sessions
-
+```
+```
 // Request
 {
     "password":"test1",
     "email": "test1"
 }
-
+```
+```
 // Response
 {
     "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZXhwIjoxNTU1OTI2NjM5fQ.FZcD0-iLJITyaqllxNh45oCGS1N0fKl-33YDNaJEsyg"
@@ -166,13 +168,15 @@ GET http://localhost:5000/users/2
 
 ```
 POST http://localhost:5000/users/1/organization
-
+```
+```
 // Request
 {
     "name":"test1-org",
     "bio": "test1"
 }
-
+```
+```
 // Response 201 CREATED
 {
     "organization_id": 1
@@ -192,13 +196,15 @@ test 1 使用email
 
 ```
 POST http://localhost:5000/users/1/organization/1/members
-
+```
+```
 // Request
 {
     "email": "test2",
     "status": "member"
 }
-
+```
+```
 // Response
 {
     "msg": "Added successfully."
@@ -209,13 +215,15 @@ test2 使用phone\_number
 
 ```
 POST http://localhost:5000/users/1/organization/1/members
-
+```
+```
 // Request
 {
     "phone_number": "test4",
     "status": "member"
 }
-
+```
+```
 // Response
 {
     "msg": "Added successfully."
@@ -235,11 +243,13 @@ methods=\['DELETE'\])
 
 ```
 DELETE http://localhost:5000/users/1/organization/1
-
+```
+```
 // Request
 // Token required
 // ...
-
+```
+```
 // Response
 {
     "name": "test1-org",
@@ -257,7 +267,8 @@ DELETE http://localhost:5000/users/1/organization/1
 
 ```
 POST http://localhost:5000/users/9/task
-
+```
+```
 // Request
 {
     "title": "task9",
@@ -283,7 +294,8 @@ POST http://localhost:5000/users/9/task
         }
     ]
 }
-
+```
+```
 // Response
 {
     "task_id": 5,
@@ -343,7 +355,8 @@ methods=\['POST'\])
 
 ```
 POST http://localhost:5000/users/1/organization/1/tasks
-
+```
+```
 // Request
 {
     "title": "task1",
@@ -369,7 +382,8 @@ POST http://localhost:5000/users/1/organization/1/tasks
         }
     ]
 }
-
+```
+```
 // Response
 {
     "task_id": 11,
@@ -428,10 +442,12 @@ POST http://localhost:5000/users/1/organization/1/tasks
 
 ```
 POST http://localhost:5000/users/9/tasks
-
+```
+```
 // Request
 // ...
-
+```
+```
 // Response
 [
     {
@@ -591,10 +607,12 @@ methods=\['GET'\])
 
 ```
 POST http://localhost:5000/users/9/organization/1/tasks
-
+```
+```
 // Request
 // ...
-
+```
+```
 // Response
 [
     {
@@ -945,10 +963,12 @@ PUT http://localhost:5000/users/1/tasks/search
 
 ```
 POST http://localhost:5000/users/2/tasks/8
-
+```
+```
 // Request
 // ...
-
+```
+```
 // Response 201 CREARTED
 {
     "msg": "Receive task successfully."
@@ -964,10 +984,12 @@ methods=\['PUT'\])
 
 ```
 PUT http://localhost:5000/users/2/tasks/1/steps/1
-
+```
+```
 // Request
 // ...
-
+```
+```
 // Response 200 OK
 {
     "user_id": 2,
@@ -992,10 +1014,12 @@ PUT http://localhost:5000/users/2/tasks/1/steps/1
 
 ```
 PUT http://localhost:5000/users/2/tasks/1/steps/1
-
+```
+```
 // Request
 // ...
-
+```
+```
 // Response 500 INTERNAL SERVER ERROR
 {
     "error_code": "500",
@@ -1007,10 +1031,12 @@ PUT http://localhost:5000/users/2/tasks/1/steps/1
 
 ```
 PUT http://localhost:5000/users/1/tasks/1/steps/1
-
+```
+```
 // Request
 // ...
-
+```
+```
 // Response 500 INTERNAL SERVER ERROR
 {
     "error_code": "500",
@@ -1027,10 +1053,12 @@ methods=\['PUT'\])
 
 ```
 PUT http://localhost:5000/users/1/tasks/1/finisher/4
-
+```
+```
 // Request
 // ...
-
+```
+```
 // Response 200 OK
 {
     "task_id": 1,
@@ -1097,10 +1125,12 @@ PUT http://localhost:5000/users/1/tasks/1/finisher/4
 
 ```
 PUT http://localhost:5000/users/1/tasks/1/finisher/2
-
+```
+```
 // Request
 // ...
-
+```
+```
 // Response 500 INTERNAL SERVER ERROR
 {
     "error_code": "500",
@@ -1117,12 +1147,14 @@ PUT http://localhost:5000/users/1/tasks/1/finisher/2
 
 ```
 PUT http://localhost:5000/users/1/tasks/2
-
+```
+```
 // Request
 {
     "status":"pending"
 }
-
+```
+```
 // Response 200 OK
 {
     "task_id": 2,
@@ -1180,12 +1212,14 @@ PUT http://localhost:5000/users/1/tasks/2
 
 ```
 PUT http://localhost:5000/users/1/tasks/2
-
+```
+```
 // Request
 {
     "status":"pending"
 }
-
+```
+```
 // Response 500 INTERNAL SERVER ERROR
 {
     "error_code": "500",
@@ -1200,7 +1234,8 @@ PUT http://localhost:5000/users/1/tasks/2
 
 ```
 PUT http://localhost:5000/users/1/tasks/1
-
+```
+```
 // Request
 {
     "title": "task1-modify",
@@ -1226,7 +1261,8 @@ PUT http://localhost:5000/users/1/tasks/1
         }
     ]
 }
-
+```
+```
 // Request 200 OK
 {
     "task_id": 1,
@@ -1289,7 +1325,8 @@ methods=\['PUT'\])
 
 ```
 PUT http://localhost:5000/users/1/organization/1/tasks/3
-
+```
+```
 // Request
 {
     "title": "task-org1-modify",
@@ -1315,7 +1352,8 @@ PUT http://localhost:5000/users/1/organization/1/tasks/3
         }
     ]
 }
-
+```
+```
 // Response 500 INTERNAL SERVER ERROR
 {
     "error_code": "500",
@@ -1328,7 +1366,8 @@ PUT http://localhost:5000/users/1/organization/1/tasks/3
 
 ```
 PUT http://localhost:5000/users/1/organization/1/tasks/3
-
+```
+```
 // Request
 {
     "title": "task-org1-modify",
@@ -1354,7 +1393,8 @@ PUT http://localhost:5000/users/1/organization/1/tasks/3
         }
     ]
 }
-
+```
+```
 // Response 200 OK
 {
     "task_id": 3,
@@ -1416,10 +1456,12 @@ PUT http://localhost:5000/users/1/organization/1/tasks/3
 
 ```
 DELETE http://localhost:5000/users/1/tasks/1
-
+```
+```
 // Request
 // ...
-
+```
+```
 // Response 200 OK
 {
     "msg": "Delete task1-modify successfully."
@@ -1431,10 +1473,12 @@ DELETE http://localhost:5000/users/1/tasks/1
 
 ```
 DELETE http://localhost:5000/users/1/tasks/4
-
+```
+```
 // Request
 // ...
-
+```
+```
 // Response 404 NOT FOUND
 {
     "error_code": "404",
@@ -1452,10 +1496,12 @@ methods=\['DELETE'\])
 
 ```
 DELETE http://localhost:5000/users/1/organization/1/tasks/3
-
+```
+```
 // Request
 // ...
-
+```
+```
 // Response 200 OK
 {
     "msg": "Delete task1-org successfully."
