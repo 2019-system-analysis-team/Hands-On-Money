@@ -29,7 +29,6 @@
 							</MenuGroup>
 						</Submenu>
                     </div>
-<<<<<<< HEAD
                     <div class="layout-nav" v-if="isLogin">
 						<MenuItem name="5">
 							<Tooltip content="创建一个新任务">
@@ -65,10 +64,6 @@
                     </div>
 					<div class="layout-button" v-if="!isLogin">
 						<Button type="default" ghost onclick="document.getElementById('loginFrame').style.display='block';
-=======
-					<div class="layout-button" v-if="!isLogin">
-						<Button onclick="document.getElementById('loginFrame').style.display='block';
->>>>>>> f3be7fa9dc36c8a4bbf4389c928ee509dd21b45b
 			document.getElementById('bgColorDiv').style.display='block'">登录</Button>
 						<Button type="primary" ghost v-on:click="register">注册</Button>
 					</div>
@@ -83,18 +78,8 @@
 					</div>
                 </Menu>
             </Header>
-<<<<<<< HEAD
 			<Content :style="{padding: '50px 50px'}" v-if="!isLogin">
 				<Card>
-=======
-            <Content :style="{padding: '0 50px'}">
-                <Breadcrumb :style="{margin: '20px 0'}">
-                    <BreadcrumbItem>Home</BreadcrumbItem>
-                    <BreadcrumbItem>Components</BreadcrumbItem>
-                    <BreadcrumbItem>Layout</BreadcrumbItem>
-                </Breadcrumb>
-                <Card>
->>>>>>> f3be7fa9dc36c8a4bbf4389c928ee509dd21b45b
                     <div style="min-height: 400px;">
                         Content
                     </div>
@@ -138,7 +123,6 @@
 					</div>
 				</form>
 			</div>
-<<<<<<< HEAD
 		</Drawer>
 			
         <div id="bgColorDiv" class="black_overlay">
@@ -169,19 +153,6 @@
 			</div>
 		</div>
 
-=======
-		</div>
-
-
-
-
-
-
-
-
-
-
->>>>>>> f3be7fa9dc36c8a4bbf4389c928ee509dd21b45b
     </div>
 </template>
 
@@ -197,7 +168,6 @@
 			return { 
 				studentID: '',
 				isLogin: false,
-<<<<<<< HEAD
 				profilePhotoPath: '',
 				money: 0,
 				shownickname:'',
@@ -214,8 +184,6 @@
                 },
 				messagesNumber:100,
 				haveTask: false
-=======
->>>>>>> f3be7fa9dc36c8a4bbf4389c928ee509dd21b45b
 			};
 		}, 
 		created: function () { 
@@ -224,7 +192,6 @@
 		},
 		methods: {
 			getEventData:function() {
-<<<<<<< HEAD
 				var _this = this;
 				let uID = window.localStorage.getItem('userID')
 				if(uID == null || uID == ""){
@@ -250,20 +217,6 @@
 					console.log(error.response.status);
 					_this.isLogin = false;
 				});
-=======
-				let routerParamsStudentID = this.$route.params.studentID;
-				if(routerParamsStudentID == null){
-					this.isLogin = false;
-				}else{
-					this.studentID = routerParamsStudentID;
-					this.isLogin = true;
-				}
-			},
-			login: function () {
-				this.$router.push({
-						path: '/userlogin'
-				});		
->>>>>>> f3be7fa9dc36c8a4bbf4389c928ee509dd21b45b
 			},
 			register: function () {
 				this.$router.push({
@@ -271,7 +224,6 @@
 				});		
 			},
 			logout (){
-<<<<<<< HEAD
 				var _this = this;
 				if(this.isLogin){
 					var url_all = "/users/" + this.$data.userID + "/session";
@@ -302,10 +254,6 @@
 			},
 			showMessage(){
 				this.messagesNumber = 0;
-=======
-				this.isLogin = false;
-				this.studentID = '';
->>>>>>> f3be7fa9dc36c8a4bbf4389c928ee509dd21b45b
 			}
 		}
     }
@@ -523,7 +471,6 @@
 }
 
 
-<<<<<<< HEAD
 .black_overlay {
 	display: none;
 	position: absolute;
@@ -683,9 +630,4 @@
 		padding: 10px 20px;
 	}
 }
-=======
-
-
-
->>>>>>> f3be7fa9dc36c8a4bbf4389c928ee509dd21b45b
 </style>
