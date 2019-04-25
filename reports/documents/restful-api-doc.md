@@ -684,9 +684,6 @@ HTTP/1.1 201 Created
     ]
 }
 
-// NOTE if some necessary thing missing, return 400
-// TODO
-
 //response: no this user/organizations in users/organizations
 HTTP/1.1 404 Not Found
 Content-Type: application/json
@@ -719,7 +716,7 @@ Content-Type: application/json
             "status": "status"
         },
         {
-            "task_id": 123,
+            "task_id": 124,
             "task_name": "name",
             "status": "status"
         }
@@ -736,7 +733,7 @@ GET /users/:user_id/organizations/:organization_id/my_tasks/:tasks_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 ```
 ```json
-//response: task's detail TODO
+//response: task's detail
 HTTP/1.1 200 OK
 Content-Type: application/json
 {
