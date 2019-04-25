@@ -2,9 +2,12 @@
     <div class="layout">
         <Layout>
             <Header>
-                <Menu mode="horizontal" theme="dark" active-name="1">
+                <Menu mode="horizontal" theme="dark">
 					<div class="layout-head">
 						个人注册
+					</div>
+					<div class="home-button">
+						<Button shape="circle" icon="ios-home" @click="handleReturnHomepage()"></Button>
 					</div>
 				</Menu>
             </Header>
@@ -173,12 +176,12 @@
 					nickname: '',
                     name: '',
 					stunumber: '',
-					grade: '',
-					school: '',
-					age: '',
+					grade: '大一',
+					school: '中国语言文学系',
+					age: '18',
 					phone: '',
                     mail: '',
-                    gender: '',
+                    gender: '女生',
                     desc: '',
                     passwd: '',
                     passwdCheck: '',
@@ -214,74 +217,76 @@
 				}
 			},
             handleSubmit (name) {
+				var _this = this;
                 this.$refs[name].validate((valid) => {
                     if (valid) {
 						this.$axios({
 							 method:"post",
 							 url:"/users",
 							 data:{
-								email: this.$data.formValidate.email,
+								username: this.$data.formValidate.nickname,
+								email: this.$data.formValidate.mail,
 								phone_number: this.$data.formValidate.phone,
-								password: this.$data.formValidate.passwd
+								password: this.$data.formValidate.passwd,
 							 }
 							}).then(function (response){
+							//------------------------------后面功能未测试--------------
 								console.log(response);
 								window.localStorage.setItem('token', response.data.access_token);
 								window.localStorage.setItem('userID', response.data.user_id);
-								var url_all = "/users/:" + response.data.user_id.toString();
+								var url_all = "/users/" + response.data.user_id;
 								var url_id = url_all + "/personality";
 								var jwt = "JWT " + response.data.access_token;
-								this.$axios({
+								_this.$axios({
 									 method:"put",
 									 url: url_id,
 									 data:{
-										nickname: this.$data.formValidate.nickname,
-										bio: this.$data.formValidate.desc
+										nickname: _this.$data.formValidate.nickname,
+										bio: _this.$data.formValidate.desc
 									 },
 									 headers:{
 										'Authorization': jwt,
 									 }
 								});
 								var url_school = url_all + "/school";
-								this.$axios({
+								_this.$axios({
 									 method:"put",
 									 url: url_school,
 									 data:{
-										school: this.$data.formValidate.school,
-										grade: this.$data.formValidate.grade,
-										student_number: this.$data.formValidate.stunumber
+										school: _this.$data.formValidate.school,
+										grade: _this.$data.formValidate.grade,
+										student_number: _this.$data.formValidate.stunumber
 									 },
 									 headers:{
 										'Authorization': jwt,
 									 }
 								});
 								var url_info = url_all + "/personal_info";
-								this.$axios({
+								_this.$axios({
 									 method:"put",
 									 url: url_info,
 									 data:{
-										name: this.$data.formValidate.name,
-										age: this.$data.formValidate.age,
-										sex: this.$data.formValidate.gender
+										name: _this.$data.formValidate.name,
+										age: _this.$data.formValidate.age,
+										sex: _this.$data.formValidate.gender
 									 },
 									 headers:{
 										'Authorization': jwt,
 									 }
 								});		
-								this.$Message.success('注册成功!');
+								_this.$Message.success('注册成功!');
 								
 								//跳转到主页
-								this.$router.push({
+								_this.$router.push({
 									path: '/', 
-									name: 'mainpage',
-									params: { 
-										userID: response.data.user_id
-									}
+									name: 'mainpage'
 								});
 							})
 							.catch(function (error) {
-								console.log(error.data.error_msg);
-								this.$Message.error('注册失败，重复的电子邮件或电话号码');
+								console.log(error.response.status);
+								if(error.response.status == 409){
+									_this.$Message.error('注册失败，重复的电子邮件或电话号码');
+								}
 							});
                     } else {
                         this.$Message.error('信息填写有误!');
@@ -290,7 +295,14 @@
             },
             handleReset (name) {
                 this.$refs[name].resetFields();
-            }
+            },
+			handleReturnHomepage () {
+			    // 返回主页
+				this.$router.push({
+					path: '/', 
+					name: 'mainpage',
+				});		
+			},
         }
     }
 </script>
@@ -305,9 +317,20 @@
 .layout-head{
     width: 150px;
     height: 30px;
-    color: white;
-	margin:0 auto;
+	color: white;
+    float: left;
+    position: relative;
+    left: 45%;
 	font-size: 30px;
+}
+.home-button{
+    width: 100px;
+    height: 30px;
+	color: white;
+    float: left;
+    position: relative;
+    left: 86%;
+	font-size: 30px;	
 }
 .layout-footer-center{
     text-align: center;

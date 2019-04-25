@@ -2,7 +2,7 @@
     <div class="layout">
         <Layout>
             <Header>
-                <Menu mode="horizontal" theme="dark" active-name="1">
+                <Menu mode="horizontal" theme="dark" active-name="4-1">
                     <div class="layout-logo"></div>
                     <div class="layout-nav">
                         <Submenu name="1">
@@ -19,7 +19,7 @@
 								<Icon type="ios-contacts"></Icon>
 								组织
 							</template>
-							<MenuItem name="2-1">我的组织</MenuItem>
+							<MenuItem name="2-1" to="/organization">我的组织</MenuItem>
 							<MenuItem name="2-2" to="/organregister">新建组织</MenuItem>
                         </Submenu>
 						<Submenu name="3">
@@ -37,7 +37,8 @@
 							<template slot="title">
 								<Avatar :src="profilePhotoPath" style="background-color: #87d068">{{shownickname}}</Avatar>
 							</template>
-							<MenuItem name="4-1" @click.native="logout()">退出</MenuItem>
+							<MenuItem name="4-1" to="/userinfomodify">个人信息</MenuItem>
+							<MenuItem name="4-2" @click.native="logout()">退出</MenuItem>
 						</Submenu>
 					</div>
 					<Button shape="circle" icon="ios-home" @click="handleReturnHomepage()"></Button>
@@ -382,12 +383,8 @@
 					this.$data.ageoptionsList.push({label:i.toString(),value:i.toString()});
 				}
 				this.$data.profilePhotoName = '头像';
-				//要用完全的路径
-				this.$data.profilePhotoUrl = "/users/:"  + "profile_photo_path";
-				this.$set(this.jwt,'Authorization','jwt');
-				this.$data.shownickname = 'hhhh';
-				/*
-				let uID = window.localStorage.getItem('userID')
+
+				let uID = window.localStorage.getItem('userID');
 				if(uID == null || uID == ""){
 					//跳转到主页
 					this.$router.push({
@@ -395,11 +392,14 @@
 						name: 'mainpage'
 					});
 				}
-				var url = "/users/:" + uID.toString();
+				var url = "/users/" + uID;
 				this.$data.userID = uID;
-				this.$data.profilePhotoUrl = "/users/:" + uID.toString() + "profile_photo_path";
+				this.$data.profilePhotoUrl = "/users/" + uID + "profile_photo_path";
 				var jwt = "JWT " + window.localStorage.getItem('token');
-				this.$data.jwt.push({Authorization:jwt});
+				//设置jwt认证头部
+				this.$set(this.jwt,'Authorization',jwt);
+				
+				var _this = this;
 				this.$axios({
 						 method:"get",
 						 url:url,
@@ -408,33 +408,33 @@
 						 }
 				}).then(function (response){
 					console.log(response);
-					this.$data.personalValidate.nickname = response.data.nickname;
-					this.$data.personalValidate.desc = response.data.bio;
-					this.$data.schoolValidate.school = response.data.school;
-					this.$data.schoolValidate.stunumber = response.data.student_id;
-					this.$data.schoolValidate.grade = response.data.grade;
-					this.$data.infoValidate.name = response.data.name;
-					this.$data.infoValidate.age = response.data.age;
-					this.$data.infoValidate.gender = response.data.sex;		
-					this.$data.money =  response.data.balance;
-					this.$data.profilePhotoPath =  response.data.profile_photo_path;
-					this.$data.defaultList.push({name:this.$data.profilePhotoName,url:this.$data.profilePhotoPath});
+					_this.$data.personalValidate.nickname = response.data.name;
+					_this.$data.personalValidate.desc = response.data.bio;
+					_this.$data.schoolValidate.school = response.data.school;
+					_this.$data.schoolValidate.stunumber = response.data.student_id;
+					_this.$data.schoolValidate.grade = response.data.grade;
+					//并没有传真实姓名???
+					//_this.$data.infoValidate.name = response.data.name;
+					_this.$data.infoValidate.age = response.data.age;
+					_this.$data.infoValidate.gender = response.data.sex;		
+					_this.$data.money = response.data.balance;
+					_this.$data.profilePhotoPath =  response.data.profile_photo_path;
+					_this.$data.defaultList.push({name:_this.$data.profilePhotoName,url:_this.$data.profilePhotoPath});
+					_this.$data.shownickname = response.data.name;
 				}).catch(function (error) {
-					console.log(error.data.error_msg);
+					if(error.response.status == 401){
+						_this.$Message.error('请先登录!');
+					}
 					//跳转到主页
-					this.$router.push({
+					_this.$router.push({
 						path: '/', 
 						name: 'mainpage'
 					});
 				});
-				*/
-			   if(this.profilePhotoPath == ''){
-				   
-			   }
 			},
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
-					var url_all = "/users/:" + this.$data.userID.toString();
+					var url_all = "/users/" + this.$data.userID;
 					var jwt = "JWT " + window.localStorage.getItem('token');
                     if (valid) {
 						if(this.tabs == "个人信息"){
@@ -511,7 +511,7 @@
             },
             handleSuccess (res, file) {
 				//从服务器获得图片路径
-				var url = "/users/:" + this.$data.userID.toString();
+				var url = "/users/" + this.$data.userID;
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
 						 method:"get",
@@ -569,7 +569,8 @@
 				this.topup = false;
 			},
 			logout (){
-				var url_all = "/users/:" + this.$data.userID.toString() + "/session";
+				var _this = this;
+				var url_all = "/users/" + this.$data.userID+ "/session";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
 					 method:"delete",
@@ -578,9 +579,9 @@
 						'Authorization': jwt,
 					 }
 				}).then(function (response){
-					window.localStorage.setItem('token', "");
-					window.localStorage.setItem('userID', "");
-					this.$router.push({
+					window.localStorage.removeItem('token');
+					window.localStorage.removeItem('userID');
+					_this.$router.push({
 						path: '/', 
 						name: 'mainpage'
 					});	

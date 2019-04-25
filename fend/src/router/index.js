@@ -1,10 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import mainpage from '@/components/MainPage'
-import userlogin from '@/components/UserLogin'
 import userregister from '@/components/UserRegister'
 import userinfomodify from '@/components/UserInfoModify'
 import organregister from '@/components/OrganRegister'
+import organization from '@/components/MyOrganization'
+import organizationInfo from '@/components/OrganizationInfo'
 import iView from 'iview';
 import axios from 'axios'
 import 'iview/dist/styles/iview.css';
@@ -13,7 +14,7 @@ Vue.use(Router);
 Vue.use(iView);
 Vue.prototype.$axios = axios    //全局注册，使用方法为:this.$axios
 axios.defaults.headers.post['Content-Type'] = 'application/json';//配置请求头信息
-axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.baseURL = process.env.BASE_API;
 
 export default new Router({
 	mode: 'history',
@@ -22,11 +23,6 @@ export default new Router({
 		  path: '/',
 		  name: 'mainpage',
 		  component: mainpage
-		},
-		{
-			path: '/userlogin',
-			name: 'userlogin',
-			component: userlogin
 		},
 		{
 			path: '/userregister',
@@ -42,6 +38,16 @@ export default new Router({
 			path: '/organregister',
 			name: 'organregister',
 			component: organregister
+		},
+		{
+			path: '/organization',
+			name: 'organization',
+			component: organization
+		},
+		{
+			path: '/organizationInfo',
+			name: 'organizationInfo',
+			component: organizationInfo
 		}
   ]
 })

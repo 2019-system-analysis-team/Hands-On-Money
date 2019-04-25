@@ -2,9 +2,12 @@
     <div class="layout">
         <Layout>
             <Header>
-                <Menu mode="horizontal" theme="dark" active-name="1">
+                <Menu mode="horizontal" theme="dark">
 					<div class="layout-head">
 						组织创建
+					</div>
+					<div class="home-button">
+						<Button shape="circle" icon="ios-home" @click="handleReturnHomepage()"></Button>
 					</div>
 				</Menu>
             </Header>
@@ -71,10 +74,11 @@
 		},
 		methods: {
             handleSubmit (name) {
+				var _this = this;
                 this.$refs[name].validate((valid) => {
                     if (valid) {
 						var jwt = "JWT " + window.localStorage.getItem('token');
-						var url = "/users/:"+ this.$data.userID.toString() +"/organization";
+						var url = "/users/"+ this.$data.userID +"/organization";
 						this.$axios({
 							 method:"post",
 							 url: url,
@@ -86,7 +90,7 @@
 								'Authorization': jwt,
 							 }
 						}).then(function (response){
-							this.$Message.success('组织注册成功!');
+							_this.$Message.success('组织注册成功!');
 							console.log(response);
 							// 跳转到组织页面
 						}).catch(function (error) {
@@ -103,6 +107,7 @@
             },
 			getEventData:function() {
 				/*
+				var _this = this;
 				let uID = window.localStorage.getItem('userID');
 				if(uID == null || uID == ""){
 					//跳转到主页
@@ -122,14 +127,21 @@
 				}).then(function (response){
 					console.log(response);
 				}).catch(function (error) {
-					console.log(error.data.error_msg);
+					console.log(error);
 					//跳转到主页
-					this.$router.push({
+					_this.$router.push({
 						path: '/', 
 						name: 'mainpage'
 					});
 				});
 				*/
+			},
+			handleReturnHomepage () {
+			    // 返回主页
+				this.$router.push({
+					path: '/', 
+					name: 'mainpage',
+				});		
 			},
         }
     }
@@ -155,9 +167,20 @@
 .layout-head{
     width: 150px;
     height: 30px;
-    color: white;
-	margin:0 auto;
+	color: white;
+    float: left;
+    position: relative;
+    left: 45%;
 	font-size: 30px;
+}
+.home-button{
+    width: 100px;
+    height: 30px;
+	color: white;
+    float: left;
+    position: relative;
+    left: 86%;
+	font-size: 30px;	
 }
 .layout-footer-center{
     text-align: center;
