@@ -36,6 +36,7 @@ layout: default
   - [inception meeting](X1-01-inception-meeting) (19/03/10)
   - [第四周例会记录](X1-02-week4-meeting-records) (19/03/17)
   - [第六周例会记录]() (19/04/04)
-  - [第七周例会记录]() (19/04/12)
-  - [第八周例会记录]() (19/04/19)
+  - [第七周例会记录](X1-03-week7-meeting-record) (19/04/12)
+  - [第八周例会记录](X1-04-week8-meeting-record) (19/04/19)
 * X2 KANBAN
+
