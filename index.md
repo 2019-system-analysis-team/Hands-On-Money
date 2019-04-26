@@ -23,7 +23,7 @@ layout: default
 * 7、Design（设计说明书）
   - 7.1 UI design（界面设计）
   - 7.2 Database design（数据库设计）
-  - 7.3 [Interface API design]()  接口 API 设计  
+  - 7.3 [Interface API design](07-03-interface-api-design)  接口 API 设计  
   - 7.4 Architecture design（架构设计）
   - 7.5 Usecase design（用例设计）
 * 8、生产规范与指南
@@ -33,8 +33,8 @@ layout: default
   - 8.4 部署说明
 
 * X1 meeting-records
-  - [inception meeting]() (19/03/10)
-  - [第四周例会记录]() (19/03/17)
+  - [inception meeting](X1-01-inception-meeting) (19/03/10)
+  - [第四周例会记录](X1-02-week4-meeting-records) (19/03/17)
   - [第六周例会记录]() (19/04/04)
   - [第七周例会记录]() (19/04/12)
   - [第八周例会记录]() (19/04/19)
