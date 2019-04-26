@@ -8,7 +8,7 @@ layout: default
 
 
 
-* 1、[About](01-about)  项目概况
+* 1、 [About](01-about)  项目概况
 * 2、[Team profile](02-team-profile)  团队组建与分工
 * 3、[Investigation](03-investigation) 项目前期调研/竞品分析
 * 4、[Vision](04-vision) 项目愿景
@@ -23,7 +23,7 @@ layout: default
 * 7、Design（设计说明书）
   - 7.1 UI design（界面设计）
   - 7.2 Database design（数据库设计）
-  - 7.3 Interface API design（接口 API 设计）
+  - 7.3 [Interface API design]()  接口 API 设计  
   - 7.4 Architecture design（架构设计）
   - 7.5 Usecase design（用例设计）
 * 8、生产规范与指南
@@ -33,5 +33,9 @@ layout: default
   - 8.4 部署说明
 
 * X1 meeting-records
-  - inception meeting (yy/mm/dd)
+  - [inception meeting]() (19/03/10)
+  - [第四周例会记录]() (19/03/17)
+  - [第六周例会记录]() (19/04/04)
+  - [第七周例会记录]() (19/04/12)
+  - [第八周例会记录]() (19/04/19)
 * X2 KANBAN
