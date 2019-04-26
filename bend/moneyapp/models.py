@@ -1,5 +1,7 @@
-from moneyapp import db
+from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
+
+db = SQLAlchemy()
 
 class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
