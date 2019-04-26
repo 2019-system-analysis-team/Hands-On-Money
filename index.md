@@ -8,18 +8,18 @@ layout: default
 
 
 
-* 1、[About 项目概况](01-about)
-* 2、Team profile（团队组建与分工）
-* 3、Investigation（项目前期调研/竞品分析）
-* 4、Vision（项目愿景）
-* 5、Product Backlog （产品特性库）
-* 6、Requirement specification（需求规格说明书）
-  - 6.1 Usecase Diagram and UML Activity Diagram（用例图，业务过程/多泳道图）
-  - 6.2 Use Cases（用例+活动图）
-  - 6.3 Domian Models（领域模型）
-  - 6.4 State Models（状态模型）
-  - 6.5 System Sequence Diagrams（功能模型）
-  - 6.6 Supplementary Requirements（补充需求）
+* 1、[About](01-about)  项目概况
+* 2、[Team profile](02-team-profile)  团队组建与分工
+* 3、[Investigation](03-investigation) 项目前期调研/竞品分析
+* 4、[Vision](04-vision) 项目愿景
+* 5、[Product Backlog](05-product-backlog)产品特性库
+* 6、[Requirement specification](06-requirement-specification)  需求规格说明书
+  - 6.1 [Usecase Diagram and UML Activity Diagram](06-01-usecase-diagram-and-uml-activity-diagram)  用例图，业务过程/多泳道图
+  - 6.2 [Use Cases](06-02-use-cases) 用例+活动图
+  - 6.3 [Domian Models](06-03-domian-models)  领域模型
+  - 6.4 [State Models](06-04-state-models)  状态模型
+  - 6.5 [System Sequence Diagrams](06-05-system-sequence-diagrams)  功能模型
+  - 6.6 [Supplementary Requirements](06-06-supplementary-requirements)  补充需求
 * 7、Design（设计说明书）
   - 7.1 UI design（界面设计）
   - 7.2 Database design（数据库设计）
