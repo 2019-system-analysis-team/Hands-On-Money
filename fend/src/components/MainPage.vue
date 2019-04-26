@@ -181,24 +181,17 @@
 				<form class="form-horizontal">
 					<span class="heading">用户登录</span>
 					<div class="form-group">
-						<input type="email" class="form-control" id="inputEmail3" placeholder="username">
+						<input type="text" class="form-control" id="inputName" placeholder="username">
 						<i class="fa fa-user"></i>
 					</div>
 					<div class="form-group help">
-						<input type="password" class="form-control" id="inputPassword3" placeholder="password">
+						<input type="password" class="form-control" id="inputPassword" placeholder="password">
 						<i class="fa fa-lock"></i>
 						<a href="#" class="fa fa-question-circle"></a>
 					</div>
 					<div class="form-group">
-						<div class="main-checkbox">
-							<input type="checkbox" value="None" id="checkbox1" name="check">
-							<label for="checkbox1"></label>
-						</div>
-						<span class="text">记住密码</span>
-						<button type="submit" class="btn btn-default" onclick="
-				document.getElementById('bgColorDiv').style.display='none'">取消</button>
-						<button type="submit" class="btn btn-default" onclick="
-				document.getElementById('bgColorDiv').style.display='none'">登录</button>
+						<button type="button" class="btn btn-default" @click="clickCancel">取消</button>
+						<button  type="button" class="btn btn-default" @click="clickLogin">登录</button>
 					</div>
 				</form>
 			</div>
@@ -298,6 +291,31 @@
 			},
 			showMessage(){
 				this.messagesNumber = 0;
+			},
+			displayLogin() {
+				document.getElementById('loginFrame').style.display='block';
+				document.getElementById('bgColorDiv').style.display='block';
+			},
+			clickLogin() {
+				var nameData = document.getElementById("inputName").value;
+				var passwordData = document.getElementById("inputPassword").value;
+				if(nameData == "" || passwordData == "") {
+					alert("请输入用户名和密码");
+				}
+				else {
+					document.getElementById('bgColorDiv').style.display='none';
+					var nameData = document.getElementById("inputName").value;
+					localStorage.setItem("nameData", nameData);
+					var passwordData = document.getElementById("inputPassword").value;
+					localStorage.setItem("passwordData", passwordData);
+				}
+			},
+			clickCancel() {
+				document.getElementById('bgColorDiv').style.display='none';
+				var storage = window.localStorage;  
+				var name = storage["nameData"];  
+				var password = storage["passwordData"];
+				console.log(name + " " + password);
 			}
 		}
     }
