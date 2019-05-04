@@ -89,7 +89,6 @@ def deleteTask(_user_id,_task_id, _organization_id):
 
 
 #----------------------------------------------------------------
-#todo 
 #delete task organization
 
 def deleteTaskOrganization(_organization_id,_task_id):

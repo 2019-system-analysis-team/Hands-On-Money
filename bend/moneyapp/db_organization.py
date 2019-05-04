@@ -12,7 +12,7 @@ def addOrganization(_name, _image_file, _bio):
 
     all_organizations = Organization.query.all()
 
-    id = len(all_organizations)
+    id = organization.id
 
     return id
 
