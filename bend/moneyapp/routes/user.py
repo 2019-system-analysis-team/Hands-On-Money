@@ -1,4 +1,5 @@
-import os, datetime
+import os
+from datetime import datetime, timedelta
 import json
 import re
 import uuid
@@ -36,7 +37,7 @@ def login():
     if user:
         bcrypt = Bcrypt(current_app)
         if bcrypt.check_password_hash(user.password, password):
-            token = jwt.encode({'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
+            token = jwt.encode({'id': user.id, 'exp': datetime.utcnow() + timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
             return jsonify({"access_token": token.decode('UTF-8')}), 200
         else:
             return jsonify({"error_code": "404", "error_msg": "account not found/password incorrect"}), 404
@@ -106,7 +107,7 @@ def creating_user():
 
             user_id = addUser(username, email, hashed_password, telephone, newFileName)
             
-            token = jwt.encode({'id': user_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
+            token = jwt.encode({'id': user_id, 'exp': datetime.utcnow() + timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
 
 
             return jsonify({'user_id': user_id,
@@ -117,7 +118,7 @@ def creating_user():
         except Exception as e:
             err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
             return jsonify({'error_code': '409',
-                         'error_msg': err_msg}), 409
+                         'error_msg': str(e)}), 409
   
 # RESTful 登录注销
 @routes.route('/users/<user_id>/session', methods=['DELETE'])    
