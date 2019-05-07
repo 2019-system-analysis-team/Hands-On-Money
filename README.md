@@ -1,4 +1,5 @@
-- [用户与组织系统](#用户与组织系统)
+[TOC]
+- - [用户与组织系统](#用户与组织系统)
 - [用户创建](#用户创建)
 - [用户登录](#用户登录)
 - [用户登录注销](#用户登录注销)
@@ -43,7 +44,7 @@
   - [test case 2：删除不属于自己的任务](#test-case-2删除不属于自己的任务)
 - [删除组织任务](#删除组织任务)
   - [test case 1：正常删除任务](#test-case-1正常删除任务-1)
-  
+
 ![_Entity Relationship Diagram Example -4.25.png](https://i.loli.net/2019/04/25/5cc0a9bb69c5e.png)
 
 #### 用户与组织系统
@@ -52,29 +53,60 @@
 
 @app.route('/users', methods=\['POST'\])
 
+###### test case1：创建已经存在的用户
+
 ```
 POST http://localhost:5000/users
 ```
 ```
 // Request
 {
-    "password":"test6",
-    "email": "test6",
-    "phone_number": "test6",
-    "username": "test6"
+    "password":"test1ll",
+    "email": "test1ll",
+    "phone_number": "test1ll",
+    "username": "test1ll"
 }
 ```
 ```
-// Response
+// Response 409
 {
-    "user_id": 6,
-    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NiwiZXhwIjoxNTU1OTI2NDc0fQ.DbbZWZ2feBmRbgYpPMPy8elIN2egFv84NAOGJcKQ040"
+    "error_code": "409",
+    
+     "error_msg": "create conflicted, duplicate email or phone_number, goto login"
 }
 ```
+
+###### test case2：创建新的用户
+
+```
+POST http://localhost:5000/users
+```
+
+```
+//Request
+{
+    "password":"test3",
+    "email": "test3",
+    "phone_number": "test3",
+    "username": "test3"
+}
+```
+
+```
+//Response 200 
+{
+    "user_id": 12,
+    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTIsImV4cCI6MTU1NzA3NzE1N30.Z_QwVqcVggw-9NDQmGCJfaoRVTv2WubTPeT252dBQlQ"
+}
+```
+
+
 
 ##### 用户登录
 
 @app.route('/sessions', methods=\['POST'\])
+
+###### test case1:用户正确登录
 
 ```
 POST http://localhost:5000/sessions
@@ -82,14 +114,14 @@ POST http://localhost:5000/sessions
 ```
 // Request
 {
-    "password":"test1",
-    "email": "test1"
+    "password":"test3",
+    "email": "test3"
 }
 ```
 ```
-// Response
+// Response 200
 {
-    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZXhwIjoxNTU1OTI2NjM5fQ.FZcD0-iLJITyaqllxNh45oCGS1N0fKl-33YDNaJEsyg"
+    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTIsImV4cCI6MTU1NzA3NzMzMH0.44DNTuebntSUx9OimCxySVp089mrczX4aWQV8wN1zbE"
 }
 ```
 
@@ -100,7 +132,7 @@ POST http://localhost:5000/sessions
 ###### test case 1：成功注销
 
 ```
-DELETE http://localhost:5000/users/1/session
+DELETE http://localhost:5000/users/12/session
 ```
 
 ```
@@ -111,7 +143,7 @@ DELETE http://localhost:5000/users/1/session
 ```
 // Response 200 OK
 {
-    "message": "test1 logged out successfully."
+    "message": "username logged out successfully."
 }
 ```
 
@@ -164,11 +196,115 @@ GET http://localhost:5000/users/2
 }
 ```
 
-##### 用户信息修改 (Todo)
+##### 用户修改昵称和简介：
+
+@app.route('/users/<user_id>/personality', methods=['PUT'])
+
+###### test case1:正确修改信息
+
+```
+PUT http://localhost:5000/users/12/personality
+```
+
+```
+//Request
+{
+    "username":"username",
+    "bio": "bio"
+}
+```
+
+```
+//Response 200 
+{ "nickname": "username", "bio": "bio" }
+```
+
+###### test case2：想要修改非登录用户信息
+
+```
+PUT http://localhost:5000/users/11/personality
+```
+
+```
+//Request
+{
+    "username":"username",
+    "bio": "bio"
+}
+```
+
+```
+//Response 404
+{ "err_msg": "user Not Found" }
+```
+
+##### 用户修改学校、年级、学号信息
+
+@app.route('/users/<user_id>/school', methods=['PUT'])
+
+```
+PUT http://localhost:5000/users/12/school
+```
+
+```
+//Request
+{
+    "school":"school",
+    "grade": "1",
+    "student_id":"1"
+}
+```
+
+```
+//Response 200
+{ "school": "school", "grade": "1", "student_number": "1" }
+```
+
+##### 用户修改真实姓名、年龄、性别信息
+
+@app.route('/users/<user_id>/personal_info', methods=['PUT'])
+
+```
+PUT http://localhost:5000/users/12/personal_info
+```
+
+```
+//Request
+{
+    "realname":"name",
+    "age": "1",
+    "sex":"f"
+}
+```
+
+```
+//Response 200
+{ "name": "name", "age": 1, "sex": "f" }
+```
+
+##### 用户修改头像
+
+@app.route('/users/<user_id>/personal_info', methods=['PUT'])
+
+```
+POST http://localhost:5000/users/12/profile_photo
+```
+
+```
+//Request
+file
+```
+
+```
+//Reaponse 200
+{ "message": "update successfully!" }
+```
+
+
 
 ##### 组织创建
 
-@app.route('/users/<user_id>/organization', methods=\['POST'\])
+@app.route('/users/<user_id>/profile_photo', methods=['POST'])
 
 ```
 POST http://localhost:5000/users/1/organization

@@ -14,7 +14,7 @@ from moneyapp.db_task import *
 from flask_jwt import JWT, jwt_required, current_identity
 from functools import wraps
 from . import routes
-from .home import token_required
+from .home import token_required , blacklist
 
 ##=========== Users ===============================
 # RESTful 用户登录
@@ -29,10 +29,11 @@ def login():
         blacklist.add(token)
 
 
-    email = request.get_json()['email']
-    password = request.get_json()['password']
-
-    user = queryUser(email)
+    ##email = request.get_json()['email']
+    ##password = request.get_json()['password']
+    d = request.get_json()
+    user = queryUser(d)
+    password = d['password']
 
     if user:
         bcrypt = Bcrypt(current_app)
@@ -73,11 +74,14 @@ def get_user_info(current_user, user_id):
 @routes.route('/users', methods=['POST'])
 def creating_user():
     if request.method == 'POST':
+        
         username = request.get_json()['username']
         email = request.get_json()['email']
         telephone = request.get_json()['phone_number']
         password = request.get_json()['password']
+        
        
+
         bcrypt = Bcrypt(current_app)
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
        
@@ -92,7 +96,7 @@ def creating_user():
 
             newFileName = str(autoGenFileName) + '.' + fileExt
 
-            target = UPLOAD_FOLDER
+            target = current_app.config['UPLOAD_FOLDER']   ###################
             print(target)
 
             if not os.path.isdir(target):
@@ -104,7 +108,7 @@ def creating_user():
             newFileName = 'default.jpg'
 
         try:
-
+            
             user_id = addUser(username, email, hashed_password, telephone, newFileName)
             
             token = jwt.encode({'id': user_id, 'exp': datetime.utcnow() + timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
@@ -118,14 +122,14 @@ def creating_user():
         except Exception as e:
             err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
             return jsonify({'error_code': '409',
-                         'error_msg': str(e)}), 409
+                         'error_msg': "create conflicted, duplicate email or phone_number, goto login"}), 409
   
 # RESTful 登录注销
 @routes.route('/users/<user_id>/session', methods=['DELETE'])    
 @token_required
 def logout(current_user, user_id):
-    print(current_user.id)
-    print(user_id)
+    #print(current_user.id)
+    #print(user_id)
 
     if current_user.id == int(user_id):
         token = request.headers['Authorization']
@@ -138,6 +142,7 @@ def logout(current_user, user_id):
         return jsonify({"err_msg": "Not Found"}), 404
 
 # 修改信息
+"""
 @routes.route('/users/modify_profile_test', methods=['POST', 'GET'])
 def test_modify():
     if request.method == 'POST':
@@ -182,18 +187,117 @@ def test_modify():
         result = jsonify({"result": "add!"})
 
     return result
+"""
+#==============================================================
+#修改用户个人信息
 
+#修改nickname，bio
+@routes.route('/users/<user_id>/personality', methods=['PUT'])
+@token_required
+def  modifyUserPersonality(current_user, user_id):
+    if request.method == 'PUT':
+        if current_user.id == int(user_id):
+            d = request.get_json()        
+            user = modify_User(current_user.id,d)
+            return jsonify({"nickname":user.username,
+                "bio":user.bio}),200
+
+        else:
+            return jsonify({"err_msg": "user Not Found"}), 404
+
+        
+#修改school，grade，sid
+@routes.route('/users/<user_id>/school', methods=['PUT'])
+@token_required
+def  modifyUserSchool(current_user, user_id):
+    if request.method == 'PUT':
+        if current_user.id == int(user_id):
+            d = request.get_json()        
+            user = modify_User(current_user.id,d)
+        
+            return jsonify({"school":user.school,
+                "grade":user.grade,
+                "student_number":user.student_id
+                }), 200
+
+        else:
+            return jsonify({"err_msg": "user Not Found"}), 404
+
+#修改name，age，sex
+@routes.route('/users/<user_id>/personal_info', methods=['PUT'])
+@token_required
+def  modifyUserPersonalInfo(current_user, user_id):
+    if request.method == 'PUT':
+        if current_user.id == int(user_id):
+            d = request.get_json()        
+            user = modify_User(current_user.id,d)
+        
+            return jsonify({"name":user.realname,
+                "age":user.age,
+                "sex":user.sex
+                }), 200
+
+        else:
+            return jsonify({"err_msg": "user Not Found"}), 404
+
+#修改photo
+@routes.route('/users/<user_id>/profile_photo', methods=['POST'])
+@token_required
+def  modifyUserPhoto(current_user, user_id):
+    if request.method == 'POST':
+        if current_user.id == int(user_id):
+            
+            if request.files and request.files['file'] :
+                file = request.files['file']
+                filename = secure_filename(file.filename)
+                print(filename)
+            
+                # Gen GUUID File Name
+                fileExt = filename.split('.')[1]
+
+
+                # 判断是否规定格式
+                picExt = ['png', 'jpg', 'jpeg', 'bmp'];
+                if fileExt not in picExt:
+                    return jsonify({"error_code": 415,
+                                    "error_msg": "Unsupported Media Type"}),415
+                    # 返回图片不支持
+
+
+
+                autoGenFileName = uuid.uuid4()
+
+                newFileName = str(autoGenFileName) + '.' + fileExt
+
+
+
+                target = current_app.config['UPLOAD_FOLDER']
+                print(target)
+
+                if not os.path.isdir(target):
+                    os.mkdir(target)
+                file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], newFileName))
+
+            else:
+
+                newFileName = 'default.jpg'
+
+            user = modify_User_Photo(current_user.id,newFileName)
+            return jsonify({"message":"update successfully!"}),200
+         
+
+
+        else:
+            return jsonify({"err_msg": "user Not Found"}), 404
+
+
+
+"""
 # TODO 给个人账号充值
 @routes.route('/users/charge', methods=['POST'])
 def user_charge():
-    """
-    需要首先在db_operations.py里面实现一个修改函数(类似chargeForOrganization)
-    然后在这里调用
-    :param request.form['user_id'] 用户id
-    :param request.form['money'] 充多少钱
-    :rtype: json {"status": "", "message": "", 
-                    "organization_id": ""}
-    """
+    
+ 
 
     #只能通过user_id进行充值
 
@@ -217,4 +321,4 @@ def user_charge():
         result = {"status": "fail",
                   "message": "no post"}  
     return jsonify(result)
- 
+"""
