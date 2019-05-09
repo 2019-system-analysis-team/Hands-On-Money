@@ -35,7 +35,7 @@
 					<div>
 						<Submenu name="4">
 							<template slot="title">
-								<Avatar :src="profilePhotoPath" style="background-color: #87d068">{{shownickname}}</Avatar>
+								<Avatar :src="profilePhotoPath" style="background-color: #87d068"></Avatar>
 							</template>
 							<MenuItem name="4-1" to="/userinfomodify">个人信息</MenuItem>
 							<MenuItem name="4-2" @click.native="logout()">退出</MenuItem>
@@ -370,7 +370,6 @@
                         { required: true, validator: validatePassCheck, trigger: 'blur' }
                     ]			
 				},
-				shownickname:'',
             }
         },
 		created: function () { 
@@ -418,13 +417,10 @@
 					_this.$data.infoValidate.age = response.data.age;
 					_this.$data.infoValidate.gender = response.data.sex;		
 					_this.$data.money = response.data.balance;
-					_this.$data.profilePhotoPath =  response.data.profile_photo_path;
+					_this.$data.profilePhotoPath =  this.$profilePath + response.data.profile_photo_path;
 					_this.$data.defaultList.push({name:_this.$data.profilePhotoName,url:_this.$data.profilePhotoPath});
-					_this.$data.shownickname = response.data.name;
 				}).catch(function (error) {
-					if(error.response.status == 401){
-						_this.$Message.error('请先登录!');
-					}
+					_this.$Message.error('请先登录!');
 					//跳转到主页
 					_this.$router.push({
 						path: '/', 

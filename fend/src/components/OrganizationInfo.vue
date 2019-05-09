@@ -35,7 +35,7 @@
 					<div>
 						<Submenu name="4">
 							<template slot="title">
-								<Avatar :src="profilePhotoPath" style="background-color: #87d068">{{shownickname}}</Avatar>
+								<Avatar :src="profilePhotoPath" style="background-color: #87d068"></Avatar>
 							</template>
 							<MenuItem name="4-1" to="/userinfomodify">个人信息</MenuItem>
 							<MenuItem name="4-2" @click.native="logout()">退出</MenuItem>
@@ -144,7 +144,7 @@
 							<Modal
 								v-model="addMember"
 								title="添加成员"
-								@on-ok="addMemberok"
+								@on-ok="addMemberok('addMemberValidate')"
 								@on-cancel="addMembercancel">
 								
 								<Form ref="addMemberValidate" :model="addMemberValidate" :rules="addMemberRuleValidate" :label-width="80">
@@ -169,7 +169,7 @@
 								<Card>
 									<p slot="title">成员信息</p>
 									<div slot="extra" v-if="isManager || isCreater">
-										<Button type="error" ghost>删除</Button>
+										<Button type="error" ghost @click="deleteMember(item.userID)">删除</Button>
 									</div>	
 									<div style="width: 70%;float: left;">
 										<p style="margin-bottom: 5px;">真实姓名 : {{item.name}}</p>
@@ -185,7 +185,7 @@
 												<Option value="创建者" disabled>创建者</Option>
 											</Select>
 											<Tooltip content="点击确认更改" theme="light" v-if="item.statusChanged">
-												<Button type="success" ghost shape="circle" icon="md-checkmark" size="small"></Button>
+												<Button type="success" @click="modifyMemberStatus(item)" ghost shape="circle" icon="md-checkmark" size="small"></Button>
 											</Tooltip>
 										</div>
 									</div>
@@ -317,7 +317,6 @@
                 visible: false,
 				uploadList: [],
 				jwt:{},
-				shownickname:'',
 				organID:0,
 				
 				allTasks:[
@@ -457,9 +456,8 @@
 				this.$data.profilePhotoName = '头像';
 				//要用完全的路径
 				this.$data.profilePhotoUrl = "/users/:"  + "profile_photo_path";
-				this.$set(this.jwt,'Authorization','jwt');
-				this.$data.shownickname = 'hhhh';
-				/*
+
+
 				let uID = window.localStorage.getItem('userID')
 				if(uID == null || uID == ""){
 					//跳转到主页
@@ -468,11 +466,14 @@
 						name: 'mainpage'
 					});
 				}
-				var url = "/users/:" + uID.toString();
+				var _this = this;
+				var url = "/users/" + uID.toString() + "/organizations/" + organID.toString();
 				this.$data.userID = uID;
 				this.$data.profilePhotoUrl = "/users/:" + uID.toString() + "profile_photo_path";
+				this.organProfilePhotoUrl = "/users/"+uID.toString()+"/organizations/"+  organID.toString() +"/profile_photo";
 				var jwt = "JWT " + window.localStorage.getItem('token');
-				this.$data.jwt.push({Authorization:jwt});
+				this.$set(this.jwt,'Authorization',jwt);
+				/*
 				this.$axios({
 						 method:"get",
 						 url:url,
@@ -480,30 +481,31 @@
 							'Authorization': jwt,
 						 }
 				}).then(function (response){
-					console.log(response);
-					this.$data.personalValidate.nickname = response.data.nickname;
-					this.$data.personalValidate.desc = response.data.bio;
-					this.$data.schoolValidate.school = response.data.school;
-					this.$data.schoolValidate.stunumber = response.data.student_id;
-					this.$data.schoolValidate.grade = response.data.grade;
-					this.$data.infoValidate.name = response.data.name;
-					this.$data.infoValidate.age = response.data.age;
-					this.$data.infoValidate.gender = response.data.sex;		
-					this.$data.money =  response.data.balance;
-					this.$data.profilePhotoPath =  response.data.profile_photo_path;
-					this.$data.defaultList.push({name:this.$data.profilePhotoName,url:this.$data.profilePhotoPath});
+					console.log(response);	
+					//----------------------
+					"name": "",
+					"bio": "",
+					"avg_comment": 0,
+					"members":[
+						{
+							"user_id": 123,
+							"status": "status"
+						},
+						{
+							"user_id": 123,
+							"status": "status"
+						}
+					]
+					//---------------------
 				}).catch(function (error) {
-					console.log(error.data.error_msg);
+					_this.$Message.error('请先登录!');
 					//跳转到主页
-					this.$router.push({
+					_this.$router.push({
 						path: '/', 
 						name: 'mainpage'
 					});
 				});
 				*/
-			   if(this.profilePhotoPath == ''){
-				   
-			   }
 			},
 			handleView (name) {
                 this.imgName = name;
@@ -602,9 +604,9 @@
 					//应该改为修改信息
                     if (valid) {
 						var jwt = "JWT " + window.localStorage.getItem('token');
-						var url = "/users/:"+ this.$data.userID.toString() +"/organization";
+						var url = "/users/"+ this.$data.userID.toString() +"/organizations" + this.organID.toString();
 						this.$axios({
-							 method:"post",
+							 method:"put",
 							 url: url,
 							 data:{
 								name: this.$data.formValidate.name,
@@ -629,12 +631,88 @@
 			changeStatus(item){
 				item.statusChanged = true;
 			},
-            addMemberok () {
-                this.$Message.info('Clicked ok');
+            addMemberok (name) {
+			   this.$refs[name].validate((valid) => {
+
+					var jwt = "JWT " + window.localStorage.getItem('token');
+					var url = "/users/"+ this.$data.userID.toString() +"/organizations" + this.organID.toString() + "/members";
+					if (valid) {
+						this.$Message.info('Clicked ok');
+						if(this.addMemberValidate.addMemberType == '邮件'){
+							this.$axios({
+								 method:"post",
+								 url: url,
+								 data:{
+									email: this.$data.addMemberValidate.addMemberInfo,
+									statue: this.$data.addMemberValidate.addMemberStatus
+								 },
+								 headers:{
+									'Authorization': jwt,
+								 }
+							}).then(function (response){
+								console.log(response);
+							}).catch(function (error) {
+								console.log(error);
+							});						
+						}else{
+							this.$axios({
+								 method:"post",
+								 url: url,
+								 data:{
+									phone_number: this.$data.addMemberValidate.addMemberInfo,
+									statue: this.$data.addMemberValidate.addMemberStatus
+								 },
+								 headers:{
+									'Authorization': jwt,
+								 }
+							}).then(function (response){
+								console.log(response);
+							}).catch(function (error) {
+								console.log(error);
+							});								
+						}
+					}
+				});
             },
             addMembercancel () {
                 this.$Message.info('Clicked cancel');
             },
+			deleteMember(deleteUserID){
+				var _this = this;
+				var url_all = "/users/"+this.userID.toString()+"/organizations/"+this.organID.toString()+"/members/"+deleteUserID.toString();
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+					 method:"delete",
+					 url: url_all,
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+
+				}).catch(function (error) {
+					console.log(error);
+				});
+			
+			},
+			modifyMemberStatus(item){
+				var url_all = "/users/"+this.userID.toString()+"/organizations/"+this.organID.toString()+"/members/"+item.userID.toString();
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+					 method:"put",
+					 url: url_all,
+					 data:{
+						statue: item.status
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					console.log(response);
+				}).catch(function (error) {
+					console.log(error);
+				});		
+				item.statusChanged = false;
+			},
         },
         mounted () {
             this.uploadList = this.$refs.upload.fileList;

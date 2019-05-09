@@ -35,7 +35,7 @@
 					<div>
 						<Submenu name="4">
 							<template slot="title">
-								<Avatar :src="profilePhotoPath" style="background-color: #87d068">{{shownickname}}</Avatar>
+								<Avatar :src="profilePhotoPath" style="background-color: #87d068"></Avatar>
 							</template>
 							<MenuItem name="4-1" to="/userinfomodify">个人信息</MenuItem>
 							<MenuItem name="4-2" @click.native="logout()">退出</MenuItem>
@@ -118,7 +118,6 @@
 					mode: '支付宝',
                 },
 				profilePhotoPath:'',
-				shownickname:'',
 				jwt:{},
 				profilePhotoName:'',
 				organclass:'全部组织',
@@ -224,10 +223,7 @@
 				this.selectOrganizations = this.allOrganizations;
 				this.$data.profilePhotoName = '头像';
 				//要用完全的路径
-				this.$data.profilePhotoUrl = "/users/:"  + "profile_photo_path";
-				this.$set(this.jwt,'Authorization','jwt');
-				this.$data.shownickname = 'hhhh';
-				/*
+				this.$data.profilePhotoUrl = "/users/:"  + "profile_photo_path";		
 				let uID = window.localStorage.getItem('userID')
 				if(uID == null || uID == ""){
 					//跳转到主页
@@ -236,11 +232,14 @@
 						name: 'mainpage'
 					});
 				}
-				var url = "/users/:" + uID.toString();
+				var url = "/users/" + uID.toString() + "organizations";
 				this.$data.userID = uID;
-				this.$data.profilePhotoUrl = "/users/:" + uID.toString() + "profile_photo_path";
+				this.$data.profilePhotoUrl = "/users/" + uID.toString() + "profile_photo_path";
 				var jwt = "JWT " + window.localStorage.getItem('token');
-				this.$data.jwt.push({Authorization:jwt});
+				this.$set(this.jwt,'Authorization',jwt);
+				
+				/*
+				var _this = this;
 				this.$axios({
 						 method:"get",
 						 url:url,
@@ -249,21 +248,14 @@
 						 }
 				}).then(function (response){
 					console.log(response);
-					this.$data.personalValidate.nickname = response.data.nickname;
-					this.$data.personalValidate.desc = response.data.bio;
-					this.$data.schoolValidate.school = response.data.school;
-					this.$data.schoolValidate.stunumber = response.data.student_id;
-					this.$data.schoolValidate.grade = response.data.grade;
-					this.$data.infoValidate.name = response.data.name;
-					this.$data.infoValidate.age = response.data.age;
-					this.$data.infoValidate.gender = response.data.sex;		
-					this.$data.money =  response.data.balance;
-					this.$data.profilePhotoPath =  response.data.profile_photo_path;
-					this.$data.defaultList.push({name:this.$data.profilePhotoName,url:this.$data.profilePhotoPath});
+					this.$data.allOrganizations =  response.data.organizations;
+					// 根据状态筛选出哪些是管理哪些是创建
+					// TODO
+					
 				}).catch(function (error) {
-					console.log(error.data.error_msg);
+					_this.$Message.error('请先登录!');
 					//跳转到主页
-					this.$router.push({
+					_this.$router.push({
 						path: '/', 
 						name: 'mainpage'
 					});

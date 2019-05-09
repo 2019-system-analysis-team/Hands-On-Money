@@ -220,6 +220,7 @@
 				var _this = this;
                 this.$refs[name].validate((valid) => {
                     if (valid) {
+						console.log("密码:" + this.$data.formValidate.passwd);
 						this.$axios({
 							 method:"post",
 							 url:"/users",
@@ -285,7 +286,7 @@
 							.catch(function (error) {
 								console.log(error.response.status);
 								if(error.response.status == 409){
-									_this.$Message.error('注册失败，重复的电子邮件或电话号码');
+									_this.$Message.error('注册失败，重复的电子邮件或电话号码或用户名');
 								}
 							});
                     } else {

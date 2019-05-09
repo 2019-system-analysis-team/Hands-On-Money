@@ -70,7 +70,7 @@
 					<div class="layout-button" v-if="isLogin">
 						<Submenu name="4">
 							<template slot="title">
-								<Avatar :src="profilePhotoPath" style="background-color: #87d068">{{shownickname}}</Avatar>
+								<Avatar :src="profilePhotoPath" style="background-color: #87d068"></Avatar>
 							</template>
 							<MenuItem name="4-1" to="/userinfomodify">个人信息</MenuItem>
 							<MenuItem name="4-2" @click.native="logout()">退出</MenuItem>
@@ -181,24 +181,17 @@
 				<form class="form-horizontal">
 					<span class="heading">用户登录</span>
 					<div class="form-group">
-						<input type="email" class="form-control" id="inputEmail3" placeholder="username">
+						<input type="text" class="form-control" v-model = "inputName" placeholder="email">
 						<i class="fa fa-user"></i>
 					</div>
 					<div class="form-group help">
-						<input type="password" class="form-control" id="inputPassword3" placeholder="password">
+						<input type="password" class="form-control" v-model="inputPassword" placeholder="password">
 						<i class="fa fa-lock"></i>
 						<a href="#" class="fa fa-question-circle"></a>
 					</div>
 					<div class="form-group">
-						<div class="main-checkbox">
-							<input type="checkbox" value="None" id="checkbox1" name="check">
-							<label for="checkbox1"></label>
-						</div>
-						<span class="text">记住密码</span>
-						<button type="submit" class="btn btn-default" onclick="
-				document.getElementById('bgColorDiv').style.display='none'">取消</button>
-						<button type="submit" class="btn btn-default" onclick="
-				document.getElementById('bgColorDiv').style.display='none'">登录</button>
+						<button type="button" class="btn btn-default" @click="clickCancel">取消</button>
+						<button  type="button" class="btn btn-default" @click="clickLogin">登录</button>
 					</div>
 				</form>
 			</div>
@@ -214,7 +207,6 @@
 				isLogin: false,
 				profilePhotoPath: '',
 				money: 0,
-				shownickname:'',
 				topupData: {
 				    value: 1,
 					mode: '支付宝',
@@ -227,7 +219,9 @@
                     position: 'static'
                 },
 				messagesNumber:100,
-				haveTask: false
+				haveTask: false,
+				inputName: '',
+				inputPassword: '',
 			};
 		}, 
 		created: function () { 
@@ -254,9 +248,8 @@
 				}).then(function (response){
 					console.log(response);
 					_this.isLogin = true;
-					//-------------------------------这里的路径还有一点问题，无法显示默认图片
-					_this.profilePhotoPath = response.data.profile_photo_path;					
-					_this.shownickname = response.data.name;
+					_this.profilePhotoPath = _this.$profilePath + response.data.profile_photo_path;					
+
 				}).catch(function (error) {
 					console.log(error.response.status);
 					_this.isLogin = false;
@@ -298,6 +291,53 @@
 			},
 			showMessage(){
 				this.messagesNumber = 0;
+			},
+			displayLogin() {
+				document.getElementById('loginFrame').style.display='block';
+				document.getElementById('bgColorDiv').style.display='block';
+			},
+			clickLogin() {
+				var _this = this;
+
+				if(this.inputName == "" || this.inputPassword == "") {
+					alert("请输入邮箱和密码");
+				}
+				else {
+					document.getElementById('bgColorDiv').style.display='none';
+					console.log(this.inputName + " + " + this.inputPassword);
+					this.$axios({
+						 method:"post",
+						 url:"/sessions",
+						 data:{
+							email: this.inputName,
+							password: this.inputPassword,
+						 }
+						}).then(function (response){
+							console.log(response);
+							window.localStorage.setItem('token', response.data.access_token);
+							window.localStorage.setItem('userID', response.data.user_id);
+							
+							//跳转到主页
+							_this.$router.push({
+								path: '/', 
+								name: 'mainpage'
+							});
+						})
+						.catch(function (error) {
+							console.log(error.response.status);
+							if(error.response.status == 404){
+								_this.$Message.error('用户不存在或者密码错误');
+							}
+							_this.inputName = '';
+							_this.inputPassword = '';
+
+						});
+				}
+			},
+			clickCancel() {
+				document.getElementById('bgColorDiv').style.display='none';
+				this.inputName = '';
+				this.inputPassword = '';
 			}
 		}
     }
@@ -359,8 +399,6 @@
 .ivu-icon-md-notifications-outline{
 	margin-bottom: 30px;
 }
-
-
 .black_overlay {
 	display: none;
 	position: absolute;

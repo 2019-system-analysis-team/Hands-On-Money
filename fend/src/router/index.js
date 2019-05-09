@@ -15,7 +15,7 @@ Vue.use(iView);
 Vue.prototype.$axios = axios    //全局注册，使用方法为:this.$axios
 axios.defaults.headers.post['Content-Type'] = 'application/json';//配置请求头信息
 axios.defaults.baseURL = process.env.BASE_API;
-
+Vue.prototype.$profilePath = "http://localhost:5000/static/profile_pics/"; // 读取头像的路径
 export default new Router({
 	mode: 'history',
     routes: [
