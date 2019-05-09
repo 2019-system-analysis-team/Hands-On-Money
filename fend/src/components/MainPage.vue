@@ -181,11 +181,19 @@
 				<form class="form-horizontal">
 					<span class="heading">用户登录</span>
 					<div class="form-group">
+<<<<<<< HEAD
 						<input type="text" class="form-control" v-model = "inputName" placeholder="email">
 						<i class="fa fa-user"></i>
 					</div>
 					<div class="form-group help">
 						<input type="password" class="form-control" v-model="inputPassword" placeholder="password">
+=======
+						<input type="text" class="form-control" id="inputName" placeholder="username">
+						<i class="fa fa-user"></i>
+					</div>
+					<div class="form-group help">
+						<input type="password" class="form-control" id="inputPassword" placeholder="password">
+>>>>>>> a8843b327cd27c9a0a8d7063bd8a1a847ca429b9
 						<i class="fa fa-lock"></i>
 						<a href="#" class="fa fa-question-circle"></a>
 					</div>
@@ -297,6 +305,7 @@
 				document.getElementById('bgColorDiv').style.display='block';
 			},
 			clickLogin() {
+<<<<<<< HEAD
 				var _this = this;
 
 				if(this.inputName == "" || this.inputPassword == "") {
@@ -332,12 +341,32 @@
 							_this.inputPassword = '';
 
 						});
+=======
+				var nameData = document.getElementById("inputName").value;
+				var passwordData = document.getElementById("inputPassword").value;
+				if(nameData == "" || passwordData == "") {
+					alert("请输入用户名和密码");
+				}
+				else {
+					document.getElementById('bgColorDiv').style.display='none';
+					var nameData = document.getElementById("inputName").value;
+					localStorage.setItem("nameData", nameData);
+					var passwordData = document.getElementById("inputPassword").value;
+					localStorage.setItem("passwordData", passwordData);
+>>>>>>> a8843b327cd27c9a0a8d7063bd8a1a847ca429b9
 				}
 			},
 			clickCancel() {
 				document.getElementById('bgColorDiv').style.display='none';
+<<<<<<< HEAD
 				this.inputName = '';
 				this.inputPassword = '';
+=======
+				var storage = window.localStorage;  
+				var name = storage["nameData"];  
+				var password = storage["passwordData"];
+				console.log(name + " " + password);
+>>>>>>> a8843b327cd27c9a0a8d7063bd8a1a847ca429b9
 			}
 		}
     }
