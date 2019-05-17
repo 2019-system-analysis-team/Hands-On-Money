@@ -10,7 +10,7 @@
 								<Icon type="ios-ionic"></Icon>
 								任务
 							 </template>
-							<MenuItem name="1-1">我的任务</MenuItem>
+							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
 							<MenuItem name="1-2">新建任务</MenuItem>
 							<MenuItem name="1-3">所有任务</MenuItem>
                         </Submenu>
@@ -64,13 +64,44 @@
 								<Card>
 									<p slot="title">{{item.title}}</p>
 									<div slot="extra">
-										<Button type="primary" ghost>编辑</Button>
+										<Button type="primary" ghost @click="LookTaskInfo(item.id)">详情</Button>
 									</div>	
-									<p>{{item.label}}</p>
+									<p>{{item.status}}</p>
 									 
 								</Card>
 							</Col>
 						</Card>		
+						<Modal v-model="showTaskInfo">
+							<p slot="header" style="text-align:center">
+								<Icon type="ios-information-circle"></Icon>
+								<span>任务详情</span>
+							</p>
+							<div>
+								<Card dis-hover>
+									<p slot="title" class="info">{{showTaskInfomation.title}}</p>
+									标签 : <Tag v-for="item in showTaskInfomation.tags" :key="item" :name="item" color="cyan">{{ item }}</Tag>
+									<p class="info">任务描述 : {{showTaskInfomation.description}}</p>
+									<p class="info">当前参与者人数 : {{showTaskInfomation.current_participant_number}}</p>
+									<p class="info">参与者人数上限 : {{showTaskInfomation.participant_number_limit}}</p>
+									<p class="info">完成奖励代币 : {{showTaskInfomation.reward_for_one_participant}}</p>
+									<p class="info">创建者名字 : {{showTaskInfomation.creator_organization_name}}</p>
+									<p class="info">创建者邮箱 : {{showTaskInfomation.creator_user_email}}</p>
+									<p class="info">创建者电话 : {{showTaskInfomation.creator_user_phone_number}}</p>
+									<p class="info">任务发布时间 : {{showTaskInfomation.post_time}}</p>
+									<p class="info">截止接受任务时间 : {{showTaskInfomation.receive_end_time}}</p>
+									<p class="info">最迟完成任务时间 : {{showTaskInfomation.finish_deadline_time}}</p>
+									<p class="info">步骤 : </p>
+									<Steps :current="showTaskInfomation.current">
+										<Step :title="item.title" v-for="item in showTaskInfomation.steps" :key="item.title">
+										</Step>
+									</Steps>
+								</Card>
+								</div>
+							<div slot="footer">
+								<Button type="text" @click="showTaskCancel">确定</Button>
+								<Button type="primary" @click="ToTaskInfo(showTaskInfomation.task_id)">编辑</Button>
+							</div>
+						</Modal>
 					</TabPane>
 					<TabPane label="组织信息" name="组织信息">
 						<Card dis-hover style="height:380px">
@@ -296,8 +327,12 @@
 					mode: '支付宝',
                 },
 				
-				taskclass:'进行中',
+				taskclass:'全部任务',
 				classifications: [
+					{
+					    value: '全部任务',
+					    label: '全部任务'
+					},
 				    {
 				        value: '进行中',
 				        label: '进行中'
@@ -306,10 +341,6 @@
 				        value: '已结束',
 				        label: '已结束'
 				    },
-				    {
-				        value: '全部任务',
-				        label: '全部任务'
-				    }
 				],		
 				
                 defaultList: [],
@@ -322,46 +353,46 @@
 				allTasks:[
 					{
 						title:'找绿帽子',
-						label:'假装有标签',
+						status:'进行中',
 						id:1,
 					},
 					{
 						title:'找红帽子',
-						label:'假装有标签',
+						status:'进行中',
 						id:2,
 					},
 					{
 						title:'找黄帽子',
-						label:'假装有标签',
+						status:'进行中',
 						id:3,
 					},
 					{
 						title:'找蓝帽子',
-						label:'假装有标签',
+						status:'已完成',
 						id:4,
 					},
 				],
 				inprogressTasks:[
 					{
 						title:'找绿帽子',
-						label:'假装有标签',
+						status:'进行中',
 						id:1,
 					},
 					{
 						title:'找红帽子',
-						label:'假装有标签',
+						status:'进行中',
 						id:2,
 					},
 					{
 						title:'找黄帽子',
-						label:'假装有标签',
+						status:'进行中',
 						id:3,
 					},
 				],
 				finishedTasks:[
 					{
 						title:'找蓝帽子',
-						label:'假装有标签',
+						status:'已完成',
 						id:4,
 					},
 				],
@@ -425,7 +456,34 @@
 					 addMemberInfo: [
 						 { required: true, message: '该字段不能为空', trigger: 'blur' }
 					 ],					
-				}
+				},
+				showTaskInfomation:{
+					task_id: 123456,
+					creator_user_email: "i@sirius.com",
+					creator_user_phone_number: "13123456789",
+					creator_organization_name: "name",
+					title: "一个标题",
+					description: "一个描述",
+					tags: ["tag1", "tag2", "tag3"],
+					current_participant_number: 3,
+					participant_number_limit: 10,
+					reward_for_one_participant: 2,
+					post_time: "date_obj",
+					receive_end_time: "date_obj",
+					finish_deadline_time: "date_obj",
+					steps: [
+						{
+							title: "下楼",
+							description: "下楼"
+						},
+						{
+							title: "拿外卖",
+							description: "拿外卖"
+						}
+					],
+					current: -1
+				},
+				showTaskInfo: false,
             }
         },
 		created: function () { 
@@ -713,6 +771,27 @@
 				});		
 				item.statusChanged = false;
 			},
+			LookTaskInfo(taskId){
+				this.showTaskInfo = true;
+				this.showTaskInfomation.task_id = taskId;
+			},
+			showTaskOK(){
+				 this.$Message.info('Clicked OK');
+			},
+			showTaskCancel(){
+				 this.$Message.info('Clicked cancel');
+				 this.showTaskInfo = false;
+			},
+			ToTaskInfo(taskID){
+				//console.log("taskID" + taskID);
+				this.$router.push({
+					path: '/', 
+					name: 'taskinfoforcreate',
+					params: { 
+							taskID: taskID
+					},
+				});				
+			}
         },
         mounted () {
             this.uploadList = this.$refs.upload.fileList;
@@ -808,5 +887,8 @@
 	text-align: center;
 	padding-top: 10px;
     padding-bottom: 10px;
+}
+.info {	
+    margin-bottom: 10px;
 }
 </style>

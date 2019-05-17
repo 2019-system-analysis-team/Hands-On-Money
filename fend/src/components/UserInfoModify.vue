@@ -10,7 +10,7 @@
 								<Icon type="ios-ionic"></Icon>
 								任务
 							 </template>
-							<MenuItem name="1-1">我的任务</MenuItem>
+							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
 							<MenuItem name="1-2">新建任务</MenuItem>
 							<MenuItem name="1-3">所有任务</MenuItem>
                         </Submenu>
@@ -397,7 +397,7 @@
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				//设置jwt认证头部
 				this.$set(this.jwt,'Authorization',jwt);
-				
+				/*
 				var _this = this;
 				this.$axios({
 						 method:"get",
@@ -427,6 +427,7 @@
 						name: 'mainpage'
 					});
 				});
+				*/
 			},
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {

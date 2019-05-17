@@ -6,6 +6,8 @@ import userinfomodify from '@/components/UserInfoModify'
 import organregister from '@/components/OrganRegister'
 import organization from '@/components/MyOrganization'
 import organizationInfo from '@/components/OrganizationInfo'
+import mytasks from '@/components/MyTasks'
+import taskinfoforcreate from '@/components/TaskInfoForCreate'
 import iView from 'iview';
 import axios from 'axios'
 import 'iview/dist/styles/iview.css';
@@ -48,6 +50,16 @@ export default new Router({
 			path: '/organizationInfo',
 			name: 'organizationInfo',
 			component: organizationInfo
+		},
+		{
+			path: '/mytasks',
+			name: 'mytasks',
+			component: mytasks
+		},
+		{
+			path: '/taskinfoforcreate',
+			name: 'taskinfoforcreate',
+			component: taskinfoforcreate
 		}
   ]
 })

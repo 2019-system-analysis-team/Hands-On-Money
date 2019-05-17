@@ -220,7 +220,6 @@
 				var _this = this;
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-						console.log("密码:" + this.$data.formValidate.passwd);
 						this.$axios({
 							 method:"post",
 							 url:"/users",
