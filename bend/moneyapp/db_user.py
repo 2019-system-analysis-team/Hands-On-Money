@@ -3,6 +3,7 @@ import json
 from flask import jsonify
 from datetime import datetime
 
+
 # ====================================================================
 # User
 # 访客基础信息
@@ -60,6 +61,7 @@ def modify_User_Photo(_id_ori,_new_filename):
 def queryUserById(_id):
     user = User.query.filter_by(id=_id).first()
     return user
+
 
 def queryUser(d):
     items ={'email','telephone'}

@@ -202,6 +202,8 @@ GET http://localhost:5000/users/2
 
 ###### test case1:正确修改信息
 
+//检查username是否重复 这个返回啥？
+
 ```
 PUT http://localhost:5000/users/12/personality
 ```
