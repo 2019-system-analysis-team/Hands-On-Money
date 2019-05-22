@@ -18,6 +18,8 @@ app.register_blueprint(routes)
 db.init_app(app)
 
 
+
+
 # from moneyapp import routes 
 
 
