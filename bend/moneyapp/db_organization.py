@@ -3,6 +3,7 @@ import json
 from flask import jsonify
 from datetime import datetime
 
+
 # ====================================================================
 # Organization
 def addOrganization(_name, _image_file, _bio):

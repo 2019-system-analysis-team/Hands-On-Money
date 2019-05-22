@@ -2,7 +2,7 @@ from moneyapp.models import db, User, Organization, Task, Receiver_Task, Organiz
 import json
 from flask import jsonify
 from datetime import datetime
-
+from moneyapp.utils import *
 
 # ====================================================================
 # User
@@ -58,9 +58,9 @@ def modify_User_Photo(_id_ori,_new_filename):
 
 
 
-def queryUserById(_id):
-    user = User.query.filter_by(id=_id).first()
-    return user
+# def queryUserById(_id):
+#     user = User.query.filter_by(id=_id).first()
+#     return user
 
 
 def queryUser(d):
@@ -97,10 +97,10 @@ def chargeForUser(_user_id,_money):
 
 # =====================================================
 # Money
-def checkBalance(_user_id, _organization_id, _money):
-    if _organization_id:
-        organization = queryOrganizationByID(_organization_id)
-        return organization.balance >= _money
-    elif _user_id:
-        user = queryUserById(_user_id)
-        return user.balance >= _money
+# def checkBalance(_user_id, _organization_id, _money):
+#     if _organization_id:
+#         organization = queryOrganizationByID(_organization_id)
+#         return organization.balance >= _money
+#     elif _user_id:
+#         user = queryUserById(_user_id)
+#         return user.balance >= _money
