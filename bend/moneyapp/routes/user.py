@@ -228,11 +228,11 @@ def  modifyUserPersonality(current_user, user_id):
             except Exception as e:
                 return jsonify({"error_code": "400", "error_msg": "fuck you asshole"}),400
             try:
-                user = modify_User(current_user.id,d)
+                user = modify_User(user_id,d)
             except Exception as e:
                 err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
                 return jsonify({'error_code': '409',
-                         'error_msg': "conflicted"}), 409k
+                         'error_msg': "conflicted"}), 409
 
             return jsonify({"nickname":user.username,
                     "bio":user.bio}),200
