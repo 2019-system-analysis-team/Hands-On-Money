@@ -45,7 +45,7 @@
 - [删除组织任务](#删除组织任务)
   - [test case 1：正常删除任务](#test-case-1正常删除任务-1)
 
-![_Entity Relationship Diagram Example -4.25.png](https://i.loli.net/2019/04/25/5cc0a9bb69c5e.png)
+[![_Entity Relationship Diagram Example (3).png](https://i.loli.net/2019/05/22/5ce50cf37871046705.png)](https://i.loli.net/2019/05/22/5ce50cf37871046705.png)
 
 #### 用户与组织系统
 

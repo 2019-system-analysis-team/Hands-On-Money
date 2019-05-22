@@ -1,4 +1,4 @@
-from moneyapp.models import db, User, Organization, Task, Receiver_Task, Organization_Member, Transaction
+from moneyapp.models import db, User, Organization, Task, Receiver_Task, Organization_Member, Transaction, Feedback_Review, Customer_Review
 import json
 from flask import jsonify
 from datetime import datetime

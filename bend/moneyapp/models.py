@@ -87,4 +87,43 @@ class Transaction(db.Model):
 	money = db.Column(db.Float, nullable=False)
 	time = db.Column(db.DateTime, default=datetime.utcnow())
 
+class Feedback_Review(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	user = db.relationship('User', backref=db.backref('feedback_reviews', lazy='dynamic'))
+	organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'))
+	organization = db.relationship('Organization', db.backref('feedback_reviews', lazy='dynamic'))
+	task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
+	task = db.relationship('Task', db.backref('feedback_reviews', lazy='dynamic'))
+	title = db.Column(db.String(100), nullable=False, default='Feedback review')
+	content = db.Column(db.Text, nullable=False, default='default good review')
+	rate = db.Column(db.Integer, nullable=False, default=5)
+
+
+class Customer_Review(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	user = db.relationship('User', backref=db.backref('customer_reviews', lazy='dynamic'))
+	task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
+	task = db.relationship('Task', db.backref('customer_reviews', lazy='dynamic'))
+	title = db.Column(db.String(100), nullable=False, default='Customer review')
+	content = db.Column(db.Text, nullable=False, default='default good review')
+	rate = db.Column(db.Integer, nullable=False, default=5)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
