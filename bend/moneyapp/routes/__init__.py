@@ -5,3 +5,4 @@ from .home import *
 from .user import *
 from .organization import *
 from .task import *
+from .review import *

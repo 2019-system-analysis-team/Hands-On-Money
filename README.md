@@ -1,52 +1,68 @@
-[TOC]
-- - [用户与组织系统](#用户与组织系统)
-- [用户创建](#用户创建)
-- [用户登录](#用户登录)
-- [用户登录注销](#用户登录注销)
-  - [test case 1：成功注销](#test-case-1成功注销)
-  - [test case 2：注销非登录者（非token记录）的账号](#test-case-2注销非登录者非token记录的账号)
-- [用户信息](#用户信息)
-- [用户信息修改 (Todo)](#用户信息修改-todo)
-- [组织创建](#组织创建)
-- [组织信息 (Todo)](#组织信息-todo)
-- [组织信息修改 (Todo)](#组织信息修改-todo)
-- [群主管理员添加成员](#群主管理员添加成员)
-- [组织成员权限变更 (Todo)](#组织成员权限变更-todo)
-- [组织成员删除 (Todo)](#组织成员删除-todo)
-- [群主删除组织](#群主删除组织)
-- [用户参加的组织 (Todo)](#用户参加的组织-todo)
-- [任务系统](#任务系统)
-- [个人创建任务](#个人创建任务)
-- [组织创建任务](#组织创建任务)
-- [用户查询自己创建的任务](#用户查询自己创建的任务)
-- [组织查询自己创建的任务](#组织查询自己创建的任务)
-- [*任务查询](#任务查询)
-  - [test case 1：查找给female的任务](#test-case-1查找给female的任务)
-  - [test case 2：查找steps不超过1的任务](#test-case-2查找steps不超过1的任务)
-  - [test case 3：找到所有task1-org组织创建的任务](#test-case-3找到所有task1-org组织创建的任务)
-- [任务接受](#任务接受)
-- [任务完成](#任务完成)
-  - [test case 1：正常改变step](#test-case-1正常改变step)
-  - [test case 2：step_id超过任务本身设定的step/step之前已经标记过了](#test-case-2step_id超过任务本身设定的stepstep之前已经标记过了)
-  - [test case 3：该用户没有接受该任务](#test-case-3该用户没有接受该任务)
-- [任务审核](#任务审核)
-  - [test case 1：正常标记用户完成任务](#test-case-1正常标记用户完成任务)
-  - [test case 2：该用户已经被标记完成](#test-case-2该用户已经被标记完成)
-- [撤回任务](#撤回任务)
-  - [test case 1：正常撤回](#test-case-1正常撤回)
-  - [test case 2：撤回已经处于pending状态的任务](#test-case-2撤回已经处于pending状态的任务)
-- [修改个人未发布任务](#修改个人未发布任务)
-- [修改组织未发布任务](#修改组织未发布任务)
-  - [test case 1：修改未经撤回的任务](#test-case-1修改未经撤回的任务)
-  - [test case 2：正常修改组织创建任务](#test-case-2正常修改组织创建任务)
-- [删除个人任务](#删除个人任务)
-  - [test case 1：正常删除任务](#test-case-1正常删除任务)
-  - [test case 2：删除不属于自己的任务](#test-case-2删除不属于自己的任务)
-- [删除组织任务](#删除组织任务)
-  - [test case 1：正常删除任务](#test-case-1正常删除任务-1)
-
-[![_Entity Relationship Diagram Example (3).png](https://i.loli.net/2019/05/22/5ce50cf37871046705.png)](https://i.loli.net/2019/05/22/5ce50cf37871046705.png)
-
+* [用户与组织系统](#用户与组织系统)
+   * [用户创建](#用户创建)
+      * [test case1：创建已经存在的用户](#test-case1创建已经存在的用户)
+      * [test case2：创建新的用户](#test-case2创建新的用户)
+   * [用户登录](#用户登录)
+      * [test case1:用户正确登录](#test-case1用户正确登录)
+   * [用户登录注销](#用户登录注销)
+      * [test case 1：成功注销](#test-case-1成功注销)
+      * [test case 2：注销非登录者（非token记录）的账号](#test-case-2注销非登录者非token记录的账号)
+   * [用户信息](#用户信息)
+   * [用户修改昵称和简介：](#用户修改昵称和简介)
+      * [test case1:正确修改信息](#test-case1正确修改信息)
+      * [test case2：想要修改非登录用户信息](#test-case2想要修改非登录用户信息)
+   * [用户修改学校、年级、学号信息](#用户修改学校年级学号信息)
+   * [用户修改真实姓名、年龄、性别信息](#用户修改真实姓名年龄性别信息)
+   * [用户修改头像](#用户修改头像)
+   * [组织创建](#组织创建)
+   * [组织信息 (Todo)](#组织信息-todo)
+   * [组织信息修改 (Todo)](#组织信息修改-todo)
+   * [群主管理员添加成员](#群主管理员添加成员)
+   * [组织成员权限变更 (Todo)](#组织成员权限变更-todo)
+   * [组织成员删除 (Todo)](#组织成员删除-todo)
+   * [群主删除组织](#群主删除组织)
+   * [用户参加的组织 (Todo)](#用户参加的组织-todo)
+* [任务系统](#任务系统)
+   * [个人创建任务](#个人创建任务)
+   * [组织创建任务](#组织创建任务)
+   * [用户查询自己创建的任务](#用户查询自己创建的任务)
+   * [组织查询自己创建的任务](#组织查询自己创建的任务)
+   * [*任务查询](#任务查询)
+      * [test case 1：查找给female的任务](#test-case-1查找给female的任务)
+      * [test case 2：查找steps不超过1的任务](#test-case-2查找steps不超过1的任务)
+      * [test case 3：找到所有task1-org组织创建的任务](#test-case-3找到所有task1-org组织创建的任务)
+   * [任务接受](#任务接受)
+   * [任务完成](#任务完成)
+      * [test case 1：正常改变step](#test-case-1正常改变step)
+      * [test case 2：step_id超过任务本身设定的step/step之前已经标记过了](#test-case-2step_id超过任务本身设定的stepstep之前已经标记过了)
+      * [test case 3：该用户没有接受该任务](#test-case-3该用户没有接受该任务)
+   * [任务审核](#任务审核)
+      * [test case 1：正常标记用户完成任务](#test-case-1正常标记用户完成任务)
+      * [test case 2：该用户已经被标记完成](#test-case-2该用户已经被标记完成)
+   * [撤回任务](#撤回任务)
+      * [test case 1：正常撤回](#test-case-1正常撤回)
+      * [test case 2：撤回已经处于pending状态的任务](#test-case-2撤回已经处于pending状态的任务)
+   * [修改个人未发布任务](#修改个人未发布任务)
+   * [修改组织未发布任务](#修改组织未发布任务)
+      * [test case 1：修改未经撤回的任务](#test-case-1修改未经撤回的任务)
+      * [test case 2：正常修改组织创建任务](#test-case-2正常修改组织创建任务)
+   * [删除个人任务](#删除个人任务)
+      * [test case 1：正常删除任务](#test-case-1正常删除任务)
+      * [test case 2：删除不属于自己的任务](#test-case-2删除不属于自己的任务)
+   * [删除组织任务](#删除组织任务)
+      * [test case 1：正常删除任务](#test-case-1正常删除任务-1)
+* [接收者评价系统](#接收者评价系统)
+   * [任务接收者写评价](#任务接收者写评价)
+      * [test case 1：正常添加评论](#test-case-1正常添加评论)
+      * [test case 3：该用户还未经审核标记为完成该任务](#test-case-3该用户还未经审核标记为完成该任务)
+      * [test case 4：该用户已经写过评价](#test-case-4该用户已经写过评价)
+   * [任务接收者修改评价](#任务接收者修改评价)
+      * [test case 1：正确修改评论](#test-case-1正确修改评论)
+      * [test case 2：还未编辑评论](#test-case-2还未编辑评论)
+   * [任务接收者删除评论](#任务接收者删除评论)
+      * [test case 1：正常删除](#test-case-1正常删除)
+      * [test case 2：未找到评论](#test-case-2未找到评论)
+   * [获取某个任务的评价（平均分 所有评价）](#获取某个任务的评价平均分所有评价)
 #### 用户与组织系统
 
 ##### 用户创建
@@ -1648,3 +1664,200 @@ DELETE http://localhost:5000/users/1/organization/1/tasks/3
 }
 
 ```
+
+#### 接收者评价系统
+
+##### 任务接收者写评价
+
+@routes.route('/users/<user_id>/tasks/<task_id>/review', methods=['POST'])
+
+###### test case 1：正常添加评论
+
+```
+POST http://localhost:5000/users/3/tasks/1/review
+```
+
+```
+// Request
+{
+    "title":"Good!",
+    "content":"It's easy to do. And can earn a lot of money!",
+    "rate": 5
+}
+```
+
+```
+// Response
+{
+    "user_id": 3,
+    "task_id": 1,
+    "review_title": "Good!",
+    "review_content": "It's easy to do. And can earn a lot of money!",
+    "review_rate": 5
+}
+```
+
+表项可以留空（会默认好评）
+
+待添加
+
+######test case 2：该用户没有接收该任务
+
+待添加
+
+###### test case 3：该用户还未经审核标记为完成该任务
+
+待添加
+
+###### test case 4：该用户已经写过评价
+
+```
+POST http://localhost:5000/users/3/tasks/1/review
+```
+
+```
+// Request
+{
+    "title":"Good! Again",
+    "content":"It's easy to do. And can earn a lot of money! Again",
+    "rate": 5
+}
+```
+
+```
+// Response
+{
+    "error_code": "500",
+    "error_msg": "You have created a comment"
+}
+```
+
+##### 任务接收者修改评价
+
+@routes.route('/users/<user_id>/tasks/<task_id>/review', methods=['PUT'])
+
+###### test case 1：正确修改评论
+
+```
+PUT http://localhost:5000/users/3/tasks/1/review
+```
+
+```
+// Request
+{
+    "title":"Good! Modify",
+    "content":"It's easy to do. And can earn a lot of money! Modify",
+    "rate": 2
+}
+```
+
+```
+// Response
+{
+    "user_id": 3,
+    "task_id": 1,
+    "review_title": "Good! Modify",
+    "review_content": "It's easy to do. And can earn a lot of money! Modify",
+    "review_rate": 2
+}
+```
+
+###### test case 2：还未编辑评论
+
+待添加
+
+##### 任务接收者删除评论
+
+@routes.route('/users/<user_id>/tasks/<task_id>/review', methods=['DELETE'])
+
+###### test case 1：正常删除
+
+待添加
+
+###### test case 2：未找到评论
+
+```
+DELETE http://localhost:5000/users/3/tasks/1/review
+```
+
+```
+// Request
+{
+    "title":"Good! Modify",
+    "content":"It's easy to do. And can earn a lot of money! Modify",
+    "rate": 2
+}
+```
+
+```
+// Response
+{
+    "error_code": "500",
+    "error_msg": "No comment found"
+}
+```
+
+##### 获取某个任务的评价（平均分+所有评价）
+
+@routes.route('/tasks/<task_id>/reviews', methods=['GET'])
+
+```
+GET http://localhost:5000/tasks/1/reviews
+```
+
+```
+// Request
+//
+```
+
+```
+// Response
+{
+    "avg_points": 4.428571428571429,
+    "reviews": [
+        {
+            "username": "test2",
+            "title": "ok",
+            "content": "ok",
+            "rate": 5
+        },
+        {
+            "username": "test2",
+            "title": "o k",
+            "content": "o k",
+            "rate": 5
+        },
+        {
+            "username": "test2",
+            "title": "o k",
+            "content": "o k",
+            "rate": 5
+        },
+        {
+            "username": "test2",
+            "title": "kakaka",
+            "content": "kakaaaaaaaaakaa",
+            "rate": 5
+        },
+        {
+            "username": "test2",
+            "title": "kakaka",
+            "content": "kakaaaaaaaaakaa",
+            "rate": 5
+        },
+        {
+            "username": "test2",
+            "title": "kakaka",
+            "content": "default good review",
+            "rate": 5
+        },
+        {
+            "username": "test-new",
+            "title": "Good! Modify",
+            "content": "It's easy to do. And can earn a lot of money! Modify",
+            "rate": 1
+        }
+    ]
+}
+```
+
