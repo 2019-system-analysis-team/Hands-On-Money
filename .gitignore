@@ -10,7 +10,7 @@
 .vscode/
 
 # database
-*.db
+bend/moneyapp/site.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
