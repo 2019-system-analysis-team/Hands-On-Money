@@ -3,7 +3,7 @@
 # src: https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
 
 # useless MAC OS file
-./bend/DS_Store
+*.DS_Store
 
 # ignore vscode usersetting
 .vscode/
