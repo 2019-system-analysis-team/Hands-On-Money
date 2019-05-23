@@ -20,6 +20,9 @@ from .home import token_required , blacklist
 # RESTful 用户登录
 @routes.route('/sessions', methods=['POST'])
 def login():
+    if request.method != 'POST':
+        return jsonify({ "error_code": 405,
+                            "error_msg": "fuck you asshole"}),405
     
     try:
         token = request.headers['Authorization']
@@ -31,9 +34,12 @@ def login():
 
     ##email = request.get_json()['email']
     ##password = request.get_json()['password']
-    d = request.get_json()
-    user = queryUser(d)
-    password = d['password']
+    try:
+        d = request.get_json()
+        user = queryUser(d)
+        password = d['password']
+    except Exception as e:
+        return jsonify({"error_code": "400", "error_msg": "fuck you asshole"}),400
 
     if user:
         bcrypt = Bcrypt(current_app)
@@ -44,42 +50,54 @@ def login():
             return jsonify({"error_code": "404", "error_msg": "account not found/password incorrect"}), 404
     else:
         return jsonify({"error_code": "404", "error_msg": "account not found/password incorrect"}), 404
+    
+        #return jsonify(e)
 
  
 # RESTful 查找用户
 @routes.route('/users/<user_id>', methods=['GET'])
 @token_required
 def get_user_info(current_user, user_id):
-    user = queryUserById(user_id)
-    if user:
-        return jsonify({'email': user.email,
-                        'phone_number': user.telephone,
-                        'profile_photo_path': user.image_file,
-                        'student_id': user.student_id,
-                        'name': user.username,
-                        'age': user.age,
-                        'sex': user.sex,
-                        'grade': user.grade,
-                        'school': user.school,
-                        'bio': user.bio,
-                        'balance': user.balance,
-                        'avg_comment': user.average_comment
-                        })
+    if request.method != 'GET':
+        return jsonify({ "error_code": 405,
+                            "error_msg": "fuck you asshole"}),405
+    if current_user.id == int(user_id):
+        user = queryUserById(user_id)
+        if user:
+            return jsonify({'email': user.email,
+                            'phone_number': user.telephone,
+                            'profile_photo_path': user.image_file,
+                            'student_id': user.student_id,
+                            'name': user.username,
+                            'age': user.age,
+                            'sex': user.sex,
+                            'grade': user.grade,
+                            'school': user.school,
+                            'bio': user.bio,
+                            'balance': user.balance,
+                            'avg_comment': user.average_comment
+                            })
+        else:
+            return jsonify({'error_code': "404",
+                             'error_msg': 'User Not Found'}), 404
     else:
         return jsonify({'error_code': "404",
-                         'error_msg': 'User Not Found'}), 404
+                             'error_msg': 'User Not Found'}),404
         
 
 # RESTful  注册
 @routes.route('/users', methods=['POST'])
 def creating_user():
     if request.method == 'POST':
-        
-        username = request.get_json()['username']
-        email = request.get_json()['email']
-        telephone = request.get_json()['phone_number']
-        password = request.get_json()['password']
-        
+
+
+        try:
+            username = request.get_json()['username']
+            email = request.get_json()['email']
+            telephone = request.get_json()['phone_number']
+            password = request.get_json()['password']
+        except Exception as e:
+            return jsonify({"error_code": "400", "error_msg": "fuck you asshole"}),400
        
 
         bcrypt = Bcrypt(current_app)
@@ -122,14 +140,26 @@ def creating_user():
         except Exception as e:
             err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
             return jsonify({'error_code': '409',
+<<<<<<< HEAD
                          'error_msg': str(e)}), 409
   
+=======
+                         'error_msg': "create conflicted, duplicate email or phone_number, goto login"}), 409
+    
+    else:
+
+        return jsonify({ "error_code": 405,
+                            "error_msg": "fuck you asshole"}),405
+>>>>>>> fb42fe908072c285fd4e2a8570995f4db397c482
 # RESTful 登录注销
 @routes.route('/users/<user_id>/session', methods=['DELETE'])    
 @token_required
 def logout(current_user, user_id):
     #print(current_user.id)
     #print(user_id)
+    if request.method != 'DELETE':
+        return jsonify({ "error_code": 405,
+                            "error_msg": "fuck you asshole"}),405
 
     if current_user.id == int(user_id):
         token = request.headers['Authorization']
@@ -192,19 +222,32 @@ def test_modify():
 #修改用户个人信息
 
 #修改nickname，bio
+#nickname username 不能重复
 @routes.route('/users/<user_id>/personality', methods=['PUT'])
 @token_required
 def  modifyUserPersonality(current_user, user_id):
     if request.method == 'PUT':
         if current_user.id == int(user_id):
-            d = request.get_json()        
-            user = modify_User(current_user.id,d)
+            try:
+                d = request.get_json() 
+            except Exception as e:
+                return jsonify({"error_code": "400", "error_msg": "fuck you asshole"}),400
+            try:
+                user = modify_User(user_id,d)
+            except Exception as e:
+                err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
+                return jsonify({'error_code': '409',
+                         'error_msg': "conflicted"}), 409
+
             return jsonify({"nickname":user.username,
-                "bio":user.bio}),200
+                    "bio":user.bio}),200
 
         else:
             return jsonify({"err_msg": "user Not Found"}), 404
-
+    
+    else:
+        return jsonify({ "error_code": 405,
+                            "error_msg": "fuck you asshole"}),405
         
 #修改school，grade，sid
 @routes.route('/users/<user_id>/school', methods=['PUT'])
@@ -212,16 +255,23 @@ def  modifyUserPersonality(current_user, user_id):
 def  modifyUserSchool(current_user, user_id):
     if request.method == 'PUT':
         if current_user.id == int(user_id):
-            d = request.get_json()        
-            user = modify_User(current_user.id,d)
-        
-            return jsonify({"school":user.school,
-                "grade":user.grade,
-                "student_number":user.student_id
-                }), 200
+            try:
+                d = request.get_json()
+            except Exception as e:
+                return jsonify({"error_code": "400", "error_msg": "fuck you asshole"}),400  
 
+            user = modify_User(current_user.id,d) 
+
+            return jsonify({"school":user.school,
+                    "grade":user.grade,
+                    "student_number":user.student_id
+                    }), 200
         else:
             return jsonify({"err_msg": "user Not Found"}), 404
+    else:
+
+        return jsonify({ "error_code": 405,
+                            "error_msg": "fuck you asshole"}),405
 
 #修改name，age，sex
 @routes.route('/users/<user_id>/personal_info', methods=['PUT'])
@@ -229,9 +279,11 @@ def  modifyUserSchool(current_user, user_id):
 def  modifyUserPersonalInfo(current_user, user_id):
     if request.method == 'PUT':
         if current_user.id == int(user_id):
-            d = request.get_json()        
+            try:
+                d = request.get_json() 
+            except Exception as e:
+                return jsonify({"error_code": "400", "error_msg": "fuck you asshole"}),400       
             user = modify_User(current_user.id,d)
-        
             return jsonify({"name":user.realname,
                 "age":user.age,
                 "sex":user.sex
@@ -239,7 +291,9 @@ def  modifyUserPersonalInfo(current_user, user_id):
 
         else:
             return jsonify({"err_msg": "user Not Found"}), 404
-
+    else:
+        return jsonify({ "error_code": 405,
+                            "error_msg": "fuck you asshole"}),405
 #修改photo
 @routes.route('/users/<user_id>/profile_photo', methods=['POST'])
 @token_required

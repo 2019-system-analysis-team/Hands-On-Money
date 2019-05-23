@@ -63,6 +63,9 @@
       * [test case 1：正常删除](#test-case-1正常删除)
       * [test case 2：未找到评论](#test-case-2未找到评论)
    * [获取某个任务的评价（平均分 所有评价）](#获取某个任务的评价平均分所有评价)
+
+[![_Entity Relationship Diagram Example (3).png](https://i.loli.net/2019/05/22/5ce50cf37871046705.png)
+
 #### 用户与组织系统
 
 ##### 用户创建
@@ -185,8 +188,10 @@ DELETE http://localhost:5000/users/2/session
 
 @app.route('/users/<user_id>', methods=['GET'])
 
+###### test case1：成功返回当前登录用户的信息
+
 ```
-GET http://localhost:5000/users/2
+GET http://localhost:5000/users/12
 ```
 
 ```
@@ -197,20 +202,41 @@ GET http://localhost:5000/users/2
 ```
 // Response 200 OK
 {
-    "email": "test2",
-    "phone_number": "test2",
-    "profile_photo_path": "default.jpg",
-    "student_id": null,
-    "name": "test2",
-    "age": null,
-    "sex": null,
-    "grade": null,
-    "school": null,
-    "bio": "this person is very lazy",
+    "email": "test3",
+    "phone_number": "test3",
+    "profile_photo_path": "27cfdf49-4c8b-4661-8cf8-c34c7c6f0b59.jpg",
+    "student_id": "1",
+    "name": "usernam",
+    "age": 1,
+    "sex": "f",
+    "grade": "1",
+    "school": "school",
+    "bio": "bi",
     "balance": 0,
     "avg_comment": 5
 }
 ```
+
+###### test case2：user_id 与当前登录账号的id不符
+
+```
+GET http://localhost:5000/users/11
+```
+
+```
+// Request
+// ...
+```
+
+```
+// Response 404
+{
+    "error_code": "404",
+    "error_msg": "User Not Found"
+}
+```
+
+
 
 ##### 用户修改昵称和简介：
 
@@ -253,6 +279,31 @@ PUT http://localhost:5000/users/11/personality
 //Response 404
 { "err_msg": "user Not Found" }
 ```
+
+###### test case3：修改后的username已存在
+
+```
+PUT http://localhost:5000/users/12/personality
+```
+
+```
+//Request
+{
+    "username":"kkk",
+    "bio": "test1"
+}
+```
+
+```
+//Response 409
+{
+    "error_code": "409",
+    "error_msg": "conflicted"
+}
+
+```
+
+
 
 ##### 用户修改学校、年级、学号信息
 
