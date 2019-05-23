@@ -3,13 +3,13 @@
 # src: https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
 
 # useless MAC OS file
-./moneyapp/DS_Store
+./bend/DS_Store
 
 # ignore vscode usersetting
 .vscode/
 
 # database
-./moneyapp/.db
+./bend/moneyapp/site.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
