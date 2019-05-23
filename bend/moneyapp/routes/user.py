@@ -140,17 +140,13 @@ def creating_user():
         except Exception as e:
             err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
             return jsonify({'error_code': '409',
-<<<<<<< HEAD
-                         'error_msg': str(e)}), 409
-  
-=======
                          'error_msg': "create conflicted, duplicate email or phone_number, goto login"}), 409
     
-    else:
+        else:
 
-        return jsonify({ "error_code": 405,
-                            "error_msg": "fuck you asshole"}),405
->>>>>>> fb42fe908072c285fd4e2a8570995f4db397c482
+            return jsonify({ "error_code": 405,
+                                "error_msg": "fuck you asshole"}),405
+
 # RESTful 登录注销
 @routes.route('/users/<user_id>/session', methods=['DELETE'])    
 @token_required
