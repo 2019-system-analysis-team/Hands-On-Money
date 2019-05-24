@@ -191,7 +191,7 @@ DELETE http://localhost:5000/users/2/session
 ###### test case1：成功返回当前登录用户的信息
 
 ```
-GET http://localhost:5000/users/12
+GET http://localhost:5000/users/2
 ```
 
 ```
@@ -202,22 +202,23 @@ GET http://localhost:5000/users/12
 ```
 // Response 200 OK
 {
-    "email": "test3",
-    "phone_number": "test3",
-    "profile_photo_path": "27cfdf49-4c8b-4661-8cf8-c34c7c6f0b59.jpg",
-    "student_id": "1",
-    "name": "usernam",
-    "age": 1,
-    "sex": "f",
-    "grade": "1",
-    "school": "school",
-    "bio": "bi",
+    "email": "test1",
+    "phone_number": "test1",
+    "profile_photo_path": "default.jpg",
+    "student_id": null,
+    "name": null,
+    "age": null,
+    "sex": null,
+    "grade": null,
+    "school": null,
+    "nickname": "test1",
+    "bio": "this person is very lazy",
     "balance": 0,
     "avg_comment": 5
 }
 ```
 
-###### test case2：user_id 与当前登录账号的id不符
+###### test case2：查询并不存在的用户信息
 
 ```
 GET http://localhost:5000/users/11
@@ -233,6 +234,32 @@ GET http://localhost:5000/users/11
 {
     "error_code": "404",
     "error_msg": "User Not Found"
+}
+```
+
+###### test case 3：查询非登录用户的信息
+
+```
+http://localhost:5000/users/1
+```
+
+```
+// Request
+// ...
+```
+
+```
+// Response 200 OK
+{
+    "profile_photo_path": "default.jpg",
+    "name": null,
+    "age": null,
+    "sex": null,
+    "grade": null,
+    "school": null,
+    "nickname": "test3",
+    "bio": "this person is very lazy",
+    "avg_comment": 5
 }
 ```
 

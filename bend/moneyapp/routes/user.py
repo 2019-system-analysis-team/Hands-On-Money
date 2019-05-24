@@ -61,28 +61,45 @@ def get_user_info(current_user, user_id):
     if request.method != 'GET':
         return jsonify({ "error_code": 405,
                             "error_msg": "fuck you asshole"}),405
-    if current_user.id == int(user_id):
-        user = queryUserById(user_id)
-        if user:
+
+
+
+    user = queryUserById(user_id)
+
+    if user:
+        if current_user.id == int(user_id):
             return jsonify({'email': user.email,
                             'phone_number': user.telephone,
                             'profile_photo_path': user.image_file,
                             'student_id': user.student_id,
-                            'name': user.username,
+                            'name': user.realname,
                             'age': user.age,
                             'sex': user.sex,
                             'grade': user.grade,
                             'school': user.school,
+                            'nickname':user.username,
                             'bio': user.bio,
                             'balance': user.balance,
                             'avg_comment': user.average_comment
                             })
         else:
-            return jsonify({'error_code': "404",
-                             'error_msg': 'User Not Found'}), 404
+            return jsonify({'profile_photo_path': user.image_file,
+                            'name': user.realname,
+                            'age': user.age,
+                            'sex': user.sex,
+                            'grade': user.grade,
+                            'school': user.school,
+                            'nickname':user.username,
+                            'bio': user.bio,
+                            'avg_comment': user.average_comment
+                            })
     else:
         return jsonify({'error_code': "404",
-                             'error_msg': 'User Not Found'}),404
+                             'error_msg': 'User Not Found'}), 404
+
+
+
+
         
 
 # RESTful  注册
