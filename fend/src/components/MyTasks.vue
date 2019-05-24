@@ -11,7 +11,7 @@
 								任务
 							 </template>
 							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
-							<MenuItem name="1-2">新建任务</MenuItem>
+							<MenuItem name="1-2" @click.native = "createNewTask()">新建任务</MenuItem>
 							<MenuItem name="1-3">所有任务</MenuItem>
                         </Submenu>
                         <Submenu name="2">
@@ -287,9 +287,6 @@
 				this.showTaskInfo = true;
 				this.showTaskInfomation.task_id = taskId;
 			},
-			showTaskOK(){
-				 this.$Message.info('Clicked OK');
-			},
 			showTaskCancel(){
 				 this.$Message.info('Clicked cancel');
 				 this.showTaskInfo = false;
@@ -302,6 +299,12 @@
 							taskID: taskID
 					},
 				});				
+			},
+			createNewTask() {
+				this.$router.push({
+					path: '/', 
+					name: 'missioncreate'
+				});		
 			}
         }
     }

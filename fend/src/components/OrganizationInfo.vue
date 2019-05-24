@@ -11,7 +11,7 @@
 								任务
 							 </template>
 							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
-							<MenuItem name="1-2">新建任务</MenuItem>
+							<MenuItem name="1-2" @click.native = "createNewTask()">新建任务</MenuItem>
 							<MenuItem name="1-3">所有任务</MenuItem>
                         </Submenu>
                         <Submenu name="2">
@@ -60,11 +60,11 @@
 							<div slot="extra" v-if="isManager || isCreater">
 								<Button type="primary" icon="ios-add" shape="circle">新建组织任务</Button>
 							</div>	
-							<Col span="8" v-for="item in selectTasks" :key="item.id" style="padding-left: 30px; padding-top: 50px;">
+							<Col span="8" v-for="item in selectTasks" :key="item.task_id" style="padding-left: 30px; padding-top: 50px;">
 								<Card>
-									<p slot="title">{{item.title}}</p>
+									<p slot="title">{{item.task_name}}</p>
 									<div slot="extra">
-										<Button type="primary" ghost @click="LookTaskInfo(item.id)">详情</Button>
+										<Button type="primary" ghost @click="LookTaskInfo(item.task_id)">详情</Button>
 									</div>	
 									<p>{{item.status}}</p>
 									 
@@ -108,13 +108,13 @@
 							<p slot="title">组织信息如下</p>
 							<Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" class="form">
 								<FormItem label="组织名称" prop="name">
-									<Input v-model="formValidate.name" placeholder="请输入组织名称"></Input>
+									<Input v-model="formValidate.name" placeholder="请输入组织名称" :disabled="organInfodisabled"></Input>
 								</FormItem>
 								<FormItem label="组织介绍" prop="desc">
-									<Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 2,maxRows: 8}" ></Input>
+									<Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 2,maxRows: 8}" :disabled="organInfodisabled"></Input>
 								</FormItem>
 								<FormItem>
-									<Button type="primary" @click="handleSubmit('ruleValidate')" style="margin-left:89%">修改信息</Button>
+									<Button type="primary" @click="handleSubmit('formValidate')" style="margin-left:89%">修改信息</Button>
 								</FormItem>
 							</Form>
 						</Card>					
@@ -190,8 +190,8 @@
 									</FormItem>
 									<FormItem label="身份" >
 										<Select v-model="addMemberValidate.addMemberStatus" style="width:100px">
-											<Option value="管理员">管理员</Option>
-											<Option value="成员">成员</Option>
+											<Option value="manager">manager</Option>
+											<Option value="member">member</Option>
 										</Select>	
 									</FormItem>
 								</Form>
@@ -208,12 +208,12 @@
 										<p v-if="!(isManager || isCreater)">身份 : {{item.status}}</p>
 										<div v-if="isManager || isCreater">
 											身份 : 
-											<Select v-model="item.status" style="width:70px" v-if="(item.status != '创建者')" @on-change="changeStatus(item)">
-												<Option value="管理员">管理员</Option>
-												<Option value="成员">成员</Option>
+											<Select v-model="item.status" style="width:100px" v-if="(item.status != 'creator')" @on-change="changeStatus(item)">
+												<Option value="manager">manager</Option>
+												<Option value="member">member</Option>
 											</Select>
-											<Select v-model="item.status" style="width:70px" disabled v-if="(item.status == '创建者')">
-												<Option value="创建者" disabled>创建者</Option>
+											<Select v-model="item.status" style="width:100px" disabled v-if="(item.status == 'creator')">
+												<Option value="creator" disabled>creator</Option>
 											</Select>
 											<Tooltip content="点击确认更改" theme="light" v-if="item.statusChanged">
 												<Button type="success" @click="modifyMemberStatus(item)" ghost shape="circle" icon="md-checkmark" size="small"></Button>
@@ -235,7 +235,7 @@
 									<Input v-model="deleteValidate.name" placeholder="请输入即将删除的组织名称"></Input>
 								</FormItem>
 								<FormItem>
-									<Button type="error" @click="handleSubmit('deleteRuleValidate')" style="margin-left:89%">确认删除</Button>
+									<Button type="error" @click="handleSubmit('deleteValidate')" style="margin-left:89%">确认删除</Button>
 								</FormItem>
 							</Form>
 						</Card>	
@@ -304,14 +304,13 @@
                 }
             };
             return {
-				profilePhotoUrl:'',
-				profilePhotoPath: '',
-				profilePhotoName: '',
-				
+				profilePhotoPath: '',		
 				organProfilePhotoUrl:'',
 				organProfilePhotoPath: '',
 				organProfilePhotoName: '',
-								
+				
+				organInfodisabled: true,
+					
 				userID: '',
 				tabs: '组织任务',
 				topup: false,
@@ -351,50 +350,12 @@
 				organID:0,
 				
 				allTasks:[
-					{
-						title:'找绿帽子',
-						status:'进行中',
-						id:1,
-					},
-					{
-						title:'找红帽子',
-						status:'进行中',
-						id:2,
-					},
-					{
-						title:'找黄帽子',
-						status:'进行中',
-						id:3,
-					},
-					{
-						title:'找蓝帽子',
-						status:'已完成',
-						id:4,
-					},
 				],
 				inprogressTasks:[
-					{
-						title:'找绿帽子',
-						status:'进行中',
-						id:1,
-					},
-					{
-						title:'找红帽子',
-						status:'进行中',
-						id:2,
-					},
-					{
-						title:'找黄帽子',
-						status:'进行中',
-						id:3,
-					},
+
 				],
 				finishedTasks:[
-					{
-						title:'找蓝帽子',
-						status:'已完成',
-						id:4,
-					},
+
 				],
 				selectTasks:[],
 				deleteValidate: {
@@ -406,7 +367,7 @@
                     ],					
 				},
 			    formValidate: {
-					 name: '红太阳',
+					 name: '',
 					 desc: ''
 				},
 				ruleValidate: {
@@ -418,30 +379,10 @@
 					 ]
 				},
 				allMembers:[
-					{
-						userID:1,
-						nickname:'无敌',
-						name:'潘茂林',
-						status:'创建者',
-						headPhotoPath:'',
-						statusChanged:false
-					},
-					{
-						userID:2,
-						nickname:'雾霭',
-						name:'潘茂森',
-						status:'管理员',
-						headPhotoPath:'',
-						statusChanged:false
-					},
-					{
-						userID:3,
-						nickname:'爱迪生',
-						name:'潘茂木',
-						status:'成员',
-						headPhotoPath:'',
-						statusChanged:false
-					}
+
+				],
+				allMembersShortInfo:[
+					
 				],
 				isManager: false,
 				isCreater: true,
@@ -450,7 +391,7 @@
 				addMemberValidate:{
 					addMemberType:'电话',
 					addMemberInfo:'',
-					addMemberStatus:'成员',
+					addMemberStatus:'member',
 				},
 				addMemberRuleValidate:{
 					 addMemberInfo: [
@@ -458,30 +399,7 @@
 					 ],					
 				},
 				showTaskInfomation:{
-					task_id: 123456,
-					creator_user_email: "i@sirius.com",
-					creator_user_phone_number: "13123456789",
-					creator_organization_name: "name",
-					title: "一个标题",
-					description: "一个描述",
-					tags: ["tag1", "tag2", "tag3"],
-					current_participant_number: 3,
-					participant_number_limit: 10,
-					reward_for_one_participant: 2,
-					post_time: "date_obj",
-					receive_end_time: "date_obj",
-					finish_deadline_time: "date_obj",
-					steps: [
-						{
-							title: "下楼",
-							description: "下楼"
-						},
-						{
-							title: "拿外卖",
-							description: "拿外卖"
-						}
-					],
-					current: -1
+
 				},
 				showTaskInfo: false,
             }
@@ -499,7 +417,8 @@
             },
 			getEventData:function() {
 				this.selectTasks = this.allTasks;
-				let routerParams = this.$route.params.organID;
+				let routerParams = this.$route.params.organID; 
+
 				if(routerParams == null)
 				{
 					// 返回主页
@@ -508,14 +427,7 @@
 						name: 'mainpage',
 					});	
 				}
-				//console.log("routerParams"+routerParams); 
 				this.organID = routerParams;
-
-				this.$data.profilePhotoName = '头像';
-				//要用完全的路径
-				this.$data.profilePhotoUrl = "/users/:"  + "profile_photo_path";
-
-
 				let uID = window.localStorage.getItem('userID')
 				if(uID == null || uID == ""){
 					//跳转到主页
@@ -525,13 +437,12 @@
 					});
 				}
 				var _this = this;
-				var url = "/users/" + uID.toString() + "/organizations/" + organID.toString();
+				var url = "/users/" + uID + "/organizations/" + this.organID;
 				this.$data.userID = uID;
-				this.$data.profilePhotoUrl = "/users/:" + uID.toString() + "profile_photo_path";
-				this.organProfilePhotoUrl = "/users/"+uID.toString()+"/organizations/"+  organID.toString() +"/profile_photo";
+				this.organProfilePhotoUrl = "/users/"+uID+"/organizations/"+  this.organID +"/profile_photo";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$set(this.jwt,'Authorization',jwt);
-				/*
+				
 				this.$axios({
 						 method:"get",
 						 url:url,
@@ -540,21 +451,42 @@
 						 }
 				}).then(function (response){
 					console.log(response);	
-					//----------------------
-					"name": "",
-					"bio": "",
-					"avg_comment": 0,
-					"members":[
-						{
-							"user_id": 123,
-							"status": "status"
-						},
-						{
-							"user_id": 123,
-							"status": "status"
+					_this.formValidate.name = response.data.name;
+					_this.formValidate.desc = response.data.bio;
+					_this.allMembersShortInfo =  response.data.members;
+					
+					for(var i=0; i < _this.allMembersShortInfo;i++){
+						var url = "/users/" + _this.allMembersShortInfo[i].user_id;
+						if(_this.allMembersShortInfo[i].user_id == _this.userID){
+							if(_this.allMembersShortInfo[i].status == 'manager'){
+								_this.isManager = true;
+							}else if(_this.allMembersShortInfo[i].status == 'creator'){
+								_this.isCreater = true;
+							}
 						}
-					]
-					//---------------------
+						var jwt = "JWT " + window.localStorage.getItem('token');
+						_this.$axios({
+								 method:"get",
+								 url:url,
+								 headers:{
+									'Authorization': jwt,
+								 }
+						}).then(function (response){
+							console.log(response);
+							var nickname = response.data.nickname;
+							var name = response.data.name;
+							var headPhotoPath =  _this.$profilePath + response.data.profile_photo_path;
+							var statusChanged = false;
+							var test = {};
+							_this.$set(test,'userID',_this.allMembersShortInfo[i].user_id);
+							_this.$set(test,'nickname',nickname);
+							_this.$set(test,'name',name);
+							_this.$set(test,'status',_this.allMembersShortInfo[i].status);
+							_this.$set(test,'statusChanged',statusChanged);
+							_this.allMembers.push(test);
+						}).catch(function (error) {
+						});
+					}
 				}).catch(function (error) {
 					_this.$Message.error('请先登录!');
 					//跳转到主页
@@ -563,7 +495,36 @@
 						name: 'mainpage'
 					});
 				});
-				*/
+				
+			    var url = "/users/" + uID + "/organizations/" + this.organID + "/my_tasks";
+				
+				this.$axios({
+						 method:"get",
+						 url:url,
+						 headers:{
+							'Authorization': jwt,
+						 }
+				}).then(function (response){
+					//console.log(response);	
+					_this.allTasks = response.data.tasks;
+					for(var i=0; i < _this.allTasks.length;i++){
+						if(_this.allTasks[i].status == "inprogress"){
+							_this.inprogressTasks.push(_this.allTasks[i]);
+						}else if(_this.allTasks[i].status == "finished"){
+							_this.finishedTasks.push(_this.allTasks[i]);
+						}
+					}
+					this.selectTasks = this.allTasks;
+				}).catch(function (error) {
+					_this.$Message.error('请先登录!');
+					//跳转到主页
+					_this.$router.push({
+						path: '/', 
+						name: 'mainpage'
+					});
+				});
+				
+			    this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 			},
 			handleView (name) {
                 this.imgName = name;
@@ -571,6 +532,8 @@
             },
             handleSuccess (res, file) {
 				//从服务器获得图片路径，更改组织头像
+				//TODO-------------------------------------------------------
+				/*
 				var url = "/users/:" + this.$data.userID.toString();
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
@@ -587,6 +550,7 @@
 				}).catch(function (error) {
 
 				});
+				*/
 				this.$Message.success('修改头像成功!');
             },
             handleFormatError (file) {
@@ -629,6 +593,7 @@
 				this.topup = false;
 			},
 			logout (){
+				var _this = this;
 				var url_all = "/users/:" + this.$data.userID.toString() + "/session";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
@@ -640,7 +605,7 @@
 				}).then(function (response){
 					window.localStorage.setItem('token', "");
 					window.localStorage.setItem('userID', "");
-					this.$router.push({
+					_this.$router.push({
 						path: '/', 
 						name: 'mainpage'
 					});	
@@ -658,29 +623,51 @@
 				}
 			},
             handleSubmit (name) {
+				if(name == "formValidate" && this.organInfodisabled == true){
+					this.organInfodisabled = false;
+					return;
+				}
+				var _this = this;
                 this.$refs[name].validate((valid) => {
-					//应该改为修改信息
                     if (valid) {
 						var jwt = "JWT " + window.localStorage.getItem('token');
-						var url = "/users/"+ this.$data.userID.toString() +"/organizations" + this.organID.toString();
-						this.$axios({
-							 method:"put",
-							 url: url,
-							 data:{
-								name: this.$data.formValidate.name,
-								bio: this.$data.formValidate.desc
-							 },
-							 headers:{
-								'Authorization': jwt,
-							 }
-						}).then(function (response){
-							this.$Message.success('组织注册成功!');
-							console.log(response);
-							// 跳转到组织页面
-						}).catch(function (error) {
-							console.log(error);
-						});
-                        
+						var url = "/users/"+ this.$data.userID +"/organizations/" + this.organID;
+						if(name == "formValidate"){
+							this.$axios({
+								 method:"put",
+								 url: url,
+								 data:{
+									name: this.$data.formValidate.name,
+									bio: this.$data.formValidate.desc
+								 },
+								 headers:{
+									'Authorization': jwt,
+								 }
+							}).then(function (response){
+								_this.$Message.success('修改成功!');
+								_this.organInfodisabled = true;
+							}).catch(function (error) {
+								console.log(error);
+							});							
+						}else{
+							this.$axios({
+								 method:"delete",
+								 url: url,
+								 headers:{
+									'Authorization': jwt,
+								 }
+							}).then(function (response){
+								_this.$Message.success('删除成功!');
+								//跳转到我的组织
+								_this.$router.push({
+									path: '/', 
+									name: 'organization'
+								});
+							}).catch(function (error) {
+								console.log(error);
+								_this.$Message.error('删除失败!');
+							});								
+						}
                     } else {
                         this.$Message.error('信息填写有误!');
                     }
@@ -691,11 +678,10 @@
 			},
             addMemberok (name) {
 			   this.$refs[name].validate((valid) => {
-
+					var _this = this;
 					var jwt = "JWT " + window.localStorage.getItem('token');
 					var url = "/users/"+ this.$data.userID.toString() +"/organizations" + this.organID.toString() + "/members";
 					if (valid) {
-						this.$Message.info('Clicked ok');
 						if(this.addMemberValidate.addMemberType == '邮件'){
 							this.$axios({
 								 method:"post",
@@ -709,6 +695,7 @@
 								 }
 							}).then(function (response){
 								console.log(response);
+								_this.$Message.success('添加成功!');
 							}).catch(function (error) {
 								console.log(error);
 							});						
@@ -725,19 +712,28 @@
 								 }
 							}).then(function (response){
 								console.log(response);
+								_this.$Message.success('添加成功!');
+								_this.$router.push({
+									path: '/', 
+									name: 'organizationInfo',
+									params: { 
+											organID: _this.organID,
+									},
+								});	
 							}).catch(function (error) {
 								console.log(error);
 							});								
 						}
 					}
 				});
+				this.$Message.error('信息填写错误!');
             },
             addMembercancel () {
-                this.$Message.info('Clicked cancel');
+                this.$Message.info('取消添加成员');
             },
 			deleteMember(deleteUserID){
 				var _this = this;
-				var url_all = "/users/"+this.userID.toString()+"/organizations/"+this.organID.toString()+"/members/"+deleteUserID.toString();
+				var url_all = "/users/"+this.userID+"/organizations/"+this.organID+"/members/"+deleteUserID;
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
 					 method:"delete",
@@ -746,14 +742,21 @@
 						'Authorization': jwt,
 					 }
 				}).then(function (response){
-
+					_this.$Message.success('删除成员成功!');
+					_this.$router.push({
+						path: '/', 
+						name: 'organizationInfo',
+						params: { 
+								organID: _this.organID,
+						},
+					});	
 				}).catch(function (error) {
 					console.log(error);
 				});
 			
 			},
 			modifyMemberStatus(item){
-				var url_all = "/users/"+this.userID.toString()+"/organizations/"+this.organID.toString()+"/members/"+item.userID.toString();
+				var url_all = "/users/"+this.userID+"/organizations/"+this.organID+"/members/"+item.userID;
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
 					 method:"put",
@@ -766,14 +769,29 @@
 					 }
 				}).then(function (response){
 					console.log(response);
+					item.statusChanged = false;
 				}).catch(function (error) {
 					console.log(error);
 				});		
-				item.statusChanged = false;
 			},
-			LookTaskInfo(taskId){
-				this.showTaskInfo = true;
-				this.showTaskInfomation.task_id = taskId;
+			LookTaskInfo(taskID){
+				//console.log("taskID" + taskID);
+				this.showTaskInfo = true;				
+				var url = "/users/" + uID + "/organizations/" + this.organID + "/my_tasks/" + taskID;
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				var _this = this;
+				this.$axios({
+						 method:"get",
+						 url:url,
+						 headers:{
+							'Authorization': jwt,
+						 }
+				}).then(function (response){
+					_this.showTaskInfomation = response.data;
+					_this.$set(this.showTaskInfomation,'current',-1);
+				}).catch(function (error) {
+
+				});
 			},
 			showTaskOK(){
 				 this.$Message.info('Clicked OK');
@@ -790,7 +808,13 @@
 					params: { 
 							taskID: taskID
 					},
-				});				
+				});			
+			},
+			createNewTask() {
+				this.$router.push({
+					path: '/', 
+					name: 'missioncreate'
+				});		
 			}
         },
         mounted () {

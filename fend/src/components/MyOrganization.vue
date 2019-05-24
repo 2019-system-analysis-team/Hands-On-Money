@@ -11,7 +11,7 @@
 								任务
 							 </template>
 							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
-							<MenuItem name="1-2">新建任务</MenuItem>
+							<MenuItem name="1-2" @click.native ="createNewTask()">新建任务</MenuItem>
 							<MenuItem name="1-3">所有任务</MenuItem>
                         </Submenu>
                         <Submenu name="2">
@@ -51,19 +51,10 @@
 							<Option v-for="item in classifications" :value="item.value" :key="item.value">{{ item.label }}</Option>
 						</Select>
 					</p>
-					
-					<Col span="8" v-for="item in selectOrganizations" :key="item.id" style="padding-left: 30px; padding-top: 50px;">
-						<Card>
-							<p slot="title">{{item.name}}</p>
-							<div slot="extra" @click="goOrganInfo(item.id)">
-								    <Tooltip content="点击进入组织信息页面" placement="top">
-										<Avatar :src="item.organPhotoPath" style="background-color: #87d068">{{item.name}}</Avatar>
-									</Tooltip>
-							</div>	
-							<p>{{item.bio}}</p>
-							 
-						</Card>
-					</Col>
+							<Table border :columns="tableOrganization" :data="allOrganizations" v-if="this.SelectType == 0"></Table>
+							<Table border :columns="tableOrganization" :data="manageOrganizations" v-if="this.SelectType == 1"></Table>
+							<Table border :columns="tableOrganization" :data="createOrganizations" v-if="this.SelectType == 2"></Table>
+							<Table border :columns="tableOrganization" :data="joinOrganizations" v-if="this.SelectType == 3"></Table>					
 				</Card>			
             </Content>
             <Footer class="layout-footer-center">2019-2019 &copy; SYSU</Footer>
@@ -104,7 +95,40 @@
         data () {
             return {
 				userID: '',
-
+                tableOrganization: [
+                    {
+                        title: '组织名称',
+                        key: 'organization_name'
+                    },
+                    {
+                        title: '权限',
+                        key: 'status'
+                    },
+                    {
+                        title: '更多',
+                        key: 'action',
+                        width: 150,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+											this.goOrganInfo(params.index);
+                                        }
+                                    }
+                                }, '详情')
+                            ]);
+                        }
+                    }
+                ],
 				topup: false,
                 styles: {
                     height: 'calc(100% - 55px)',
@@ -118,8 +142,6 @@
 					mode: '支付宝',
                 },
 				profilePhotoPath:'',
-				jwt:{},
-				profilePhotoName:'',
 				organclass:'全部组织',
 				classifications: [
                     {
@@ -140,79 +162,22 @@
                     }
                 ],				
 				allOrganizations:[
-					{
-						name:'红太阳',
-						bio:'我们是共产主义接班人，hhhhhhhhhhhhhhh',
-						organPhotoPath:'',
-						status:'创建者',
-						id:1,
-					},
-					{
-						name:'绿太阳',
-						bio:'我们是共产主义接班人，hhhhhhhhhhhhhhh',
-						organPhotoPath:'',
-						status:'管理者',
-						id:2
-					},
-					{
-						name:'黄太阳',
-						bio:'我们是共产主义接班人，hhhhhhhhhhhhhhh',
-						organPhotoPath:'',
-						status:'成员',
-						id:3
-					},
-					{
-						name:'蓝太阳',
-						bio:'我们是共产主义接班人，hhhhhhhhhhhhhhh',
-						organPhotoPath:'',
-						status:'成员',
-						id:4
-					},
+
 				],
 				manageOrganizations:[
-					{
-						name:'绿太阳',
-						bio:'我们是共产主义接班人，hhhhhhhhhhhhhhh',
-						organPhotoPath:'',
-						status:'管理者',
-						id:2
-					}
+
 				],
 				joinOrganizations:[
-					{
-						name:'黄太阳',
-						bio:'我们是共产主义接班人，hhhhhhhhhhhhhhh',
-						organPhotoPath:'',
-						status:'成员',
-						id:3
-					},
-					{
-						name:'蓝太阳',
-						bio:'我们是共产主义接班人，hhhhhhhhhhhhhhh',
-						organPhotoPath:'',
-						status:'成员',
-						id:4
-					},
+
 				],
 				createOrganizations:[
-					{
-						name:'红太阳',
-						bio:'我们是共产主义接班人，hhhhhhhhhhhhhhh',
-						organPhotoPath:'',
-						status:'创建者',
-						id:1
-					}
+
 				],
-				selectOrganizations:[],
+				SelectType: 0,
             }
         },
 		mounted(){
 		  this.$nextTick(()=>{
-			  // 设置导航的当前菜单项
-			//this.activeName = this.$route.path.slice(1);
-			//console.log(this.activeName);
-			//this.$refs.menu.updateOpened();
-			//this.$refs.menu.updateActiveName();
 		  })
 		},
 		created: function () { 
@@ -220,11 +185,9 @@
 		},
         methods: {
 			getEventData:function() {
-				this.selectOrganizations = this.allOrganizations;
-				this.$data.profilePhotoName = '头像';
-				//要用完全的路径
-				this.$data.profilePhotoUrl = "/users/:"  + "profile_photo_path";		
+				//要用完全的路径	
 				let uID = window.localStorage.getItem('userID')
+
 				if(uID == null || uID == ""){
 					//跳转到主页
 					this.$router.push({
@@ -232,13 +195,11 @@
 						name: 'mainpage'
 					});
 				}
-				var url = "/users/" + uID.toString() + "organizations";
+
+				var url = "/users/" + uID + "/organizations";
 				this.$data.userID = uID;
-				this.$data.profilePhotoUrl = "/users/" + uID.toString() + "profile_photo_path";
 				var jwt = "JWT " + window.localStorage.getItem('token');
-				this.$set(this.jwt,'Authorization',jwt);
-				
-				/*
+
 				var _this = this;
 				this.$axios({
 						 method:"get",
@@ -247,11 +208,18 @@
 							'Authorization': jwt,
 						 }
 				}).then(function (response){
-					console.log(response);
-					this.$data.allOrganizations =  response.data.organizations;
-					// 根据状态筛选出哪些是管理哪些是创建
-					// TODO
-					
+					console.log(response);					
+					_this.allOrganizations = response.data.organizations;
+					for(var i=0; i<_this.allOrganizations.length;i++){
+						if(_this.allOrganizations[i].status == "member"){
+							_this.joinOrganizations.push(_this.allOrganizations[i]);
+						}else if(_this.allOrganizations[i].status == "creator"){
+							_this.createOrganizations.push(_this.allOrganizations[i]);
+						}else if(_this.allOrganizations[i].status == "manager"){
+							_this.manageOrganizations.push(_this.allOrganizations[i]);
+						}
+					} 
+										
 				}).catch(function (error) {
 					_this.$Message.error('请先登录!');
 					//跳转到主页
@@ -260,7 +228,8 @@
 						name: 'mainpage'
 					});
 				});
-				*/
+
+			   this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 			},
             handleReturnHomepage () {
                 // 返回主页
@@ -269,15 +238,41 @@
 					name: 'mainpage',
 				});		
             },
-			goOrganInfo(id){
+			goOrganInfo(index){
                 // 去组织的详情页面
-				this.$router.push({
-					path: '/', 
-					name: 'organizationInfo',
-					params: { 
-							organID: id
-					},
-				});					
+				if(this.SelectType == 0){
+					this.$router.push({
+						path: '/', 
+						name: 'organizationInfo',
+						params: { 
+								organID: this.allOrganizations[index].organization_id
+						},
+					});		
+				}else if(this.SelectType == 1){
+					this.$router.push({
+						path: '/', 
+						name: 'organizationInfo',
+						params: { 
+								organID: this.manageOrganizations[index].organization_id
+						},
+					});						
+				}else if(this.SelectType == 2){
+					this.$router.push({
+						path: '/', 
+						name: 'organizationInfo',
+						params: { 
+								organID: this.createOrganizations[index].organization_id
+						},
+					});						
+				}else if(this.SelectType == 3){
+					this.$router.push({
+						path: '/', 
+						name: 'organizationInfo',
+						params: { 
+								organID: this.joinOrganizations[index].organization_id
+						},
+					});						
+				};			
 			},
 			GotoTopup (){
 				this.topup = true;
@@ -309,16 +304,22 @@
 				});
 			},
 			selectChange(value){
-				console.log(value);
+				//console.log(value);
 				if(value == '全部组织'){
-					this.selectOrganizations = this.allOrganizations;
+					this.SelectType = 0;
 				}else if(value == '我管理的'){
-					this.selectOrganizations = this.manageOrganizations;
+					this.SelectType = 1;
 				}else if(value == '我创建的'){
-					this.selectOrganizations = this.createOrganizations;
+					this.SelectType = 2;
 				}else if(value == '我加入的'){
-					this.selectOrganizations = this.joinOrganizations;
+					this.SelectType = 3;
 				}
+			},
+			createNewTask() {
+				this.$router.push({
+					path: '/', 
+					name: 'missioncreate'
+				});		
 			}
         }
     }

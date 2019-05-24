@@ -32,7 +32,7 @@
                     <div class="layout-nav" v-if="isLogin">
 						<MenuItem name="5">
 							<Tooltip content="创建一个新任务">
-								<Icon type="md-add-circle" size="45" color="#eee"/>
+								<Icon type="md-add-circle" size="45" color="#eee" @click="createNewTask"/>
 							</Tooltip>
 						</MenuItem>
 						<Submenu name="1">
@@ -41,7 +41,7 @@
 								任务
 							 </template>
 							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
-							<MenuItem name="1-2">新建任务</MenuItem>
+							<MenuItem name="1-2" @click.native="createNewTask()">新建任务</MenuItem>
 							<MenuItem name="1-3">所有任务</MenuItem>
                         </Submenu>
                         <Submenu name="2">
@@ -123,7 +123,7 @@
 							<p slot="title">开始创建一个新任务吧</p>
 							<p>							
 								<div style="min-height: 300px;text-align:center;">
-									<Button type="primary" ghost shape="circle" icon="md-add" style="width: 30%;height: 63px;margin-top: 8%;">新建任务</Button>
+									<Button @click="createNewTask" type="primary" ghost shape="circle" icon="md-add" style="width: 30%;height: 63px;margin-top: 8%;">新建任务</Button>
 								</div>
 							</p>
 						</Card>
@@ -249,10 +249,12 @@
 					console.log(response);
 					_this.isLogin = true;
 					_this.profilePhotoPath = _this.$profilePath + response.data.profile_photo_path;					
-
+					window.localStorage.setItem('MyProfilePhotoPath', _this.profilePhotoPath);
 				}).catch(function (error) {
 					console.log(error.response.status);
 					_this.isLogin = false;
+					window.localStorage.removeItem('token');
+					window.localStorage.removeItem('userID');
 				});
 			},
 			register: function () {
@@ -300,7 +302,7 @@
 				var _this = this;
 
 				if(this.inputName == "" || this.inputPassword == "") {
-					alert("请输入邮箱和密码");
+					_this.$Message.error('请输入邮箱和密码');
 				}
 				else {
 					document.getElementById('bgColorDiv').style.display='none';
@@ -324,6 +326,9 @@
 							if(error.response.status == 404){
 								_this.$Message.error('用户不存在或者密码错误');
 							}
+							if(error.response.status == 400){
+								_this.$Message.error('后端抽风?');
+							}
 							_this.inputName = '';
 							_this.inputPassword = '';
 
@@ -334,6 +339,12 @@
 				document.getElementById('bgColorDiv').style.display='none';
 				this.inputName = '';
 				this.inputPassword = '';
+			},
+			createNewTask() {
+				this.$router.push({
+					path: '/', 
+					name: 'missioncreate'
+				});		
 			}
 		}
     }

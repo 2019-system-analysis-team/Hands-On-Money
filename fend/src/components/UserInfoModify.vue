@@ -11,7 +11,7 @@
 								任务
 							 </template>
 							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
-							<MenuItem name="1-2">新建任务</MenuItem>
+							<MenuItem name="1-2" @click.native="createNewTask()">新建任务</MenuItem>
 							<MenuItem name="1-3">所有任务</MenuItem>
                         </Submenu>
                         <Submenu name="2">
@@ -51,10 +51,10 @@
 							<p slot="title">您的个人信息如下</p>
 							<Form ref="personalValidate" :model="personalValidate" :rules="personalRuleValidate" :label-width="80" class="form">
 								<FormItem label="昵称" prop="nickname">
-									<Input v-model="personalValidate.nickname" placeholder="请输入您的昵称"></Input>
+									<Input v-model="personalValidate.nickname" placeholder="请输入您的昵称" :disabled="disabledPersonal"></Input>
 								</FormItem>	
 								<FormItem label="自我介绍" prop="desc">
-									<Input v-model="personalValidate.desc" type="textarea" :autosize="{minRows: 2,maxRows: 5}"></Input>
+									<Input v-model="personalValidate.desc" type="textarea" :autosize="{minRows: 2,maxRows: 5}" :disabled="disabledPersonal"></Input>
 								</FormItem>
 								<FormItem>
 									<Button type="primary" @click="handleSubmit('personalValidate')" style="margin-left:89%">修改信息</Button>
@@ -67,7 +67,7 @@
 							<p slot="title">您的学校信息如下</p>
 							<Form ref="schoolValidate" :model="schoolValidate" :rules="schoolRuleValidate" :label-width="80" class="form">
 								<FormItem label="学院" prop="school">
-									<Select v-model="schoolValidate.school">
+									<Select v-model="schoolValidate.school" :disabled="disabledSchool">
 										<Option value="中国语言文学系">中国语言文学系</Option>
 										<Option value="历史学系">历史学系</Option>
 										<Option value="哲学系">哲学系</Option>
@@ -105,7 +105,7 @@
 									</Select>
 								</FormItem>
 								<FormItem label="年级" prop="grade">
-									<Select v-model="schoolValidate.grade">
+									<Select v-model="schoolValidate.grade" :disabled="disabledSchool">
 										<Option value="大一">大一</Option>
 										<Option value="大二">大二</Option>
 										<Option value="大三">大三</Option>
@@ -115,7 +115,7 @@
 									</Select>
 								</FormItem>
 								<FormItem label="学号" prop="stunumber">
-									<Input v-model="schoolValidate.stunumber" placeholder="请输入您的学号"></Input>
+									<Input v-model="schoolValidate.stunumber" placeholder="请输入您的学号" :disabled="disabledSchool"></Input>
 								</FormItem>
 								<FormItem>
 									<Button type="primary" @click="handleSubmit('schoolValidate')" style="margin-left:89%">修改信息</Button>
@@ -128,15 +128,15 @@
 							<p slot="title">您的详细信息如下</p>
 							<Form ref="infoValidate" :model="infoValidate" :rules="infoRuleValidate" :label-width="80" class="form">
 								<FormItem label="真实姓名" prop="name">
-									<Input v-model="infoValidate.name" placeholder="请输入您的真实姓名"></Input>
+									<Input v-model="infoValidate.name" placeholder="请输入您的真实姓名" :disabled="disabledInfo"></Input>
 								</FormItem>
 								<FormItem label="年龄" prop="age">
-									<Select v-model="infoValidate.age" >
+									<Select v-model="infoValidate.age" :disabled="disabledInfo">
 										<Option v-for="item in ageoptionsList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 									</Select>						
 								</FormItem>
 								<FormItem label="性别" prop="gender">
-									<RadioGroup v-model="infoValidate.gender">
+									<RadioGroup v-model="infoValidate.gender" :disabled="disabledInfo">
 										<Radio label="女生">女生</Radio>
 										<Radio label="男生">男生</Radio>
 									</RadioGroup>
@@ -197,10 +197,10 @@
 							<p slot="title">请输入新的密码</p>
 							<Form ref="pwdValidate" :model="pwdValidate" :rules="pwdRuleValidate" :label-width="80" class="form">
 									<FormItem label="新密码" prop="passwd" >
-										<Input type="password" v-model="pwdValidate.passwd" placeholder="请输入您的密码"></Input>
+										<Input type="password" v-model="pwdValidate.passwd" placeholder="请输入您的密码" :disabled="disabledPwd"></Input>
 									</FormItem>
 									<FormItem label="确认密码" prop="passwdCheck" >
-										<Input type="password" v-model="pwdValidate.passwdCheck" placeholder="请再次输入您的密码"></Input>
+										<Input type="password" v-model="pwdValidate.passwdCheck" placeholder="请再次输入您的密码" :disabled="disabledPwd"></Input>
 									</FormItem>		
 									<FormItem>
 										<Button type="primary" @click="handleSubmit('pwdValidate')" style="margin-left:89%">修改密码</Button>
@@ -324,6 +324,10 @@
 					mode: '支付宝',
                 },
 				ageoptionsList:[],
+				disabledPersonal: true,
+				disabledSchool: true,
+				disabledInfo: true,
+				disabledPwd: true,
 				personalValidate:{
 					nickname: '',
 					desc: ''
@@ -393,11 +397,11 @@
 				}
 				var url = "/users/" + uID;
 				this.$data.userID = uID;
-				this.$data.profilePhotoUrl = "/users/" + uID + "profile_photo_path";
+				this.$data.profilePhotoUrl = "/users/" + uID + "/profile_photo_path";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				//设置jwt认证头部
 				this.$set(this.jwt,'Authorization',jwt);
-				/*
+				//console.log(this.jwt);
 				var _this = this;
 				this.$axios({
 						 method:"get",
@@ -407,13 +411,12 @@
 						 }
 				}).then(function (response){
 					console.log(response);
-					_this.$data.personalValidate.nickname = response.data.name;
+					_this.$data.personalValidate.nickname = response.data.nickname;
 					_this.$data.personalValidate.desc = response.data.bio;
 					_this.$data.schoolValidate.school = response.data.school;
 					_this.$data.schoolValidate.stunumber = response.data.student_id;
 					_this.$data.schoolValidate.grade = response.data.grade;
-					//并没有传真实姓名???
-					//_this.$data.infoValidate.name = response.data.name;
+					_this.$data.infoValidate.name = response.data.name;
 					_this.$data.infoValidate.age = response.data.age;
 					_this.$data.infoValidate.gender = response.data.sex;		
 					_this.$data.money = response.data.balance;
@@ -427,9 +430,24 @@
 						name: 'mainpage'
 					});
 				});
-				*/
 			},
             handleSubmit (name) {
+				if(this.tabs == "个人信息" && this.disabledPersonal == true){
+					this.disabledPersonal = false;
+					return;
+				}
+				if(this.tabs == "学校信息" && this.disabledSchool == true){
+					this.disabledSchool = false;
+					return;
+				}
+				if(this.tabs == "详细信息" && this.disabledInfo == true){
+					this.disabledInfo = false;
+					return;
+				}
+				if(this.tabs == "密码修改" && this.disabledPwd == true){
+					this.disabledPwd = false;
+					return;
+				}
                 this.$refs[name].validate((valid) => {
 					var url_all = "/users/" + this.$data.userID;
 					var jwt = "JWT " + window.localStorage.getItem('token');
@@ -448,6 +466,7 @@
 								 }
 							}).then(function (response){
 								this.$Message.success('修改成功!');
+								this.disabledPersonal = true;
 							}).catch(function (error) {
 								console.log(error);
 							});
@@ -466,6 +485,7 @@
 								 }
 							}).then(function (response){
 								this.$Message.success('修改成功!');
+								this.disabledSchool = true;
 							}).catch(function (error) {
 								console.log(error);
 							});
@@ -484,11 +504,13 @@
 								 }
 							}).then(function (response){
 								this.$Message.success('修改成功!');
+								this.disabledInfo = true;
 							}).catch(function (error) {
 								console.log(error);
 							});
 						}else if(this.tabs == "密码修改"){
 							this.$Message.success('修改成功!');
+							this.disabledPwd = true;
 						}
                     } else {
                         this.$Message.error('信息填写有误!');
@@ -508,6 +530,7 @@
             },
             handleSuccess (res, file) {
 				//从服务器获得图片路径
+				var _this = this;
 				var url = "/users/" + this.$data.userID;
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
@@ -518,9 +541,10 @@
 						 }
 				}).then(function (response){
 					console.log(response);
-					this.$data.profilePhotoPath =  response.data.profile_photo_path;
-					file.url = response.data.profile_photo_path;
+					_this.$data.profilePhotoPath =  _this.$profilePath + response.data.profile_photo_path;
+					file.url =  _this.$profilePath + response.data.profile_photo_path;
 					file.name = '头像';
+					window.localStorage.setItem('MyProfilePhotoPath', _this.profilePhotoPath);
 				}).catch(function (error) {
 
 				});
@@ -585,11 +609,18 @@
 				}).catch(function (error) {
 					console.log(error);
 				});
+			},
+			createNewTask() {
+				this.$router.push({
+					path: '/', 
+					name: 'missioncreate'
+				});		
 			}
         },
         mounted () {
             this.uploadList = this.$refs.upload.fileList;
-        }
+        },
+		
     }
 </script>
 <style scoped>

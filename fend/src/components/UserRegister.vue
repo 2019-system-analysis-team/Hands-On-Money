@@ -230,7 +230,6 @@
 								password: this.$data.formValidate.passwd,
 							 }
 							}).then(function (response){
-							//------------------------------后面功能未测试--------------
 								console.log(response);
 								window.localStorage.setItem('token', response.data.access_token);
 								window.localStorage.setItem('userID', response.data.user_id);

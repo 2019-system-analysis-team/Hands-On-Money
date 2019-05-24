@@ -11,7 +11,7 @@
 								任务
 							 </template>
 							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
-							<MenuItem name="1-2">新建任务</MenuItem>
+							<MenuItem name="1-2" @click.native = "createNewTask()">新建任务</MenuItem>
 							<MenuItem name="1-3">所有任务</MenuItem>
                         </Submenu>
                         <Submenu name="2">
@@ -49,8 +49,20 @@
 					<TabPane label="基本信息" name="基本信息">
 						<Card dis-hover>
 							<div slot="extra">
+								<Button type="warning" shape="circle"  @click="toshowWithdrawInfo()">撤回任务</Button>
 								<Button type="primary" icon="ios-hammer-outline" shape="circle">修改任务</Button>
 							</div>	
+							<Modal v-model="showWithdrawInfo">
+								<div>
+									<p style="text-align:center; font-size: 16px;">
+										<span>您真的要撤回该任务吗？撤回操作不可逆!</span>
+									</p>
+								</div>
+								<div slot="footer">
+									<Button type="text" @click="showWithdrawInfoCancel">取消</Button>
+									<Button type="error" @click="withdrawTask">确认撤回</Button>
+								</div>
+							</Modal>
 							<p slot="title" class="info">{{showTaskInfomation.title}}</p>
 							标签 : <Tag v-for="item in showTaskInfomation.tags" :key="item" :name="item" color="cyan">{{ item }}</Tag>
 							<p class="info">任务描述 : {{showTaskInfomation.description}}</p>
@@ -88,10 +100,35 @@
 						</Card>
 					</TabPane>
 					<TabPane label="任务审核" name="任务审核">
-						
-					</TabPane>
-					<TabPane label="任务撤回" name="任务撤回">
-						
+						<Card dis-hover style="height: 560px">
+							<p slot="title" style="height: 38px;">
+								<Select v-model="participantclass" style="width:200px" @on-change="selectChange">
+									<Option v-for="item in classifications" :value="item.value" :key="item.value">{{ item.label }}</Option>
+								</Select>
+							</p>
+							
+							<Table border :columns="allParticipant" :data="participant_info" v-if="this.participantSelectType == 0"></Table>
+							<Table border :columns="ongoingParticipant" :data="ongoing_participant_info" v-if="this.participantSelectType == 1"></Table>
+							<Table border :columns="waitingExamineParticipant" :data="waiting_examine_participant_info" v-if="this.participantSelectType == 2"></Table>
+							<Table border :columns="allParticipant" :data="finished_participant_info" v-if="this.participantSelectType == 3"></Table>
+						</Card>		
+						<Modal v-model="showTaskStepInfo">
+							<p slot="header" style="text-align:center">
+								<span>已完成步骤</span>
+							</p>
+							<div>
+							<Card dis-hover>
+								<Steps :current="current">
+									<Step :title="item.title" v-for="item in showTaskInfomation.steps" :key="item.title">
+									</Step>
+								</Steps>
+								<Button type="primary" @click="next" class="finshButton">完成当前步骤</Button>
+							</Card>
+							</div>
+							<div slot="footer">
+								<Button type="primary" @click="showTaskCancel">关闭</Button>
+							</div>
+						</Modal>
 					</TabPane>
 				</Tabs>
             </Content>
@@ -132,6 +169,152 @@
   export default {
         data () {
             return {
+				showWithdrawInfo: false,
+				showTaskStepInfo: false,
+                allParticipant: [
+                    {
+                        title: '名字',
+                        key: 'name',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Icon', {
+                                    props: {
+                                        type: 'person'
+                                    }
+                                }),
+                                h('strong', params.row.name)
+                            ]);
+                        }
+                    },
+                    {
+                        title: '邮箱',
+                        key: 'email'
+                    },
+                    {
+                        title: '电话',
+                        key: 'phone_number'
+                    }
+                ],
+                ongoingParticipant: [
+                    {
+                        title: '名字',
+                        key: 'name',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Icon', {
+                                    props: {
+                                        type: 'person'
+                                    }
+                                }),
+                                h('strong', params.row.name)
+                            ]);
+                        }
+                    },
+                    {
+                        title: '邮箱',
+                        key: 'email'
+                    },
+                    {
+                        title: '电话',
+                        key: 'phone_number'
+                    },
+                    {
+                        title: '设置',
+                        key: 'action',
+                        width: 150,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.show(params.index)
+                                        }
+                                    }
+                                }, '完成任务')
+                            ]);
+                        }
+                    }
+                ],
+				waitingExamineParticipant: [
+                    {
+                        title: '名字',
+                        key: 'name',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Icon', {
+                                    props: {
+                                        type: 'person'
+                                    }
+                                }),
+                                h('strong', params.row.name)
+                            ]);
+                        }
+                    },
+                    {
+                        title: '邮箱',
+                        key: 'email'
+                    },
+                    {
+                        title: '电话',
+                        key: 'phone_number'
+                    },
+                    {
+                        title: '设置',
+                        key: 'action',
+                        width: 150,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+											
+                                        }
+                                    }
+                                }, '确认参与')
+                            ]);
+                        }
+                    }
+                ],
+				finishedParticipant: [
+                    {
+                        title: '名字',
+                        key: 'name',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Icon', {
+                                    props: {
+                                        type: 'person'
+                                    }
+                                }),
+                                h('strong', params.row.name)
+                            ]);
+                        }
+                    },
+                    {
+                        title: '邮箱',
+                        key: 'email'
+                    },
+                    {
+                        title: '电话',
+                        key: 'phone_number'
+                    }
+                ],
 				profilePhotoPath: '',
 				taskID: '',
 				userID: '',
@@ -182,8 +365,111 @@
 					"participant_ids": [123, 124, 125, 126],
 					"ongoing_participant_ids": [123, 124],
 					"waiting_examine_participant_ids": [125],
-					"finished_participant_ids": [126]
+					"finished_participant_ids": [126],
 				},
+				ongoing_participant_info:[
+					{
+						"id": 123,
+						"email": "a@163.com",
+						"phone_number": "12345618912",
+						"name": "123",
+					},
+					{
+						"id": 124,
+						"email": "b@163.com",
+						"phone_number": "12345628912",
+						"name": "124",
+					},
+					{
+						"id": 125,
+						"email": "c@163.com",
+						"phone_number": "12345638912",
+						"name": "125",
+					},
+					{
+						"id": 126,
+						"email": "d@163.com",
+						"phone_number": "12345648912",
+						"name": "126",
+					},
+				],
+				waiting_examine_participant_info:[
+					{
+						"id": 125,
+						"email": "c@163.com",
+						"phone_number": "12345638912",
+						"name": "125",
+					},					
+				],
+				ongoing_participant_info:[
+					{
+						"id": 123,
+						"email": "a@163.com",
+						"phone_number": "12345618912",
+						"name": "123",
+					},
+					{
+						"id": 124,
+						"email": "b@163.com",
+						"phone_number": "12345628912",
+						"name": "124",
+					},					
+				],
+				finished_participant_info:[
+					{
+						"id": 126,
+						"email": "d@163.com",
+						"phone_number": "12345648912",
+						"name": "126",
+					},					
+				],
+				participant_info:[
+					{
+						"id": 123,
+						"email": "a@163.com",
+						"phone_number": "12345618912",
+						"name": "123",
+					},
+					{
+						"id": 124,
+						"email": "b@163.com",
+						"phone_number": "12345628912",
+						"name": "124",
+					},
+					{
+						"id": 125,
+						"email": "c@163.com",
+						"phone_number": "12345638912",
+						"name": "125",
+					},
+					{
+						"id": 126,
+						"email": "d@163.com",
+						"phone_number": "12345648912",
+						"name": "126",
+					},
+				],
+				participantclass:'全部参与者',
+				classifications: [
+                    {
+                        value: '全部参与者',
+                        label: '全部参与者'
+                    },
+                    {
+                        value: '正在完成任务的参与者',
+                        label: '正在完成任务的参与者'
+                    },
+                    {
+                        value: '等待确认的参与者',
+                        label: '等待确认的参与者'
+                    },
+                    {
+                        value: '完成任务的参与者',
+                        label: '完成任务的参与者'
+                    }
+                ],	
+				participantSelectType: 0,
+				current:0,
             }
         },
 		created: function () { 
@@ -247,7 +533,54 @@
 					console.log(error);
 				});
 			},
-		
+			selectChange(value){
+				if(value == '全部参与者'){
+					this.participantSelectType = 0;
+				}else if(value == '正在完成任务的参与者'){
+					this.participantSelectType = 1;
+				}else if(value == '等待确认的参与者'){
+					this.participantSelectType = 2;
+				}else if(value == '完成任务的参与者'){
+					this.participantSelectType = 3;
+				}
+			
+			},
+            show (index) {
+				this.showTaskStepInfo = true;
+				/*
+                this.$Modal.info({
+                    title: '已完成步骤',
+                    content: `名字：${this.ongoing_participant_info[index].name}<br>`
+                })
+				*/
+            },
+			showTaskCancel(){
+				 this.$Message.info('Clicked cancel');
+				 this.showTaskStepInfo = false;
+			},
+			next () {
+                if (this.current == this.showTaskInfomation.steps.length - 1) {
+                    this.$Message.info("完成任务");
+                } else {
+                    this.current += 1;
+                }
+            },
+			toshowWithdrawInfo(){
+				this.showWithdrawInfo = true;
+			},
+			showWithdrawInfoCancel(){
+				this.showWithdrawInfo = false;
+			},
+			withdrawTask() {
+				this.$Message.info('撤回任务成功');
+				this.showWithdrawInfo = false;
+			},
+			createNewTask() {
+				this.$router.push({
+					path: '/', 
+					name: 'missioncreate'
+				});		
+			}
         }
     }
 </script>
@@ -350,5 +683,8 @@
 }
 .info {	
     margin-bottom: 10px;
+}
+.finshButton{
+	margin-top: 25px;
 }
 </style>

@@ -92,7 +92,14 @@
 						}).then(function (response){
 							_this.$Message.success('组织注册成功!');
 							console.log(response);
-							// 跳转到组织页面
+							// 去组织的详情页面
+							this.$router.push({
+								path: '/', 
+								name: 'organizationInfo',
+								params: { 
+										organID: response.data.organization_id
+								},
+							});	
 						}).catch(function (error) {
 							console.log(error);
 						});
@@ -106,7 +113,6 @@
                 this.$refs[name].resetFields();
             },
 			getEventData:function() {
-				/*
 				var _this = this;
 				let uID = window.localStorage.getItem('userID');
 				if(uID == null || uID == ""){
@@ -117,24 +123,6 @@
 					});
 				}
 				this.$data.userID = uID;
-				var jwt = "JWT " + window.localStorage.getItem('token');
-				this.$axios({
-						 method:"get",
-						 url:url,
-						 headers:{
-							'Authorization': jwt,
-						 }
-				}).then(function (response){
-					console.log(response);
-				}).catch(function (error) {
-					console.log(error);
-					//跳转到主页
-					_this.$router.push({
-						path: '/', 
-						name: 'mainpage'
-					});
-				});
-				*/
 			},
 			handleReturnHomepage () {
 			    // 返回主页
