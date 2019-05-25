@@ -47,7 +47,7 @@ def checkCommentCreated(_user_id, _task_id):
 
 # 打印一条评论
 def printSingleReview(review):
-    return {"username": review.user.username,
+    return {"nickname": review.user.nickname,
             "title": review.title,
             "content": review.content,
             "rate": review.rate}
@@ -59,7 +59,7 @@ def updateAvgComment(_task_id):
         # 个人
         user = task.user
         # print('em,,')
-        # print(user.username)
+        # print(user.nickname)
         # print('end')
 
         all_tasks = user.tasks

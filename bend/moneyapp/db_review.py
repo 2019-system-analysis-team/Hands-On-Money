@@ -32,8 +32,3 @@ def deleteCustomerReview(_user_id, _task_id):
 def getCustomerReviewByTask(_task_id):
 	return Customer_Review.query.filter_by(task_id=_task_id)
 
-def addUser(_username, _email, _hashed_password, _telephone, _image_file):
-    user = User(username=_username, email=_email, password=_hashed_password, telephone=_telephone, image_file=_image_file)
-    db.session.add(user)
-    db.session.commit()
-    return user.id

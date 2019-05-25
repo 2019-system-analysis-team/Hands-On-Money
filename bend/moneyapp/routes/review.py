@@ -50,7 +50,7 @@ def create_Customer_Review(current_user, user_id, task_id):
         print(d['task_id'])
         customer_review = createCustomerReview(d)
 
-        # 更改avg_comment
+        # 更改average_comment
         updateAvgComment(task_id)
 
         return jsonify({"user_id": current_user.id,
@@ -115,9 +115,9 @@ def get_customer_review_by_task(task_id):
     for review in review_list:
         review_info.append(printSingleReview(review))
 
-    avg_comment = calculateTaskAvgComment(task_id)
+    average_comment = calculateTaskAvgComment(task_id)
 
-    return jsonify({"avg_points": avg_comment, "reviews": review_info})
+    return jsonify({"avg_points": average_comment, "reviews": review_info})
 
 
 
