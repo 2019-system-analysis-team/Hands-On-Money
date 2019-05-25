@@ -485,6 +485,7 @@
             },
 			getEventData:function() {
 				let routerParams = this.$route.params.taskID;
+				
 				if(routerParams == null)
 				{
 					// 返回主页
@@ -502,6 +503,7 @@
 						name: 'mainpage'
 					});
 				}
+				
 				this.$data.userID = uID;
 
 			},

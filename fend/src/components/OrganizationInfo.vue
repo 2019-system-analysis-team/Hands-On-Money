@@ -350,6 +350,7 @@
 				organID:0,
 				
 				allTasks:[
+
 				],
 				inprogressTasks:[
 
@@ -417,8 +418,11 @@
             },
 			getEventData:function() {
 				this.selectTasks = this.allTasks;
-				let routerParams = this.$route.params.organID; 
+				let routerParams = this.$route.params.organID;
+				//console.log(routerParams);
 
+							   
+		
 				if(routerParams == null)
 				{
 					// 返回主页
@@ -427,8 +431,10 @@
 						name: 'mainpage',
 					});	
 				}
+	
 				this.organID = routerParams;
 				let uID = window.localStorage.getItem('userID')
+			
 				if(uID == null || uID == ""){
 					//跳转到主页
 					this.$router.push({
@@ -436,13 +442,14 @@
 						name: 'mainpage'
 					});
 				}
+			
 				var _this = this;
 				var url = "/users/" + uID + "/organizations/" + this.organID;
 				this.$data.userID = uID;
 				this.organProfilePhotoUrl = "/users/"+uID+"/organizations/"+  this.organID +"/profile_photo";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$set(this.jwt,'Authorization',jwt);
-				
+			
 				this.$axios({
 						 method:"get",
 						 url:url,
@@ -495,9 +502,9 @@
 						name: 'mainpage'
 					});
 				});
-				
+			
 			    var url = "/users/" + uID + "/organizations/" + this.organID + "/my_tasks";
-				
+		
 				this.$axios({
 						 method:"get",
 						 url:url,

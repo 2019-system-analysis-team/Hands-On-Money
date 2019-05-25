@@ -187,6 +187,9 @@
                     passwdCheck: '',
                 },
                 ruleValidate: {
+					stunumber: [
+						   { required: false, validator: validateStuNumberCheck, trigger: 'blur' }
+					],
                     passwd: [
                         { required: true, validator: validatePass, trigger: 'blur' }
                     ],
@@ -230,7 +233,7 @@
 								password: this.$data.formValidate.passwd,
 							 }
 							}).then(function (response){
-								console.log(response);
+								//console.log(response);
 								window.localStorage.setItem('token', response.data.access_token);
 								window.localStorage.setItem('userID', response.data.user_id);
 								var url_all = "/users/" + response.data.user_id;
@@ -254,7 +257,7 @@
 									 data:{
 										school: _this.$data.formValidate.school,
 										grade: _this.$data.formValidate.grade,
-										student_number: _this.$data.formValidate.stunumber
+										student_id: _this.$data.formValidate.stunumber
 									 },
 									 headers:{
 										'Authorization': jwt,
@@ -265,7 +268,7 @@
 									 method:"put",
 									 url: url_info,
 									 data:{
-										name: _this.$data.formValidate.name,
+										realname: _this.$data.formValidate.name,
 										age: _this.$data.formValidate.age,
 										sex: _this.$data.formValidate.gender
 									 },

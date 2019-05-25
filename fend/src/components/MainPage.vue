@@ -236,9 +236,11 @@
 					this.isLogin = false;
 					return;
 				}
+
 				var url = "/users/" + uID;
 				this.$data.userID = uID;
 				var jwt = "JWT " + window.localStorage.getItem('token');
+	
 				this.$axios({
 						 method:"get",
 						 url:url,
@@ -246,16 +248,17 @@
 							'Authorization': jwt,
 						 }
 				}).then(function (response){
-					console.log(response);
+					//console.log(response);
 					_this.isLogin = true;
 					_this.profilePhotoPath = _this.$profilePath + response.data.profile_photo_path;					
 					window.localStorage.setItem('MyProfilePhotoPath', _this.profilePhotoPath);
 				}).catch(function (error) {
-					console.log(error.response.status);
+					//console.log(error.response.status);
 					_this.isLogin = false;
 					window.localStorage.removeItem('token');
 					window.localStorage.removeItem('userID');
 				});
+		
 			},
 			register: function () {
 				this.$router.push({

@@ -13,11 +13,6 @@ import iView from 'iview'
 import axios from 'axios'
 import 'iview/dist/styles/iview.css'
 
-
-import VueResource from 'vue-resource'
-Vue.use(VueResource);
-
-
 Vue.use(Router);
 Vue.use(iView);
 Vue.prototype.$axios = axios    //全局注册，使用方法为:this.$axios

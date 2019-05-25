@@ -187,7 +187,7 @@
 			getEventData:function() {
 				//要用完全的路径	
 				let uID = window.localStorage.getItem('userID')
-
+			
 				if(uID == null || uID == ""){
 					//跳转到主页
 					this.$router.push({
@@ -195,11 +195,11 @@
 						name: 'mainpage'
 					});
 				}
-
+		
 				var url = "/users/" + uID + "/organizations";
 				this.$data.userID = uID;
 				var jwt = "JWT " + window.localStorage.getItem('token');
-
+		
 				var _this = this;
 				this.$axios({
 						 method:"get",
@@ -228,7 +228,7 @@
 						name: 'mainpage'
 					});
 				});
-
+		
 			   this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 			},
             handleReturnHomepage () {

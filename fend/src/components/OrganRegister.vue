@@ -93,7 +93,7 @@
 							_this.$Message.success('组织注册成功!');
 							console.log(response);
 							// 去组织的详情页面
-							this.$router.push({
+							_this.$router.push({
 								path: '/', 
 								name: 'organizationInfo',
 								params: { 
@@ -113,6 +113,7 @@
                 this.$refs[name].resetFields();
             },
 			getEventData:function() {
+
 				var _this = this;
 				let uID = window.localStorage.getItem('userID');
 				if(uID == null || uID == ""){
@@ -123,6 +124,7 @@
 					});
 				}
 				this.$data.userID = uID;
+
 			},
 			handleReturnHomepage () {
 			    // 返回主页

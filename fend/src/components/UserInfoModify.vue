@@ -388,6 +388,7 @@
 				this.$data.profilePhotoName = '头像';
 
 				let uID = window.localStorage.getItem('userID');
+
 				if(uID == null || uID == ""){
 					//跳转到主页
 					this.$router.push({
@@ -395,6 +396,7 @@
 						name: 'mainpage'
 					});
 				}
+
 				var url = "/users/" + uID;
 				this.$data.userID = uID;
 				this.$data.profilePhotoUrl = "/users/" + uID + "/profile_photo_path";
@@ -402,6 +404,7 @@
 				//设置jwt认证头部
 				this.$set(this.jwt,'Authorization',jwt);
 				//console.log(this.jwt);
+	
 				var _this = this;
 				this.$axios({
 						 method:"get",
@@ -417,10 +420,10 @@
 					_this.$data.schoolValidate.stunumber = response.data.student_id;
 					_this.$data.schoolValidate.grade = response.data.grade;
 					_this.$data.infoValidate.name = response.data.name;
-					_this.$data.infoValidate.age = response.data.age;
+					_this.$data.infoValidate.age = response.data.age.toString();
 					_this.$data.infoValidate.gender = response.data.sex;		
 					_this.$data.money = response.data.balance;
-					_this.$data.profilePhotoPath =  this.$profilePath + response.data.profile_photo_path;
+					_this.$data.profilePhotoPath =  _this.$profilePath + response.data.profile_photo_path;
 					_this.$data.defaultList.push({name:_this.$data.profilePhotoName,url:_this.$data.profilePhotoPath});
 				}).catch(function (error) {
 					_this.$Message.error('请先登录!');
@@ -430,6 +433,7 @@
 						name: 'mainpage'
 					});
 				});
+		
 			},
             handleSubmit (name) {
 				if(this.tabs == "个人信息" && this.disabledPersonal == true){
@@ -448,6 +452,7 @@
 					this.disabledPwd = false;
 					return;
 				}
+				var _this = this;
                 this.$refs[name].validate((valid) => {
 					var url_all = "/users/" + this.$data.userID;
 					var jwt = "JWT " + window.localStorage.getItem('token');
@@ -465,8 +470,8 @@
 									'Authorization': jwt,
 								 }
 							}).then(function (response){
-								this.$Message.success('修改成功!');
-								this.disabledPersonal = true;
+								_this.$Message.success('修改成功!');
+								_this.disabledPersonal = true;
 							}).catch(function (error) {
 								console.log(error);
 							});
@@ -478,14 +483,14 @@
 								 data:{
 									school: this.$data.schoolValidate.school,
 									grade: this.$data.schoolValidate.grade,
-									student_number: this.$data.schoolValidate.stunumber
+									student_id: this.$data.schoolValidate.stunumber
 								 },
 								 headers:{
 									'Authorization': jwt,
 								 }
 							}).then(function (response){
-								this.$Message.success('修改成功!');
-								this.disabledSchool = true;
+								_this.$Message.success('修改成功!');
+								_this.disabledSchool = true;
 							}).catch(function (error) {
 								console.log(error);
 							});
@@ -495,7 +500,7 @@
 								 method:"put",
 								 url: url_info,
 								 data:{
-									name: this.$data.infoValidate.name,
+									realname: this.$data.infoValidate.name,
 									age: this.$data.infoValidate.age,
 									sex: this.$data.infoValidate.gender
 								 },
@@ -503,17 +508,17 @@
 									'Authorization': jwt,
 								 }
 							}).then(function (response){
-								this.$Message.success('修改成功!');
-								this.disabledInfo = true;
+								_this.$Message.success('修改成功!');
+								_this.disabledInfo = true;
 							}).catch(function (error) {
 								console.log(error);
 							});
 						}else if(this.tabs == "密码修改"){
-							this.$Message.success('修改成功!');
-							this.disabledPwd = true;
+							_this.$Message.success('修改成功!');
+							_this.disabledPwd = true;
 						}
                     } else {
-                        this.$Message.error('信息填写有误!');
+                        _this.$Message.error('信息填写有误!');
                     }
                 })
             },

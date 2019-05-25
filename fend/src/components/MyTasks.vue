@@ -236,6 +236,7 @@
             },
 			getEventData:function() {
 				let uID = window.localStorage.getItem('userID')
+				
 				if(uID == null || uID == ""){
 					//跳转到主页
 					this.$router.push({
@@ -243,6 +244,7 @@
 						name: 'mainpage'
 					});
 				}
+			
 				this.$data.userID = uID;
 				this.selectTasks = this.allTasks;
 			},
