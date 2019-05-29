@@ -15,13 +15,30 @@
    * [用户修改真实姓名、年龄、性别信息](#用户修改真实姓名年龄性别信息)
    * [用户修改头像](#用户修改头像)
    * [组织创建](#组织创建)
-   * [组织信息 (Todo)](#组织信息-todo)
-   * [组织信息修改 (Todo)](#组织信息修改-todo)
+      * [test case 1: 成功创建组织](#test-case-1:-成功创建组织)
+      * [test case 2: 非登陆用户创建组织](#test-case-2:-非登陆用户创建组织)
+      * [test case 3: 组织名重复](#test-case-3:-组织名重复)
+   * [组织信息](#组织信息)
+      * [test case 1: 正确获得指定组织信息](#test-case-1:-正确获得指定组织信息)
+      * [test case 2: 非登陆用户获取信息](#test-case-2:-非登陆用户获取信息)
+      * [test case 3: 找不到组织](#test-case-3:-找不到组织)
+      * [test case 4: 管理员成功查询组织余额](#test-case-4:-管理员成功查询组织余额)
+      * [test case 5: 非管理员查询组织余额](#test-case-5:-非管理员查询组织余额)
+   * [组织信息修改 (Todo)](#组织信息修改)
+      * [test case 1: 正确修改指定组织信息](#test-case-1:-正确修改指定组织信息)
+      * [test case 2: 非管理员修改组织信息](#test-case-2:-非管理员修改组织信息)
+      * [test case 3: 找不到组织2](#test-case-3:-找不到组织2)
+      * [test case 4: 组织名重复(Todo)](#test-case-4:-组织名重复(Todo))
    * [群主管理员添加成员](#群主管理员添加成员)
-   * [组织成员权限变更 (Todo)](#组织成员权限变更-todo)
+      * [test case 1: 使用邮箱成功添加](#test-case-1:-使用邮箱成功添加)
+      * [test case 2: 使用电话成功添加](#test-case-2:-使用电话成功添加)
+      * [test case 3: 重复添加成员(Todo)](#test-case-3:-重复添加成员(Todo))
+   * [组织成员权限变更(Todo)](#组织成员权限变更(Todo))
+      * [test case 1: 成功修改权限](#test-case-1:-成功修改权限)
    * [组织成员删除 (Todo)](#组织成员删除-todo)
-   * [群主删除组织](#群主删除组织)
-   * [用户参加的组织 (Todo)](#用户参加的组织-todo)
+      * [test case 1: 成功删除成员](#test-case-1:-成功删除成员)
+   * [群主删除组织(Todo)](#群主删除组织(Todo))
+   * [用户参加的组织](#用户参加的组织)
 * [任务系统](#任务系统)
    * [个人创建任务](#个人创建任务)
    * [组织创建任务](#组织创建任务)
@@ -398,18 +415,22 @@ file
 
 ##### 组织创建
 
-@app.route('/users/<user_id>/profile_photo', methods=['POST'])
+@app.route('/users/<user_id>/organizations', methods=['POST']
+
+###### test case 1: 成功创建组织
 
 ```
-POST http://localhost:5000/users/1/organization
+POST http://localhost:5000/users/1/organizations
 ```
+
 ```
 // Request
 {
-    "name":"test1-org",
-    "bio": "test1"
+    "name":"org1",
+    "bio": "bio1"
 }
 ```
+
 ```
 // Response 201 CREATED
 {
@@ -417,81 +438,367 @@ POST http://localhost:5000/users/1/organization
 }
 ```
 
-##### 组织信息 (Todo)
+###### test case 2: 非登陆用户创建组织
 
-##### 组织信息修改 (Todo)
+```
+POST http://localhost:5000/users/2/organizations
+```
 
-##### 群主管理员添加成员
+```
+// Request
+{
+    "name":"org1",
+    "bio": "bio1"
+}
+```
 
-@app.route('/users/<user_id>/organization/<organization_id>/members',
+```
+// Response 401 Unauthorized
+{
+    "error_code": "401",
+    "error_msg": "Unauthorized"
+}
+```
+
+##### test case 3: 组织名重复
+
+```
+POST http://localhost:5000/users/1/organizations
+```
+
+```
+// Request
+{
+    "name":"org1",
+    "bio": "bio1"
+}
+```
+
+```
+// Response 409 Conflict
+{
+    "error_code": 409,
+    "error_msg": "create conflicted, duplicate organization name"
+}
+```
+
+##### 组织信息
+
+@app.route('/users/<user_id>/organizations/<organization_id>', methods=['GET'])
+
+@app.route('/users/<user_id>/organizations/<organization_id>/balance', methods=['GET'])
+
+###### test case 1: 正确获得指定组织信息
+
+```
+GET http://localhost:5000/users/2/organizations/1
+```
+
+```
+// Response 200 OK
+{
+    "name": "name11",
+    "bio": "bio11",
+    "avg_comment": 5,
+    "members": [
+        {
+            "user_id": 2,
+            "status": "admin"
+        }
+    ]
+}
+```
+
+###### test case 2: 非登陆用户获取信息
+
+```
+GET http://localhost:5000/users/1/organizations/1
+```
+
+```
+// Response 401 Unauthorized
+{
+    "error_code": "401",
+    "error_msg": "Unauthorized"
+}
+```
+
+###### test case 3: 找不到组织
+
+```
+GET http://localhost:5000/users/1/organizations/10
+```
+
+```
+// Response 404 Not Found
+{
+    "error_code": "404",
+    "error_msg": "Unauthorized"
+}
+```
+
+###### test case 4: 管理员成功查询组织余额
+
+```
+GET http://localhost:5000/users/1/organizations/1/balance
+```
+
+```
+// Response 200 OK
+{
+    "balance": 0
+}
+```
+
+###### test case 5: 非管理员查询组织余额
+
+```
+GET http://localhost:5000/users/2/organizations/1/balance
+```
+
+```
+// Response 401 Unauthorized
+{
+    "error_code": "401",
+    "error_msg": "Unauthorized"
+}
+```
+
+##### 组织信息修改
+
+@app.route('/users/<user_id>/organizations/<organization_id>', methods=['PUT'])
+
+###### test case 1: 正确修改指定组织信息
+
+```
+PUT http://localhost:5000/users/2/organizations/1
+```
+
+```
+// Request
+{
+    "name":"org111",
+    "bio": "bio111"
+}
+```
+
+```
+// Response 200 OK
+{
+    "name": "name111",
+    "bio": "bio111"
+}
+```
+
+###### test case 2: 非管理员修改组织信息
+
+```
+PUT http://localhost:5000/users/2/organizations/3
+```
+
+```
+// Request
+{
+    "name":"org111",
+    "bio": "bio111"
+}
+```
+
+```
+// Response 401 Unauthorized
+{
+    "error_code": "401",
+    "error_msg": "Unauthorized"
+}
+```
+
+###### test case 3: 找不到组织2
+
+```
+PUT http://localhost:5000/users/2/organizations/10
+```
+
+```
+// Request
+{
+    "name":"org111",
+    "bio": "bio111"
+}
+```
+
+```
+// Response 404 Not Found
+{
+    "error_code": "404",
+    "error_msg": "Organization Not Found"
+}
+```
+
+###### test case 4: 组织名重复(Todo)
+
+```
+PUT http://localhost:5000/users/2/organizations/2
+```
+
+```
+// Request
+{
+    "name":"org1",
+    "bio": "bio1"
+}
+```
+
+```
+// Response 500
+{
+    "error_code": 500,
+    "error_msg": "duplicate organization name"
+}
+```
+
+##### 群主管理员添加成员(Todo)
+
+@app.route('/users/<user_id>/organizations/<organization_id>/members',
 methods=\['POST'\])
 
-test 1 使用email
+###### test case 1: 使用邮箱成功添加
 
 ```
-POST http://localhost:5000/users/1/organization/1/members
+POST http://localhost:5000/users/2/organizations/1/members
 ```
+
 ```
-// Request
+// Request 
 {
-    "email": "test2",
+    "email": "test",
     "status": "member"
 }
 ```
+
 ```
-// Response
+// Response 201 Created
 {
     "msg": "Added successfully."
 }
 ```
 
-test2 使用phone\_number
+###### test case 2: 使用电话成功添加
 
 ```
-POST http://localhost:5000/users/1/organization/1/members
+POST http://localhost:5000/users/2/organizations/1/members
 ```
+
 ```
 // Request
 {
-    "phone_number": "test4",
+    "phone_number": "test2",
     "status": "member"
 }
 ```
+
 ```
-// Response
+// Response 201 Created
 {
-    "msg": "Added successfully."
+    "msg": "add successfully."
 }
 ```
 
+###### test case 3: 重复添加成员(Todo)
 
+```
+POST http://localhost:5000/users/2/organizations/1/members
+```
 
-##### 组织成员权限变更 (Todo)
+```
+// Request 500
+{
+    "phone_number": "test1",
+    "status": "member"
+}
+```
 
-##### 组织成员删除 (Todo)
+```
+// Response
+{
+    "error_code": "500",
+    "error_msg": "duplicate member"
+}
+```
 
-##### 群主删除组织
+##### 组织成员权限变更(Todo)
 
-@app.route('/users/<user_id>/organization/<organization_id>',
+@app.route('/users/<user_id>/organizations/<organization_id>/members/<member_id>', methods=['PUT'])
+
+###### test case 1: 成功修改权限
+
+```
+POST http://localhost:5000/users/2/organizations/1/members/1
+```
+
+```
+// Request 
+{
+    "status": "member"
+}
+```
+
+```
+// Response 200 OK
+{
+    "msg": "update successfully."
+}
+```
+
+##### 组织成员删除(Todo)
+
+@app.route('/users/<user_id>/organizations/<organization_id>/members/<member_id>', methods=['DELETE'])
+
+###### test case 1: 成功删除成员
+
+```
+DELETE http://localhost:5000/users/2/organizations/2/members/1
+```
+
+```
+// Response 200 OK
+{
+    "msg": "delete successfully."
+}
+```
+
+##### 群主删除组织(Todo)
+
+@app.route('/users/<user_id>/organizations/<organization_id>',
 methods=\['DELETE'\])
 
 ```
-DELETE http://localhost:5000/users/1/organization/1
+DELETE http://localhost:5000/users/2/organization/1
 ```
-```
-// Request
-// Token required
-// ...
-```
+
 ```
 // Response
 {
-    "name": "test1-org",
-    "bio": "test1"
+    "name": "test4",
+    "bio": "test4"
 }
 ```
 
-##### 用户参加的组织 (Todo)
+##### 用户参加的组织
+
+@app.route('/users/<user_id>/organizations', methods=['GET'])
+
+```
+//Response
+{
+    "organizations": [
+        {
+            "organization_id": 2,
+            "organization_name": "name",
+            "status": "admin"
+        }
+    ]
+}
+```
 
 #### 任务系统
 
