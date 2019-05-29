@@ -33,7 +33,7 @@ def token_required(f):
             token = token[4:]
             data = jwt.decode(token, current_app.config['SECRET_KEY'])
             current_user = queryUserById(data['id']) 
-            print(current_user.username)
+            print(current_user.nickname)
         except:
             print(token)
             return jsonify({'message': 'Token is invalid'}), 401
@@ -44,30 +44,8 @@ def token_required(f):
 
 
 
-@routes.route("/", methods=['GET','POST'])
-def home():
-    if request.method == 'POST':
-        if request.form['button'] == 'add':
-            if request.form['username'] and request.form['email'] and request.form['password']:
-                bcrypt = Bcrypt(current_app)
-                hashed_password = bcrypt.generate_password_hash(request.form['password']).decode('utf-8')
-                addUser(request.form['username'], request.form['email'], hashed_password)
-                flash("Successfully added! " + request.form['username'])
-        elif request.form['button'] == 'search':
-            if request.form['username2']:
-                user = queryUser(request.form['username2'])
-                if user:
-                    flash("username: " + user.username)
-                    flash("email: " + user.email)
-                    flash("image_file: " + user.image_file)
-                else:
-                    flash("Can't find this user")
-    return render_template('layout.html')
 
-@routes.route('/api/users', methods=['GET'])
-def get_all_users():
-    user = queryUser('zhutou')
-    return json.dumps({"username":user.username, "email":user.email})
+
 
 
 @routes.route('/users/register', methods=['POST', 'GET'])

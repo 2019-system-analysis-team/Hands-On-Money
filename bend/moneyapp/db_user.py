@@ -8,8 +8,14 @@ from moneyapp.utils import *
 # User
 # 访客基础信息
 
-def addUser(_username, _email, _hashed_password, _telephone, _image_file):
-    user = User(username=_username, email=_email, password=_hashed_password, telephone=_telephone, image_file=_image_file)
+def addUser(_nickname, _email, _hashed_password, _phone_number, _profile_photo_path):
+    user = User(nickname=_nickname, email=_email, password=_hashed_password, phone_number=_phone_number, profile_photo_path=_profile_photo_path)
+    db.session.add(user)
+    db.session.commit()
+    return user.id
+
+def addUser2(d):
+    user = User(**d)
     db.session.add(user)
     db.session.commit()
     return user.id
@@ -17,21 +23,21 @@ def addUser(_username, _email, _hashed_password, _telephone, _image_file):
 
 """
 # 一开始就填详细信息成为用户
-def addUser_detailed(_username, _email, _hashed_password, _telephone, _image_file, _student_id, _realname, _age, _sex, _grade, _school, _bio):
-    user = User(username=_username, email=_email, password=_hashed_password, telephone=_telephone, image_file=_image_file, student_id=_student_id, realname=_realname, age=_age, sex=_sex, grade=_grade, school=_school, bio=_bio)
+def addUser_detailed(_nickname, _email, _hashed_password, _phone_number, _profile_photo_path, _student_id, _name, _age, _sex, _grade, _school, _bio):
+    user = User(nickname=_nickname, email=_email, password=_hashed_password, phone_number=_phone_number, profile_photo_path=_profile_photo_path, student_id=_student_id, name=_name, age=_age, sex=_sex, grade=_grade, school=_school, bio=_bio)
     db.session.add(user)
     db.session.commit()
 """
 
 """
 # 修改操作(不包括密码修改)
-def modify_profile(_username_ori, _username, _email, _telephone, _image_file, _age, _sex, _grade, _school, _bio):
-    user = User.query.filter_by(username=_username_ori).first()
+def modify_profile(_nickname_ori, _nickname, _email, _phone_number, _profile_photo_path, _age, _sex, _grade, _school, _bio):
+    user = User.query.filter_by(nickname=_nickname_ori).first()
     
-    user.username = _username
+    user.nickname = _nickname
     user.email = _email
-    user.telephone = _telephone
-    user.image_file = _image_file
+    user.phone_number = _phone_number
+    user.profile_photo_path = _profile_photo_path
     user.age = _age
     user.sex = _sex
     user.grade = _grade
@@ -43,7 +49,7 @@ def modify_profile(_username_ori, _username, _email, _telephone, _image_file, _a
 #修改用户信息(不包括修改图片)
 def modify_User(_id_ori,d):
     
-    #items = {"student_id","realname","age","sex","grade","school","bio","username"}
+    #items = {"student_id","name","age","sex","grade","school","bio","nickname"}
     User.query.filter_by(id=_id_ori).update(d)
     user = User.query.filter_by(id=_id_ori).first()
     db.session.commit()
@@ -52,7 +58,7 @@ def modify_User(_id_ori,d):
 #修改用户图片信息
 def modify_User_Photo(_id_ori,_new_filename):
     user = user = User.query.filter_by(id=_id_ori).first()
-    user.image_file = _new_filename
+    user.profile_photo_path = _new_filename
     db.session.commit()
     return user
 
@@ -64,25 +70,25 @@ def modify_User_Photo(_id_ori,_new_filename):
 
 
 def queryUser(d):
-    items ={'email','telephone'}
+    items ={'email','phone_number'}
     
     if "email" in d:
         user = User.query.filter_by(email = d['email']).first()
-    elif "telephone" in d:
-        user = User.query.filter_by(telephone=d['telephone']).first()
+    elif "phone_number" in d:
+        user = User.query.filter_by(phone_number=d['phone_number']).first()
     return user
 
 """
-def queryUser(_username):
-    user = User.query.filter_by(username=_username).first()
+def queryUser(_nickname):
+    user = User.query.filter_by(nickname=_nickname).first()
     return user
 
 def queryUserByEmail(_email):
     user = User.query.filter_by(email=_email).first()
     return user
 
-def queryUserByTelephone(_telephone):
-    user = User.query.filter_by(telephone=_telephone).first()
+def queryUserByphone_number(_phone_number):
+    user = User.query.filter_by(phone_number=_phone_number).first()
     return user
 """
 #---------------------------------------

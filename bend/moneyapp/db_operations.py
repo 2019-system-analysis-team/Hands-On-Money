@@ -6,27 +6,27 @@ from datetime import datetime
 # ====================================================================
 # User
 # 访客基础信息
-def addUser(_username, _email, _hashed_password, _telephone, _image_file):
-    user = User(username=_username, email=_email, password=_hashed_password, telephone=_telephone, image_file=_image_file)
+def addUser(_nickname, _email, _hashed_password, _phone_number, _profile_photo_path):
+    user = User(nickname=_nickname, email=_email, password=_hashed_password, phone_number=_phone_number, profile_photo_path=_profile_photo_path)
     db.session.add(user)
     db.session.commit()
     return user.id
 
 
 # 一开始就填详细信息成为用户
-def addUser_detailed(_username, _email, _hashed_password, _telephone, _image_file, _student_id, _realname, _age, _sex, _grade, _school, _bio):
-    user = User(username=_username, email=_email, password=_hashed_password, telephone=_telephone, image_file=_image_file, student_id=_student_id, realname=_realname, age=_age, sex=_sex, grade=_grade, school=_school, bio=_bio)
+def addUser_detailed(_nickname, _email, _hashed_password, _phone_number, _profile_photo_path, _student_id, _name, _age, _sex, _grade, _school, _bio):
+    user = User(nickname=_nickname, email=_email, password=_hashed_password, phone_number=_phone_number, profile_photo_path=_profile_photo_path, student_id=_student_id, name=_name, age=_age, sex=_sex, grade=_grade, school=_school, bio=_bio)
     db.session.add(user)
     db.session.commit()
 
 # 修改操作(不包括密码修改)
-def modify_profile(_username_ori, _username, _email, _telephone, _image_file, _age, _sex, _grade, _school, _bio):
-    user = User.query.filter_by(username=_username_ori).first()
+def modify_profile(_nickname_ori, _nickname, _email, _phone_number, _profile_photo_path, _age, _sex, _grade, _school, _bio):
+    user = User.query.filter_by(nickname=_nickname_ori).first()
     
-    user.username = _username
+    user.nickname = _nickname
     user.email = _email
-    user.telephone = _telephone
-    user.image_file = _image_file
+    user.phone_number = _phone_number
+    user.profile_photo_path = _profile_photo_path
     user.age = _age
     user.sex = _sex
     user.grade = _grade
@@ -36,8 +36,8 @@ def modify_profile(_username_ori, _username, _email, _telephone, _image_file, _a
     db.session.commit()
 
 
-def queryUser(_username):
-    user = User.query.filter_by(username=_username).first()
+def queryUser(_nickname):
+    user = User.query.filter_by(nickname=_nickname).first()
     return user
 
 def queryUserById(_id):
@@ -48,8 +48,8 @@ def queryUserByEmail(_email):
     user = User.query.filter_by(email=_email).first()
     return user
 
-def queryUserByTelephone(_telephone):
-    user = User.query.filter_by(telephone=_telephone).first()
+def queryUserByphone_number(_phone_number):
+    user = User.query.filter_by(phone_number=_phone_number).first()
     return user
 
 
@@ -57,8 +57,8 @@ def queryUserByTelephone(_telephone):
 
 # ====================================================================
 # Organization
-def addOrganization(_name, _image_file, _bio):
-    organization = Organization(name=_name, image_file=_image_file, bio=_bio)
+def addOrganization(_name, _profile_photo_path, _bio):
+    organization = Organization(name=_name, profile_photo_path=_profile_photo_path, bio=_bio)
     db.session.add(organization)
     db.session.commit()
 
@@ -112,13 +112,13 @@ def queryOrganizationByName(_organization_name):
 
 #--------------------------------------------------
 #todo 改变组织信息
-def modify_orgfile(_organization_id,_organization_name,_organization_bio, _image_file):
+def modify_orgfile(_organization_id,_organization_name,_organization_bio, _profile_photo_path):
 
     organization = Organization.query.filter_by(id = _organization_id).first()
 
     organization.name = _organization_name
     organization.bio = _organization_bio
-    organization.image_file = _image_file
+    organization.profile_photo_path = _profile_photo_path
 
     db.session.commit()
 
@@ -329,7 +329,7 @@ def searchTask(d):
                 continue
 
         if 'creator_user_phone_number' in d:
-            if not d['creator_user_phone_number'] == creator_user.telephone:
+            if not d['creator_user_phone_number'] == creator_user.phone_number:
                 task_not_satisfy.add(task)
                 continue
 

@@ -100,7 +100,7 @@ POST http://localhost:5000/users
     "password":"test1ll",
     "email": "test1ll",
     "phone_number": "test1ll",
-    "username": "test1ll"
+    "nickname": "test1ll"
 }
 ```
 ```

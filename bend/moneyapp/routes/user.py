@@ -69,29 +69,29 @@ def get_user_info(current_user, user_id):
     if user:
         if current_user.id == int(user_id):
             return jsonify({'email': user.email,
-                            'phone_number': user.telephone,
-                            'profile_photo_path': user.image_file,
+                            'phone_number': user.phone_number,
+                            'profile_photo_path': user.profile_photo_path,
                             'student_id': user.student_id,
-                            'name': user.realname,
+                            'name': user.name,
                             'age': user.age,
                             'sex': user.sex,
                             'grade': user.grade,
                             'school': user.school,
-                            'nickname':user.username,
+                            'nickname':user.nickname,
                             'bio': user.bio,
                             'balance': user.balance,
-                            'avg_comment': user.average_comment
+                            'average_comment': user.average_comment
                             })
         else:
-            return jsonify({'profile_photo_path': user.image_file,
-                            'name': user.realname,
+            return jsonify({'profile_photo_path': user.profile_photo_path,
+                            'name': user.name,
                             'age': user.age,
                             'sex': user.sex,
                             'grade': user.grade,
                             'school': user.school,
-                            'nickname':user.username,
+                            'nickname':user.nickname,
                             'bio': user.bio,
-                            'avg_comment': user.average_comment
+                            'average_comment': user.average_comment
                             })
     else:
         return jsonify({'error_code': "404",
@@ -106,19 +106,37 @@ def get_user_info(current_user, user_id):
 @routes.route('/users', methods=['POST'])
 def creating_user():
     if request.method == 'POST':
+        d = request.get_json()
+        new_dict = dict()
+        items = {'email',
+                'phone_number',
+                'student_id',
+                'name',
+                'age',
+                'sex',
+                'grade',
+                'school',
+                'bio',
+                'nickname',
+                'password'}
+        if 'email' not in d or 'password' not in d or 'phone_number' not in d:
+            return jsonify({"error_code": "500", "error_msg": "Invalid information"}),500
+        
+        for arg in d:
+            if arg in items:
+                new_dict[arg] = d[arg]
 
-
-        try:
-            username = request.get_json()['username']
-            email = request.get_json()['email']
-            telephone = request.get_json()['phone_number']
-            password = request.get_json()['password']
-        except Exception as e:
-            return jsonify({"error_code": "400", "error_msg": "fuck you asshole"}),400
+        # try:
+        #     nickname = request.get_json()['nickname']
+        #     email = request.get_json()['email']
+        #     phone_number = request.get_json()['phone_number']
+        #     password = request.get_json()['password']
+        # except Exception as e:
+        #     return jsonify({"error_code": "400", "error_msg": "fuck you asshole"}),400
        
 
         bcrypt = Bcrypt(current_app)
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        hashed_password = bcrypt.generate_password_hash(d['password']).decode('utf-8')
        
 
         if request.files and request.files['file'] :
@@ -144,7 +162,8 @@ def creating_user():
 
         try:
             
-            user_id = addUser(username, email, hashed_password, telephone, newFileName)
+            #user_id = addUser(nickname, email, hashed_password, phone_number, newFileName)
+            user_id = addUser2(new_dict)
             
             token = jwt.encode({'id': user_id, 'exp': datetime.utcnow() + timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
 
@@ -157,7 +176,7 @@ def creating_user():
         except Exception as e:
             err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
             return jsonify({'error_code': '409',
-                         'error_msg': "create conflicted, duplicate email or phone_number, goto login"}), 409
+                         'error_msg': str(e)}), 409
     
         else:
 
@@ -179,7 +198,7 @@ def logout(current_user, user_id):
         # print(token)
         # 加入黑名单 不能再使用该token
         blacklist.add(token)
-        return jsonify({"message": current_user.username + " logged out successfully."}), 200
+        return jsonify({"message": current_user.nickname + " logged out successfully."}), 200
 
     else:
         return jsonify({"err_msg": "Not Found"}), 404
@@ -190,18 +209,18 @@ def logout(current_user, user_id):
 def test_modify():
     if request.method == 'POST':
         # 之后下面改成 取页面原本的名字 或session里面的名字进行query
-        username_ori = 'popiko22'
+        nickname_ori = 'popiko22'
 
         email = request.form['email']
-        telephone = request.form['telephone']
+        phone_number = request.form['phone_number']
         student_id = request.form['student_id']
-        realname = request.form['realname']
+        name = request.form['name']
         age = request.form['age']
         sex = request.form['sex']
         grade = request.form['grade']
         school = request.form['school']
         bio = request.form['bio']
-        username = request.form['username']
+        nickname = request.form['nickname']
 
 
         if request.files and request.files['file'] :
@@ -225,7 +244,7 @@ def test_modify():
             #filename = 'default.jpg'
             newFileName = 'default.jpg'
 
-        modify_profile(username_ori, username, email, telephone, newFileName, age, sex, grade, school, bio)
+        modify_profile(nickname_ori, nickname, email, phone_number, newFileName, age, sex, grade, school, bio)
 
         result = jsonify({"result": "add!"})
 
@@ -235,7 +254,7 @@ def test_modify():
 #修改用户个人信息
 
 #修改nickname，bio
-#nickname username 不能重复
+#nickname nickname 不能重复
 @routes.route('/users/<user_id>/personality', methods=['PUT'])
 @token_required
 def  modifyUserPersonality(current_user, user_id):
@@ -247,13 +266,23 @@ def  modifyUserPersonality(current_user, user_id):
                 return jsonify({"error_code": "400", "error_msg": "fuck you asshole"}),400
             try:
                 user = modify_User(user_id,d)
+                
             except Exception as e:
                 err_msg = re.findall(r"UNIQUE constraint failed: .*", str(e))
                 return jsonify({'error_code': '409',
-                         'error_msg': "conflicted"}), 409
+                         'error_msg': str(e)}), 409
 
-            return jsonify({"nickname":user.username,
-                    "bio":user.bio}),200
+            # return jsonify({"nickname":user.nickname,
+            #         "bio":user.bio}),200
+            return jsonify({'name': user.name,
+                            'age': user.age,
+                            'sex': user.sex,
+                            'grade': user.grade,
+                            'school': user.school,
+                            'nickname':user.nickname,
+                            'bio': user.bio,
+                            'average_comment': user.average_comment
+                            }),200
 
         else:
             return jsonify({"err_msg": "user Not Found"}), 404
@@ -273,7 +302,7 @@ def  modifyUserSchool(current_user, user_id):
             except Exception as e:
                 return jsonify({"error_code": "400", "error_msg": "fuck you asshole"}),400  
 
-            user = modify_User(current_user.id,d) 
+            user = modify_User(current_user.id,d)   #####
 
             return jsonify({"school":user.school,
                     "grade":user.grade,
@@ -297,7 +326,7 @@ def  modifyUserPersonalInfo(current_user, user_id):
             except Exception as e:
                 return jsonify({"error_code": "400", "error_msg": "fuck you asshole"}),400       
             user = modify_User(current_user.id,d)
-            return jsonify({"name":user.realname,
+            return jsonify({"name":user.name,
                 "age":user.age,
                 "sex":user.sex
                 }), 200

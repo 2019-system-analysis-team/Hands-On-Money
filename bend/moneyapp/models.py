@@ -6,10 +6,10 @@ db = SQLAlchemy()
 class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	email = db.Column(db.String(100), unique=True, nullable=False)
-	telephone = db.Column(db.String(30), unique=True, nullable=True)
-	image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
+	phone_number = db.Column(db.String(30), unique=True, nullable=True)
+	profile_photo_path = db.Column(db.String(20), nullable=False, default='default.jpg')
 	student_id = db.Column(db.String(8), unique=True, nullable=True)
-	realname = db.Column(db.String(30), nullable=True)
+	name = db.Column(db.String(30), nullable=True)
 	age = db.Column(db.Integer, nullable=True)
 	sex = db.Column(db.String(30), nullable=True)
 	grade = db.Column(db.String(100), nullable=True)
@@ -17,7 +17,7 @@ class User(db.Model):
 	bio = db.Column(db.Text, default='this person is very lazy')
 	balance = db.Column(db.Float, default=0.0)
 	average_comment = db.Column(db.Float, default=5.0)
-	username = db.Column(db.String(30), unique=True, nullable=False)
+	nickname = db.Column(db.String(30))
 	password = db.Column(db.String(60), nullable=False)
 	
 	
