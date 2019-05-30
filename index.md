@@ -15,7 +15,7 @@ layout: default
 * 5、[Product Backlog](05-product-backlog)产品特性库
 * 6、[Requirement specification](06-requirement-specification)  需求规格说明书
   - 6.1 [Usecase Diagram and UML Activity Diagram](06-01-usecase-diagram-and-uml-activity-diagram)  用例图，业务过程/多泳道图
-  - 6.2 [Use Cases](06-02-use-cases) 用例+活动图
+  - 6.2 [Use Cases](06-02-use-case) 用例+活动图
   - 6.3 [Domian Models](06-03-domian-models)  领域模型
   - 6.4 [State Models](06-04-state-models)  状态模型
   - 6.5 [System Sequence Diagrams](06-05-system-sequence-diagrams)  功能模型
