@@ -170,13 +170,13 @@
 											:show-upload-list="false"
 											:default-file-list="defaultList"
 											:on-success="handleSuccess"
-											:format="['jpeg']"
+											:format="['jpeg','jpg','png','bmp']"
 											:max-size="2048"
 											:on-format-error="handleFormatError"
 											:on-exceeded-size="handleMaxSize"
 											:before-upload="handleBeforeUpload"
 											:on-error="handleError"
-											accept="image/jpeg"
+											accept="image/jpeg,image/jpg, image/png, image/bmp"
 											type="drag"
 											:action= "profilePhotoUrl"
 											style="display: inline-block;width:78px;">
@@ -186,7 +186,7 @@
 										</Upload>
 									</Tooltip>
 									<Modal title="浏览头像" v-model="visible">
-										<img :src="'https://o5wwk8baw.qnssl.com/' + imgName + '/avatar'" v-if="visible" style="width: 100%">
+										<img :src= "profilePhotoPath" v-if="visible" style="width: 100%">
 									</Modal>
 								</FormItem>
 							</Form>
@@ -361,7 +361,7 @@
                     passwd: '',
                     passwdCheck: ''
 				},
-                defaultList: [],
+                defaultList: [{name:'profile',url:'default.jpg'}],
                 imgName: '',
                 visible: false,
 				uploadList: [],
@@ -399,11 +399,11 @@
 
 				var url = "/users/" + uID;
 				this.$data.userID = uID;
-				this.$data.profilePhotoUrl = "/users/" + uID + "/profile_photo_path";
+				this.$data.profilePhotoUrl = "/users/" + uID + "/profile_photo";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				//设置jwt认证头部
 				this.$set(this.jwt,'Authorization',jwt);
-				//console.log(this.jwt);
+				console.log(this.jwt);
 	
 				var _this = this;
 				this.$axios({
@@ -424,7 +424,9 @@
 					_this.$data.infoValidate.gender = response.data.sex;		
 					_this.$data.money = response.data.balance;
 					_this.$data.profilePhotoPath =  _this.$profilePath + response.data.profile_photo_path;
-					_this.$data.defaultList.push({name:_this.$data.profilePhotoName,url:_this.$data.profilePhotoPath});
+					_this.$set(_this.$data.defaultList[0],'name',_this.$data.profilePhotoName);
+					_this.$set(_this.$data.defaultList[0],'url',_this.$data.profilePhotoPath);
+					console.log(_this.defaultList);
 				}).catch(function (error) {
 					_this.$Message.error('请先登录!');
 					//跳转到主页
@@ -433,7 +435,6 @@
 						name: 'mainpage'
 					});
 				});
-		
 			},
             handleSubmit (name) {
 				if(this.tabs == "个人信息" && this.disabledPersonal == true){
@@ -500,7 +501,7 @@
 								 method:"put",
 								 url: url_info,
 								 data:{
-									realname: this.$data.infoValidate.name,
+									name: this.$data.infoValidate.name,
 									age: this.$data.infoValidate.age,
 									sex: this.$data.infoValidate.gender
 								 },
@@ -558,7 +559,7 @@
             handleFormatError (file) {
                 this.$Notice.warning({
                     title: '文件格式不正确',
-                    desc: '文件 ' + file.name + ' 的格式不正确, 请选择 jpeg .'
+                    desc: '文件 ' + file.name + ' 的格式不正确, 请选择 jpeg jpg png bmp.'
                 });
             },
             handleMaxSize (file) {
@@ -567,12 +568,28 @@
                     desc: '文件  ' + file.name + ' 太大, 不能超过 2M.'
                 });
             },
-			handleError(error, file){
-				if(this.$data.profilePhotoPath != ""){
-					file.url = this.$data.profilePhotoPath;
-					file.name = '头像';
-				}
-				this.$Message.error('修改头像失败!');
+			handleError(error, dom, file){
+				console.log(file);
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				var _this = this;
+				let param = new FormData(); // 创建form对象
+				param.append('file', file); // 将文件存入file下面
+				this.$axios({
+					 method:"post",
+					 url: this.profilePhotoUrl,
+					 data:param,
+					 headers:{
+						'Authorization': jwt,
+						'Content-Type': 'multipart/form-data',
+					 }
+				}).then(function (response){
+					console.log(response.data);
+					_this.$Message.success('修改头像成功!');
+					_this.$router.go(0);
+				}).catch(function (error) {
+					console.log(error);
+				});
+				
 			},
             handleBeforeUpload () {
 				// 如果之前上传过则删除

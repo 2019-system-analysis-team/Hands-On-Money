@@ -208,7 +208,7 @@
 							'Authorization': jwt,
 						 }
 				}).then(function (response){
-					console.log(response);					
+					//console.log(response);					
 					_this.allOrganizations = response.data.organizations;
 					for(var i=0; i<_this.allOrganizations.length;i++){
 						if(_this.allOrganizations[i].status == "member"){

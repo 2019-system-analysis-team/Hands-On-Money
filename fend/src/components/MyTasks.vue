@@ -54,9 +54,9 @@
 								</Select>
 							</p>
 							<div slot="extra">
-								<Button type="primary" icon="ios-add" shape="circle">创建个人任务</Button>
+								<Button type="primary" icon="ios-add" shape="circle"  @click = "createNewTask()">创建个人任务</Button>
 							</div>	
-							<Col span="8" v-for="item in selectTasks" :key="item.id" style="padding-left: 30px; padding-top: 50px;">
+							<Col span="8" v-for="item in selectTasks" :key="item.task_id" style="padding-left: 30px; padding-top: 50px;">
 								<Card>
 									<p slot="title">{{item.task_name}}</p>
 									<div slot="extra">
@@ -153,64 +153,32 @@
 					mode: '支付宝',
                 },
 				showTaskInfomation:{
-					task_id: 123456,
-					creator_user_email: "i@sirius.com",
-					creator_user_phone_number: "13123456789",
-					creator_organization_name: "name",
-					title: "一个标题",
-					description: "一个描述",
-					tags: ["tag1", "tag2", "tag3"],
-					current_participant_number: 3,
-					participant_number_limit: 10,
-					reward_for_one_participant: 2,
-					post_time: "date_obj",
-					receive_end_time: "date_obj",
-					finish_deadline_time: "date_obj",
-					steps: [
-						{
-							title: "下楼",
-							description: "下楼"
-						},
-						{
-							title: "拿外卖",
-							description: "拿外卖"
-						}
-					],
-					current: -1
 				},
-				selectTasks:[],
-				allTasks:[
-					{
-						task_id: 123,
-						task_name: "填写问卷",
-						status: "进行中"
-					},
-					{
-						task_id: 124,
-						task_name: "拿快递",
-						status: "已结束"
-					}
-				],
-				finishedTasks:[
-					{
-						task_id: 124,
-						task_name: "拿快递",
-						status: "已结束"						
-					}
-				],
-				inprogressTasks:[
-					{
-						task_id: 123,
-						task_name: "填写问卷",
-						status: "进行中"
-					}
-				],
+				selectTasks:[{
+					"task_id": 123,
+					"task_name": "name123",
+					"status": "已完成"
+				},],
+				allTasks:[],
+				finishedTasks:[],
+				inprogressTasks:[],
+				receivedTasks:[],
+				createdTasks:[],
+				
 				taskclass:'全部任务',
 				classifications: [
 				    {
 				        value: '全部任务',
 				        label: '全部任务'
 				    },
+					{
+					    value: '我创建的',
+					    label: '我创建的'
+					},
+					{
+					    value: '我接收的',
+					    label: '我接收的'
+					},
 				    {
 				        value: '进行中',
 				        label: '进行中'
@@ -235,8 +203,8 @@
 				});		
             },
 			getEventData:function() {
-				let uID = window.localStorage.getItem('userID')
-				
+				let uID = window.localStorage.getItem('userID');
+				/*
 				if(uID == null || uID == ""){
 					//跳转到主页
 					this.$router.push({
@@ -244,9 +212,65 @@
 						name: 'mainpage'
 					});
 				}
-			
+				*/
 				this.$data.userID = uID;
-				this.selectTasks = this.allTasks;
+				var _this = this;
+				var url = "/users/" + uID + "/my_tasks";
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				/*
+				this.$axios({
+					 method:"get",
+					 url:url,
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.createdTasks = response.data.tasks;
+					for(var i=0; i<_this.createdTasks.length;i++){
+						if(_this.createdTasks[i].status == "已完成"){
+							_this.finishedTasks.push(_this.createdTasks[i]);
+						}else if(_this.createdTasks[i].status == "进行中"){
+							_this.inprogressTasks.push(_this.createdTasks[i]);
+						}
+						_this.allTasks.push(_this.createdTasks[i]);
+					}			
+					_this.selectTasks = _this.allTasks;	
+				}).catch(function (error) {
+					_this.$Message.error('请先登录!');
+					//跳转到主页
+					_this.$router.push({
+						path: '/', 
+						name: 'mainpage'
+					});
+				});
+				var url = "/users/" + uID + "/received_tasks";
+				this.$axios({
+					 method:"get",
+					 url:url,
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.receivedTasks = response.data.tasks;
+					for(var i=0; i<_this.receivedTasks.length;i++){
+						if(_this.receivedTasks[i].status == "已完成"){
+							_this.finishedTasks.push(_this.receivedTasks[i]);
+						}else if(_this.receivedTasks[i].status == "进行中"){
+							_this.inprogressTasks.push(_this.receivedTasks[i]);
+						}
+						_this.allTasks.push(_this.receivedTasks[i]);
+					}
+					_this.selectTasks = _this.allTasks;			
+				}).catch(function (error) {
+					_this.$Message.error('请先登录!');
+					//跳转到主页
+					_this.$router.push({
+						path: '/', 
+						name: 'mainpage'
+					});
+				});
+				*/
+			    this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 			},
 			GotoTopup (){
 				this.topup = true;
@@ -277,17 +301,41 @@
 				});
 			},
 			selectChange(value){
+				console.log(value);
 				if(value == '已结束'){
 					this.selectTasks = this.finishedTasks;
+					console.log(this.selectTasks);
 				}else if(value == '进行中'){
 					this.selectTasks = this.inprogressTasks;
+					console.log(this.selectTasks);
 				}else if(value == '全部任务'){
 					this.selectTasks = this.allTasks;
+					console.log(this.selectTasks);
+				}else if(value == '我创建的'){
+					this.selectTasks = this.createdTasks;
+					console.log(this.selectTasks);
+				}else if(value == '我接收的'){
+					this.selectTasks = this.receivedTasks;
+					console.log(this.selectTasks);
 				}
 			},
 			LookTaskInfo(taskId){
-				this.showTaskInfo = true;
-				this.showTaskInfomation.task_id = taskId;
+				this.showTaskInfo = true;				
+				var url = "/users/" + uID + "/my_tasks/" + taskID;
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				var _this = this;
+				this.$axios({
+						 method:"get",
+						 url:url,
+						 headers:{
+							'Authorization': jwt,
+						 }
+				}).then(function (response){
+					_this.showTaskInfomation = response.data;
+					_this.$set(this.showTaskInfomation,'current',-1);
+				}).catch(function (error) {
+
+				});
 			},
 			showTaskCancel(){
 				 this.$Message.info('Clicked cancel');

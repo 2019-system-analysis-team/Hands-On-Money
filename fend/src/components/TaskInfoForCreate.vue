@@ -112,23 +112,6 @@
 							<Table border :columns="waitingExamineParticipant" :data="waiting_examine_participant_info" v-if="this.participantSelectType == 2"></Table>
 							<Table border :columns="allParticipant" :data="finished_participant_info" v-if="this.participantSelectType == 3"></Table>
 						</Card>		
-						<Modal v-model="showTaskStepInfo">
-							<p slot="header" style="text-align:center">
-								<span>已完成步骤</span>
-							</p>
-							<div>
-							<Card dis-hover>
-								<Steps :current="current">
-									<Step :title="item.title" v-for="item in showTaskInfomation.steps" :key="item.title">
-									</Step>
-								</Steps>
-								<Button type="primary" @click="next" class="finshButton">完成当前步骤</Button>
-							</Card>
-							</div>
-							<div slot="footer">
-								<Button type="primary" @click="showTaskCancel">关闭</Button>
-							</div>
-						</Modal>
 					</TabPane>
 				</Tabs>
             </Content>
@@ -170,7 +153,6 @@
         data () {
             return {
 				showWithdrawInfo: false,
-				showTaskStepInfo: false,
                 allParticipant: [
                     {
                         title: '名字',
@@ -187,12 +169,12 @@
                         }
                     },
                     {
-                        title: '邮箱',
-                        key: 'email'
+                        title: '学校',
+                        key: 'school'
                     },
                     {
-                        title: '电话',
-                        key: 'phone_number'
+                        title: '年级',
+                        key: 'grade'
                     }
                 ],
                 ongoingParticipant: [
@@ -211,12 +193,12 @@
                         }
                     },
                     {
-                        title: '邮箱',
-                        key: 'email'
+                        title: '学校',
+                        key: 'school'
                     },
                     {
-                        title: '电话',
-                        key: 'phone_number'
+                        title: '年级',
+                        key: 'grade'
                     },
                     {
                         title: '设置',
@@ -259,12 +241,12 @@
                         }
                     },
                     {
-                        title: '邮箱',
-                        key: 'email'
+                        title: '学校',
+                        key: 'school'
                     },
                     {
-                        title: '电话',
-                        key: 'phone_number'
+                        title: '年级',
+                        key: 'grade'
                     },
                     {
                         title: '设置',
@@ -307,12 +289,12 @@
                         }
                     },
                     {
-                        title: '邮箱',
-                        key: 'email'
+                        title: '学校',
+                        key: 'school'
                     },
                     {
-                        title: '电话',
-                        key: 'phone_number'
+                        title: '年级',
+                        key: 'grade'
                     }
                 ],
 				profilePhotoPath: '',
@@ -332,123 +314,46 @@
 					mode: '支付宝',
                 },
 				showTaskInfomation:{
-					task_id: 123456,
-					creator_user_email: "i@sirius.com",
-					creator_user_phone_number: "13123456789",
-					creator_organization_name: "name",
-					title: "一个标题",
-					description: "一个描述",
-					tags: ["tag1", "tag2", "tag3"],
-					current_participant_number: 3,
-					participant_number_limit: 10,
-					reward_for_one_participant: 2,
-					post_time: "date_obj",
-					receive_end_time: "date_obj",
-					finish_deadline_time: "date_obj",
-					steps: [
-						{
-							title: "下楼",
-							description: "下楼"
-						},
-						{
-							title: "拿外卖",
-							description: "拿外卖"
-						}
-					],
+					"task_id": 123456,
+					"creator_user_email": "i@sirius.com",
+					"creator_user_phone_number": "13123456789",
+					"creator_organization_name": "name",
+					"status": "ongoing",
+					"title": "string",
+					"description": "string",
+					"tags": ["tag1", "tag2", "tag3"],
+					"current_participant_number": 3,
+					"participant_number_limit": 10,
+					"reward_for_one_participant": 2,
+					"post_time": "date_obj",
+					"receive_end_time": "date_obj",
+					"finish_deadline_time": "date_obj",
 					"user_limit": {
-						"age_upper": 0,
-						"age_lower": 1,
+						"age_upper": 8,
+						"age_lower": 18,
 						"grades": ["grade1", "grade1"],
 						"sexes": ["sex_type1", "sex_type2", "sex_type3"],
 						"schools": ["school_name1", "school_name2"]
 					},
+					"steps": [
+						{
+							"title": "string1",
+							"description": "string1"
+						},
+						{
+							"title": "string2",
+							"description": "string2"
+						}
+					],
 					"participant_ids": [123, 124, 125, 126],
-					"ongoing_participant_ids": [123, 124],
+					"ongoing_participant_ids": [121, 128],
 					"waiting_examine_participant_ids": [125],
-					"finished_participant_ids": [126],
+					"finished_participant_ids": [126]
 				},
-				ongoing_participant_info:[
-					{
-						"id": 123,
-						"email": "a@163.com",
-						"phone_number": "12345618912",
-						"name": "123",
-					},
-					{
-						"id": 124,
-						"email": "b@163.com",
-						"phone_number": "12345628912",
-						"name": "124",
-					},
-					{
-						"id": 125,
-						"email": "c@163.com",
-						"phone_number": "12345638912",
-						"name": "125",
-					},
-					{
-						"id": 126,
-						"email": "d@163.com",
-						"phone_number": "12345648912",
-						"name": "126",
-					},
-				],
-				waiting_examine_participant_info:[
-					{
-						"id": 125,
-						"email": "c@163.com",
-						"phone_number": "12345638912",
-						"name": "125",
-					},					
-				],
-				ongoing_participant_info:[
-					{
-						"id": 123,
-						"email": "a@163.com",
-						"phone_number": "12345618912",
-						"name": "123",
-					},
-					{
-						"id": 124,
-						"email": "b@163.com",
-						"phone_number": "12345628912",
-						"name": "124",
-					},					
-				],
-				finished_participant_info:[
-					{
-						"id": 126,
-						"email": "d@163.com",
-						"phone_number": "12345648912",
-						"name": "126",
-					},					
-				],
-				participant_info:[
-					{
-						"id": 123,
-						"email": "a@163.com",
-						"phone_number": "12345618912",
-						"name": "123",
-					},
-					{
-						"id": 124,
-						"email": "b@163.com",
-						"phone_number": "12345628912",
-						"name": "124",
-					},
-					{
-						"id": 125,
-						"email": "c@163.com",
-						"phone_number": "12345638912",
-						"name": "125",
-					},
-					{
-						"id": 126,
-						"email": "d@163.com",
-						"phone_number": "12345648912",
-						"name": "126",
-					},
-				],
+				waiting_examine_participant_info:[],
+				ongoing_participant_info:[],
+				finished_participant_info:[],
+				participant_info:[],
 				participantclass:'全部参与者',
 				classifications: [
                     {
@@ -469,7 +374,8 @@
                     }
                 ],	
 				participantSelectType: 0,
-				current:0,
+				isCreateByOrgan:false,
+				organID:null,
             }
         },
 		created: function () { 
@@ -484,7 +390,13 @@
 				});		
             },
 			getEventData:function() {
+				/*
 				let routerParams = this.$route.params.taskID;
+				let organID = this.$route.params.organID;
+				if(organID != null){
+					this.isCreateByOrgan = true;
+					this.organID = organID;
+				}
 				
 				if(routerParams == null)
 				{
@@ -504,8 +416,112 @@
 					});
 				}
 				
-				this.$data.userID = uID;
+				//this.$data.userID = uID;
+				
+				var _this = this;
+				var url = "/users/" + this.$data.userID;
+				if(this.isCreateByOrgan){
+					url += "/organizations/" + this.organID + "/my_tasks/" + this.taskID;
+				}
+				else{
+					url += "/my_tasks/" + this.taskID;
+				}
+				var jwt = "JWT " + window.localStorage.getItem('token');
+								
+				this.$axios({
+					 method:"get",
+					 url: url,
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.showTaskInfomation = response.data;
+				}).catch(function (error) {
+					console.log(error);
+				});	
+				*/
+			   var _this = this;
+			   for(var i = 0 ;i < this.showTaskInfomation.participant_ids.length;i++){					
+					var url = "/users/" + this.showTaskInfomation.participant_ids[i];
+					var jwt = "JWT " + window.localStorage.getItem('token');
+					this.$axios({
+						 method:"get",
+						 url:url,
+						 headers:{
+							'Authorization': jwt,
+						 }
+					}).then(function (response){
+						var test = {};
+						_this.$set(test,'id',response.data.id);
+						_this.$set(test,'school',response.data.school);
+						_this.$set(test,'grade',response.data.grade);
+						_this.$set(test,'name',response.data.name);
+						_this.participant_info.push(test);
+					}).catch(function (error) {
 
+					});
+			   }
+			   for(var i = 0 ;i < this.showTaskInfomation.ongoing_participant_ids.length;i++){
+					var url = "/users/" + this.showTaskInfomation.ongoing_participant_ids[i];
+					var jwt = "JWT " + window.localStorage.getItem('token');
+					this.$axios({
+						 method:"get",
+						 url:url,
+						 headers:{
+							'Authorization': jwt,
+						 }
+					}).then(function (response){
+						var test = {};
+						_this.$set(test,'id',response.data.id);
+						_this.$set(test,'school',response.data.school);
+						_this.$set(test,'grade',response.data.grade);
+						_this.$set(test,'name',response.data.name);
+						_this.ongoing_participant_info.push(test);
+					}).catch(function (error) {
+					
+					});
+			   }
+			   for(var i = 0 ;i < this.showTaskInfomation.waiting_examine_participant_ids.length;i++){
+					var url = "/users/" + this.showTaskInfomation.waiting_examine_participant_ids[i];
+					var jwt = "JWT " + window.localStorage.getItem('token');
+					this.$axios({
+						 method:"get",
+						 url:url,
+						 headers:{
+							'Authorization': jwt,
+						 }
+					}).then(function (response){
+						var test = {};
+						_this.$set(test,'id',response.data.id);
+						_this.$set(test,'school',response.data.school);
+						_this.$set(test,'grade',response.data.grade);
+						_this.$set(test,'name',response.data.name);
+						_this.waiting_examine_participant_info.push(test);
+					}).catch(function (error) {
+					
+					});
+			   }
+			   for(var i = 0 ;i < this.showTaskInfomation.finished_participant_ids.length;i++){
+					var url = "/users/" + this.showTaskInfomation.finished_participant_ids[i];
+					var jwt = "JWT " + window.localStorage.getItem('token');
+					this.$axios({
+						 method:"get",
+						 url:url,
+						 headers:{
+							'Authorization': jwt,
+						 }
+					}).then(function (response){
+						var test = {};
+						_this.$set(test,'id',response.data.id);
+						_this.$set(test,'school',response.data.school);
+						_this.$set(test,'grade',response.data.grade);
+						_this.$set(test,'name',response.data.name);
+						_this.finished_participant_info.push(test);
+					}).catch(function (error) {
+					
+					});
+			   }
+			    this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 			},
 			GotoTopup (){
 				this.topup = true;
@@ -548,24 +564,33 @@
 			
 			},
             show (index) {
-				this.showTaskStepInfo = true;
-				/*
-                this.$Modal.info({
-                    title: '已完成步骤',
-                    content: `名字：${this.ongoing_participant_info[index].name}<br>`
-                })
-				*/
-            },
-			showTaskCancel(){
-				 this.$Message.info('Clicked cancel');
-				 this.showTaskStepInfo = false;
-			},
-			next () {
-                if (this.current == this.showTaskInfomation.steps.length - 1) {
-                    this.$Message.info("完成任务");
-                } else {
-                    this.current += 1;
-                }
+				var _this = this;
+				var url = "/users/:" + this.$data.userID + "/tasks/" + this.taskID+ "/finishers/" + this.ongoing_participant_info[index].id;
+				var deleteID = this.ongoing_participant_info[index].id;
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+					 method:"put",
+					 url: url,
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.$Message.success('完成任务!');
+					_this.showTaskInfomation.ongoing_participant_ids = response.data.ongoing_participant_ids;
+					_this.showTaskInfomation.participant_ids = response.data.participant_ids;
+					_this.ongoing_participant_info.splice(index,1);
+					for(var i=0; i < _this.participant_info.length; i++)
+					{
+						if(_this.participant_info[i].id == deleteID)
+						{
+							_this.ongoing_participant_info.splice(i,1);
+							break;
+						}
+					}
+				}).catch(function (error) {
+					console.log(error);
+				});
+				
             },
 			toshowWithdrawInfo(){
 				this.showWithdrawInfo = true;
@@ -574,8 +599,32 @@
 				this.showWithdrawInfo = false;
 			},
 			withdrawTask() {
-				this.$Message.info('撤回任务成功');
-				this.showWithdrawInfo = false;
+				var _this = this;
+				var url = "/users/" + this.$data.userID;
+				if(this.isCreateByOrgan){
+					url += "/organizations/" + this.organID + "/tasks/" + this.taskID;
+				}
+				else{
+					url += "/tasks/" + this.taskID;
+				}
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				
+				this.$axios({
+					 method:"put",
+					 url: url,
+					 data:{
+						task_id: this.taskID,
+						status: "pending",
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.$Message.info('撤回任务成功');
+					_this.showWithdrawInfo = false;
+				}).catch(function (error) {
+					console.log(error);
+				});	
 			},
 			createNewTask() {
 				this.$router.push({

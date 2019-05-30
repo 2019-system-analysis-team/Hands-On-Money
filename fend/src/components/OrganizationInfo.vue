@@ -57,7 +57,7 @@
 									<Option v-for="item in classifications" :value="item.value" :key="item.value">{{ item.label }}</Option>
 								</Select>
 							</p>
-							<div slot="extra" v-if="isManager || isCreater">
+							<div slot="extra" v-show="isManager || isCreater">
 								<Button type="primary" icon="ios-add" shape="circle">新建组织任务</Button>
 							</div>	
 							<Col span="8" v-for="item in selectTasks" :key="item.task_id" style="padding-left: 30px; padding-top: 50px;">
@@ -169,7 +169,7 @@
 							<p slot="title" style="height: 38px;">
 								全部成员
 							</p>
-							<div slot="extra" v-if="isManager || isCreater">
+							<div slot="extra" v-show="isManager || isCreater">
 								<Button type="primary" icon="ios-add" shape="circle" @click="addMember = true">添加成员</Button>
 							</div>	
 							<Modal
@@ -199,21 +199,21 @@
 							<Col span="5" v-for="item in allMembers" :key="item.id" style="padding-left: 30px; padding-top: 30px;">
 								<Card>
 									<p slot="title">成员信息</p>
-									<div slot="extra" v-if="isManager || isCreater">
+									<div slot="extra" v-show="isManager || isCreater">
 										<Button type="error" ghost @click="deleteMember(item.userID)">删除</Button>
 									</div>	
 									<div style="width: 70%;float: left;">
 										<p style="margin-bottom: 5px;">真实姓名 : {{item.name}}</p>
 										<p style="margin-bottom: 5px;">昵称 : {{item.nickname}}</p>
-										<p v-if="!(isManager || isCreater)">身份 : {{item.status}}</p>
-										<div v-if="isManager || isCreater">
+										<p v-show="!(isManager || isCreater)">身份 : {{item.status}}</p>
+										<div v-show="isManager || isCreater">
 											身份 : 
-											<Select v-model="item.status" style="width:100px" v-if="(item.status != 'creator')" @on-change="changeStatus(item)">
+											<Select v-model="item.status" style="width:100px" v-if="(item.status != 'owner')" @on-change="changeStatus(item)">
 												<Option value="manager">manager</Option>
 												<Option value="member">member</Option>
 											</Select>
-											<Select v-model="item.status" style="width:100px" disabled v-if="(item.status == 'creator')">
-												<Option value="creator" disabled>creator</Option>
+											<Select v-model="item.status" style="width:100px" disabled v-if="(item.status == 'owner')">
+												<Option value="owner" disabled>owner</Option>
 											</Select>
 											<Tooltip content="点击确认更改" theme="light" v-if="item.statusChanged">
 												<Button type="success" @click="modifyMemberStatus(item)" ghost shape="circle" icon="md-checkmark" size="small"></Button>
@@ -227,7 +227,7 @@
 							</Col>
 						</Card>		
 					</TabPane>
-					<TabPane label="删除组织" name="删除组织" v-if="isCreater">
+					<TabPane label="删除组织" name="删除组织" v-show="isCreater">
 						<Card dis-hover style="height:380px">
 							<p slot="title">请确认要删除组织</p>
 							<Form ref="deleteValidate" :model="deleteValidate" :rules="deleteRuleValidate" :label-width="120" class="form">
@@ -350,7 +350,11 @@
 				organID:0,
 				
 				allTasks:[
-
+					{
+						"task_id": 123,
+						"task_name": "name1",
+						"status": "inprogress"
+					},
 				],
 				inprogressTasks:[
 
@@ -380,13 +384,18 @@
 					 ]
 				},
 				allMembers:[
-
+					{
+						userID:0,
+						nickname:"nickname",
+						name:"name",
+						status:"member",
+						statusChanged:false,
+					},
 				],
 				allMembersShortInfo:[
-					
 				],
 				isManager: false,
-				isCreater: true,
+				isCreater: false,
 				
 				addMember:false,
 				addMemberValidate:{
@@ -420,8 +429,6 @@
 				this.selectTasks = this.allTasks;
 				let routerParams = this.$route.params.organID;
 				//console.log(routerParams);
-
-							   
 		
 				if(routerParams == null)
 				{
@@ -431,7 +438,7 @@
 						name: 'mainpage',
 					});	
 				}
-	
+
 				this.organID = routerParams;
 				let uID = window.localStorage.getItem('userID')
 			
@@ -460,17 +467,17 @@
 					console.log(response);	
 					_this.formValidate.name = response.data.name;
 					_this.formValidate.desc = response.data.bio;
-					_this.allMembersShortInfo =  response.data.members;
-					
-					for(var i=0; i < _this.allMembersShortInfo;i++){
+					 _this.allMembersShortInfo = response.data.members;
+					for(var i=0; i < _this.allMembersShortInfo.length;i++){
 						var url = "/users/" + _this.allMembersShortInfo[i].user_id;
 						if(_this.allMembersShortInfo[i].user_id == _this.userID){
 							if(_this.allMembersShortInfo[i].status == 'manager'){
 								_this.isManager = true;
-							}else if(_this.allMembersShortInfo[i].status == 'creator'){
+							}else if(_this.allMembersShortInfo[i].status == 'owner'){
 								_this.isCreater = true;
 							}
 						}
+	
 						var jwt = "JWT " + window.localStorage.getItem('token');
 						_this.$axios({
 								 method:"get",
@@ -492,6 +499,7 @@
 							_this.$set(test,'statusChanged',statusChanged);
 							_this.allMembers.push(test);
 						}).catch(function (error) {
+							console.log(error);
 						});
 					}
 				}).catch(function (error) {
@@ -504,7 +512,7 @@
 				});
 			
 			    var url = "/users/" + uID + "/organizations/" + this.organID + "/my_tasks";
-		
+				/*
 				this.$axios({
 						 method:"get",
 						 url:url,
@@ -530,8 +538,9 @@
 						name: 'mainpage'
 					});
 				});
-				
+				*/
 			    this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
+				
 			},
 			handleView (name) {
                 this.imgName = name;
@@ -687,7 +696,7 @@
 			   this.$refs[name].validate((valid) => {
 					var _this = this;
 					var jwt = "JWT " + window.localStorage.getItem('token');
-					var url = "/users/"+ this.$data.userID.toString() +"/organizations" + this.organID.toString() + "/members";
+					var url = "/users/"+ this.$data.userID.toString() +"/organizations/" + this.organID.toString() + "/members";
 					if (valid) {
 						if(this.addMemberValidate.addMemberType == '邮件'){
 							this.$axios({
@@ -813,7 +822,8 @@
 					path: '/', 
 					name: 'taskinfoforcreate',
 					params: { 
-							taskID: taskID
+							taskID: taskID,
+							organID: this.organID,
 					},
 				});			
 			},

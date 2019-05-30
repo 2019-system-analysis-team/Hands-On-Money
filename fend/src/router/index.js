@@ -9,9 +9,12 @@ import organizationInfo from '@/components/OrganizationInfo'
 import mytasks from '@/components/MyTasks'
 import taskinfoforcreate from '@/components/TaskInfoForCreate'
 import missioncreate from '@/components/MissionCreate'
+import taskinfoforreceiver from '@/components/TaskInfoForReceiver'
+
 import iView from 'iview'
 import axios from 'axios'
 import 'iview/dist/styles/iview.css'
+
 
 Vue.use(Router);
 Vue.use(iView);
@@ -66,6 +69,11 @@ export default new Router({
 			path: '/missioncreate',
 			name: 'missioncreate',
 			component: missioncreate
+		},
+		{
+			path: '/taskinfoforreceiver',
+			name: 'taskinfoforreceiver',
+			component: taskinfoforreceiver
 		}
   ]
 })

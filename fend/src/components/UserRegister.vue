@@ -268,7 +268,7 @@
 									 method:"put",
 									 url: url_info,
 									 data:{
-										realname: _this.$data.formValidate.name,
+										name: _this.$data.formValidate.name,
 										age: _this.$data.formValidate.age,
 										sex: _this.$data.formValidate.gender
 									 },

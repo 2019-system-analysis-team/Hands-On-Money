@@ -78,7 +78,7 @@
                 this.$refs[name].validate((valid) => {
                     if (valid) {
 						var jwt = "JWT " + window.localStorage.getItem('token');
-						var url = "/users/"+ this.$data.userID +"/organization";
+						var url = "/users/"+ this.$data.userID +"/organizations";
 						this.$axios({
 							 method:"post",
 							 url: url,
