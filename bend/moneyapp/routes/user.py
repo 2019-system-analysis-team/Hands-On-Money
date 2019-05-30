@@ -137,7 +137,7 @@ def creating_user():
 
         bcrypt = Bcrypt(current_app)
         hashed_password = bcrypt.generate_password_hash(d['password']).decode('utf-8')
-       
+        d.pop('password', None)
 
         if request.files and request.files['file'] :
             file = request.files['file']
@@ -163,7 +163,7 @@ def creating_user():
         try:
             
             #user_id = addUser(nickname, email, hashed_password, phone_number, newFileName)
-            user_id = addUser2(new_dict)
+            user_id = addUser2(new_dict, hashed_password)
             
             token = jwt.encode({'id': user_id, 'exp': datetime.utcnow() + timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
 

@@ -14,8 +14,9 @@ def addUser(_nickname, _email, _hashed_password, _phone_number, _profile_photo_p
     db.session.commit()
     return user.id
 
-def addUser2(d):
+def addUser2(d, _hashed_password):
     user = User(**d)
+    user.password = _hashed_password
     db.session.add(user)
     db.session.commit()
     return user.id
