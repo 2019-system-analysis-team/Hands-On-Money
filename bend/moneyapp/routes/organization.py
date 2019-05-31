@@ -109,7 +109,7 @@ def get_organization_balance(current_user, user_id, organization_id):
     }), 200
 
 
-# 组织信息修改
+# 组织信息修改 # TODO
 @routes.route('/users/<user_id>/organizations/<organization_id>', methods=['PUT'])
 @token_required
 def modify_organization(current_user, user_id, organization_id):
@@ -134,12 +134,13 @@ def modify_organization(current_user, user_id, organization_id):
         return jsonify({"error_code": "401", "error_msg": "Unauthorized"}), 401
 
     info = request.get_json()
+    
     # 组织名重复
-    if queryOrganizationByName(info['name']):
+    if 'name' in info and queryOrganizationByName(info['name']):
         return jsonify({"error_code": 500,
                         "error_msg": "duplicate organization name"}), 500
 
-    modifyOrganization(int(organization_id), info)
+    modifyOrganization2(int(organization_id), info)
     return jsonify({
         "name": organization.name,
         "bio": organization.bio

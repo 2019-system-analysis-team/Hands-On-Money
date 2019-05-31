@@ -32,6 +32,14 @@ def modifyOrganization(_organization_id, info):
     db.session.commit()
     return organization
 
+def modifyOrganization2(organization_id, d):
+    
+    organization = Organization.query.filter_by(id=organization_id).update(d)
+   
+
+    db.session.commit()
+    return organization
+
 def modifyOrganizationPhoto(_organization_id, _image_file):
     organization = Organization.query.filter_by(id = _organization_id).first()
     organization.image_file = _image_file
