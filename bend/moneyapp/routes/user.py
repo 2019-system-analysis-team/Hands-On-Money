@@ -68,7 +68,8 @@ def get_user_info(current_user, user_id):
 
     if user:
         if current_user.id == int(user_id):
-            return jsonify({'email': user.email,
+            return jsonify({'user_id': user.id,
+                            'email': user.email,
                             'phone_number': user.phone_number,
                             'profile_photo_path': user.profile_photo_path,
                             'student_id': user.student_id,
@@ -83,7 +84,8 @@ def get_user_info(current_user, user_id):
                             'average_comment': user.average_comment
                             })
         else:
-            return jsonify({'profile_photo_path': user.profile_photo_path,
+            return jsonify({'user_id': user.id,
+                            'profile_photo_path': user.profile_photo_path,
                             'name': user.name,
                             'age': user.age,
                             'sex': user.sex,

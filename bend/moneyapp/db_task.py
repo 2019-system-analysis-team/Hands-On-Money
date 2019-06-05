@@ -188,7 +188,7 @@ def searchTask(d):
                 continue
 
         if 'creator_user_phone_number' in d:
-            if not d['creator_user_phone_number'] == creator_user.telephone:
+            if not d['creator_user_phone_number'] == creator_user.phone_number:
                 task_not_satisfy.add(task)
                 continue
 

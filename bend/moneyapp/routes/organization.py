@@ -205,11 +205,12 @@ def add_organization_member(current_user, user_id, organization_id):
     # email, telephone任意有一个就好
     user = None
     info = request.get_json()
-    try:
-        info['telephone'] = info['phone_number']
-        user = queryUser(info)
-    except:
-        pass
+    user = queryUser(info)
+    # try:
+    #     info['telephone'] = info['phone_number']
+    #     user = queryUser(info)
+    # except:
+    #     pass
     # 添加非注册用户
     if not user:
         return jsonify({"error_code": "404",

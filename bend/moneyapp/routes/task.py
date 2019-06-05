@@ -14,7 +14,7 @@ from .home import token_required
 
 ##=========== Task =================================
 # RESTful 用户创建任务
-@routes.route('/users/<user_id>/task', methods=['POST'])
+@routes.route('/users/<user_id>/tasks', methods=['POST'])
 @token_required
 def user_create_task(current_user, user_id):
     if current_user.id != int(user_id):
@@ -36,7 +36,7 @@ def user_create_task(current_user, user_id):
     
 
 # RESTful 组织创建任务
-@routes.route('/users/<user_id>/organization/<organization_id>/tasks', methods=['POST'])
+@routes.route('/users/<user_id>/organizations/<organization_id>/tasks', methods=['POST'])
 @token_required
 def organization_create_task(current_user, user_id, organization_id):
     # 检查user, organization是否存在
@@ -71,7 +71,7 @@ def organization_create_task(current_user, user_id, organization_id):
 
 
 # RESTful 用户查询自己创建的任务
-@routes.route('/users/<user_id>/tasks', methods=['GET'])
+@routes.route('/users/<user_id>/my_tasks', methods=['GET'])
 @token_required
 def check_user_tasks(current_user, user_id):
     if current_user.id != int(user_id):
@@ -86,7 +86,7 @@ def check_user_tasks(current_user, user_id):
 
 
 # RESTful 组织查询自己创建的任务
-@routes.route('/users/<user_id>/organization/<organization_id>/tasks', methods=['GET'])
+@routes.route('/users/<user_id>/organizations/<organization_id>/my_tasks', methods=['GET'])
 @token_required
 def check_organization_tasks(current_user, user_id, organization_id):
     if current_user.id != int(user_id):
@@ -108,6 +108,20 @@ def check_organization_tasks(current_user, user_id, organization_id):
 
     return jsonify(task_info), 200
 
+
+# RESTful 查询自己已接受的任务
+@routes.route('/users/<user_id>/received_tasks', methods=['GET'])
+@token_required
+def get_received_task(current_user, user_id):
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+
+    task_info = []
+
+    for received_task_record in current_user.received_tasks:
+        task_info.append(printSingleTask(received_task_record.task))
+
+    return jsonify(task_info), 200
 
 # RESTful 删除个人任务
 @routes.route('/users/<user_id>/tasks/<task_id>', methods=['DELETE'])

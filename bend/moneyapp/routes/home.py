@@ -51,7 +51,7 @@ def token_required(f):
 @routes.route('/users/register', methods=['POST', 'GET'])
 def uploadFile():
     if request.method == 'POST':
-        username = request.form['username']
+        nickname = request.form['nickname']
         email = request.form['email']
         password = request.form['password']
         telephone = request.form['telephone']
