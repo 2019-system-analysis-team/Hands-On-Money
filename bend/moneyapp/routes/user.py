@@ -68,7 +68,8 @@ def get_user_info(current_user, user_id):
 
     if user:
         if current_user.id == int(user_id):
-            return jsonify({'email': user.email,
+            return jsonify({'user_id': user.id,
+                            'email': user.email,
                             'phone_number': user.phone_number,
                             'profile_photo_path': user.profile_photo_path,
                             'student_id': user.student_id,
@@ -83,7 +84,8 @@ def get_user_info(current_user, user_id):
                             'average_comment': user.average_comment
                             })
         else:
-            return jsonify({'profile_photo_path': user.profile_photo_path,
+            return jsonify({'user_id': user.id,
+                            'profile_photo_path': user.profile_photo_path,
                             'name': user.name,
                             'age': user.age,
                             'sex': user.sex,
@@ -210,7 +212,6 @@ def test_modify():
     if request.method == 'POST':
         # 之后下面改成 取页面原本的名字 或session里面的名字进行query
         nickname_ori = 'popiko22'
-
         email = request.form['email']
         phone_number = request.form['phone_number']
         student_id = request.form['student_id']
@@ -221,33 +222,23 @@ def test_modify():
         school = request.form['school']
         bio = request.form['bio']
         nickname = request.form['nickname']
-
-
         if request.files and request.files['file'] :
             file = request.files['file']
             filename = secure_filename(file.filename)
-
             # Gen GUUID File Name
             fileExt = filename.split('.')[1]
             autoGenFileName = uuid.uuid4()
-
             newFileName = str(autoGenFileName) + '.' + fileExt
-
             target = UPLOAD_FOLDER
             print(target)
-
             if not os.path.isdir(target):
                 os.mkdir(target)
             file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], newFileName))
-
         else:
             #filename = 'default.jpg'
             newFileName = 'default.jpg'
-
         modify_profile(nickname_ori, nickname, email, phone_number, newFileName, age, sex, grade, school, bio)
-
         result = jsonify({"result": "add!"})
-
     return result
 """
 #==============================================================
@@ -394,9 +385,7 @@ def  modifyUserPhoto(current_user, user_id):
 def user_charge():
     
  
-
     #只能通过user_id进行充值
-
     if request.method == 'POST':
         user_id = request.form['user_id']
         money = request.form['money']
