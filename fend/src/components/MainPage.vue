@@ -320,7 +320,7 @@
 							console.log(response);
 							window.localStorage.setItem('token', response.data.access_token);
 							window.localStorage.setItem('userID', response.data.user_id);
-							
+							_this.$Message.success('登录成功');
 							//跳转到主页
 							_this.$router.go(0);
 						})
@@ -337,7 +337,7 @@
 									console.log(response);
 									window.localStorage.setItem('token', response.data.access_token);
 									window.localStorage.setItem('userID', response.data.user_id);
-									
+									_this.$Message.success('登录成功');
 									//跳转到主页
 									_this.$router.go(0);
 								})

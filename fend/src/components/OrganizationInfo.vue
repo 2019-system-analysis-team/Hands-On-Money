@@ -698,13 +698,14 @@
 					var jwt = "JWT " + window.localStorage.getItem('token');
 					var url = "/users/"+ this.$data.userID.toString() +"/organizations/" + this.organID.toString() + "/members";
 					if (valid) {
-						if(this.addMemberValidate.addMemberType == '邮件'){
+						if(this.addMemberValidate.addMemberType == '邮箱'){
+							//console.log('通过邮件添加' + this.$data.addMemberValidate.addMemberInfo + " " +  this.$data.addMemberValidate.addMemberStatus);
 							this.$axios({
 								 method:"post",
 								 url: url,
 								 data:{
 									email: this.$data.addMemberValidate.addMemberInfo,
-									statue: this.$data.addMemberValidate.addMemberStatus
+									status: this.$data.addMemberValidate.addMemberStatus
 								 },
 								 headers:{
 									'Authorization': jwt,
@@ -716,6 +717,7 @@
 								console.log(error);
 							});						
 						}else{
+							//console.log('通过电话添加' + this.$data.addMemberValidate.addMemberInfo + " " +  this.$data.addMemberValidate.addMemberStatus);
 							this.$axios({
 								 method:"post",
 								 url: url,
@@ -778,7 +780,7 @@
 					 method:"put",
 					 url: url_all,
 					 data:{
-						statue: item.status
+						status: item.status
 					 },
 					 headers:{
 						'Authorization': jwt,
