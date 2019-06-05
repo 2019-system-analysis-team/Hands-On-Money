@@ -102,6 +102,7 @@ def updateAvgComment(_task_id):
                 count += 1
                 total_points += review.rate
 
+
             organization.average_comment = float(total_points/count)
 
     db.session.commit()
