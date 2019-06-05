@@ -350,11 +350,7 @@
 				organID:0,
 				
 				allTasks:[
-					{
-						"task_id": 123,
-						"task_name": "name1",
-						"status": "inprogress"
-					},
+
 				],
 				inprogressTasks:[
 
@@ -384,13 +380,7 @@
 					 ]
 				},
 				allMembers:[
-					{
-						userID:0,
-						nickname:"nickname",
-						name:"name",
-						status:"member",
-						statusChanged:false,
-					},
+
 				],
 				allMembersShortInfo:[
 				],
@@ -492,17 +482,27 @@
 							var headPhotoPath =  _this.$profilePath + response.data.profile_photo_path;
 							var statusChanged = false;
 							var test = {};
-							_this.$set(test,'userID',_this.allMembersShortInfo[i].user_id);
+							_this.$set(test,'userID',response.data.user_id);
 							_this.$set(test,'nickname',nickname);
 							_this.$set(test,'name',name);
-							_this.$set(test,'status',_this.allMembersShortInfo[i].status);
+							
+							for(var j=0; j < _this.allMembersShortInfo.length;j++){
+								if(_this.allMembersShortInfo[j].user_id == response.data.user_id){
+									_this.$set(test,'status',_this.allMembersShortInfo[j].status);
+								}
+							}
+							//_this.$set(test,'status',_this.allMembersShortInfo[i].status);
 							_this.$set(test,'statusChanged',statusChanged);
+							_this.$set(test,'headPhotoPath',_this.$profilePath + response.data.profile_photo_path);
+							console.log("新成员:");
+							console.log(test);
 							_this.allMembers.push(test);
 						}).catch(function (error) {
 							console.log(error);
 						});
 					}
 				}).catch(function (error) {
+					console.log(error);
 					_this.$Message.error('请先登录!');
 					//跳转到主页
 					_this.$router.push({
@@ -520,7 +520,8 @@
 							'Authorization': jwt,
 						 }
 				}).then(function (response){
-					//console.log(response);	
+					console.log("所有任务");	
+					console.log(response);	
 					_this.allTasks = response.data.tasks;
 					for(var i=0; i < _this.allTasks.length;i++){
 						if(_this.allTasks[i].status == "inprogress"){
@@ -610,7 +611,7 @@
 			},
 			logout (){
 				var _this = this;
-				var url_all = "/users/:" + this.$data.userID.toString() + "/session";
+				var url_all = "/users/" + this.$data.userID.toString() + "/session";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
 					 method:"delete",
@@ -713,6 +714,7 @@
 							}).then(function (response){
 								console.log(response);
 								_this.$Message.success('添加成功!');
+								_this.$router.go(0);
 							}).catch(function (error) {
 								console.log(error);
 							});						
@@ -731,13 +733,7 @@
 							}).then(function (response){
 								console.log(response);
 								_this.$Message.success('添加成功!');
-								_this.$router.push({
-									path: '/', 
-									name: 'organizationInfo',
-									params: { 
-											organID: _this.organID,
-									},
-								});	
+								_this.$router.go(0);
 							}).catch(function (error) {
 								console.log(error);
 							});								

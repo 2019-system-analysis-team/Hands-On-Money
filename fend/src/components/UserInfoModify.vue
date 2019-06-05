@@ -424,6 +424,7 @@
 					_this.$data.infoValidate.gender = response.data.sex;		
 					_this.$data.money = response.data.balance;
 					_this.$data.profilePhotoPath =  _this.$profilePath + response.data.profile_photo_path;
+					window.localStorage.setItem('MyProfilePhotoPath', _this.$data.profilePhotoPath);
 					_this.$set(_this.$data.defaultList[0],'name',_this.$data.profilePhotoName);
 					_this.$set(_this.$data.defaultList[0],'url',_this.$data.profilePhotoPath);
 					console.log(_this.defaultList);
@@ -550,7 +551,6 @@
 					_this.$data.profilePhotoPath =  _this.$profilePath + response.data.profile_photo_path;
 					file.url =  _this.$profilePath + response.data.profile_photo_path;
 					file.name = '头像';
-					window.localStorage.setItem('MyProfilePhotoPath', _this.profilePhotoPath);
 				}).catch(function (error) {
 
 				});

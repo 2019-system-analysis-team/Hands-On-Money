@@ -281,7 +281,7 @@
 				this.topup = false;
 			},
 			logout (){
-				var url_all = "/users/:" + this.$data.userID.toString() + "/session";
+				var url_all = "/users/" + this.$data.userID.toString() + "/session";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
 					 method:"delete",

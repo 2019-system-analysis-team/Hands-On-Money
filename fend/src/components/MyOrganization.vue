@@ -228,7 +228,7 @@
 						name: 'mainpage'
 					});
 				});
-		
+
 			   this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 			},
             handleReturnHomepage () {
