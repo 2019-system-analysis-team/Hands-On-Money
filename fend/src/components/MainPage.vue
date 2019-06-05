@@ -181,7 +181,7 @@
 				<form class="form-horizontal">
 					<span class="heading">用户登录</span>
 					<div class="form-group">
-						<input type="text" class="form-control" v-model = "inputName" placeholder="email">
+						<input type="text" class="form-control" v-model = "inputName" placeholder="email / phone">
 						<i class="fa fa-user"></i>
 					</div>
 					<div class="form-group help">
@@ -326,15 +326,32 @@
 						})
 						.catch(function (error) {
 							console.log(error.response.status);
-							if(error.response.status == 404){
-								_this.$Message.error('用户不存在或者密码错误');
-							}
-							if(error.response.status == 400){
-								_this.$Message.error('后端抽风?');
-							}
-							_this.inputName = '';
-							_this.inputPassword = '';
-
+								_this.$axios({
+								 method:"post",
+								 url:"/sessions",
+								 data:{
+									phone_number: _this.inputName,
+									password: _this.inputPassword,
+								 }
+								}).then(function (response){
+									console.log(response);
+									window.localStorage.setItem('token', response.data.access_token);
+									window.localStorage.setItem('userID', response.data.user_id);
+									
+									//跳转到主页
+									_this.$router.go(0);
+								})
+								.catch(function (error) {
+									console.log(error.response.status);
+									if(error.response.status == 404){
+										_this.$Message.error('用户不存在或者密码错误');
+									}
+									if(error.response.status == 400){
+										_this.$Message.error('后端抽风?');
+									}
+									_this.inputName = '';
+									_this.inputPassword = '';
+								});
 						});
 				}
 			},

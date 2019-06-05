@@ -58,7 +58,7 @@
 								</Select>
 							</p>
 							<div slot="extra" v-show="isManager || isCreater">
-								<Button type="primary" icon="ios-add" shape="circle">新建组织任务</Button>
+								<Button type="primary" icon="ios-add" shape="circle" @click="createOrganTask">新建组织任务</Button>
 							</div>	
 							<Col span="8" v-for="item in selectTasks" :key="item.task_id" style="padding-left: 30px; padding-top: 50px;">
 								<Card>
@@ -721,7 +721,7 @@
 								 url: url,
 								 data:{
 									phone_number: this.$data.addMemberValidate.addMemberInfo,
-									statue: this.$data.addMemberValidate.addMemberStatus
+									status: this.$data.addMemberValidate.addMemberStatus
 								 },
 								 headers:{
 									'Authorization': jwt,
@@ -832,6 +832,15 @@
 					path: '/', 
 					name: 'missioncreate'
 				});		
+			},
+			createOrganTask(){
+				this.$router.push({
+					path: '/', 
+					name: 'missioncreate',
+					params: { 
+							organID: this.organID,
+					},
+				});					
 			}
         },
         mounted () {

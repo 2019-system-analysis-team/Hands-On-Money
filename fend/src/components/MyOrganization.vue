@@ -213,7 +213,7 @@
 					for(var i=0; i<_this.allOrganizations.length;i++){
 						if(_this.allOrganizations[i].status == "member"){
 							_this.joinOrganizations.push(_this.allOrganizations[i]);
-						}else if(_this.allOrganizations[i].status == "creator"){
+						}else if(_this.allOrganizations[i].status == "owner"){
 							_this.createOrganizations.push(_this.allOrganizations[i]);
 						}else if(_this.allOrganizations[i].status == "manager"){
 							_this.manageOrganizations.push(_this.allOrganizations[i]);
