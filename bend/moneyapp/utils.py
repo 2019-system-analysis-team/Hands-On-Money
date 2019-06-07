@@ -21,6 +21,13 @@ def checkBalance(_user_id, _organization_id, _money):
         user = queryUserById(_user_id)
         return user.balance >= _money
 
+
+# 检查用户是否创建了某个任务
+def checkUserCreateTask(_user_id, _task_id):
+    task = Task.query.filter_by(id=_task_id, user_id=_user_id).first()
+    return task
+
+
 # 检查用户是否接受了某个任务
 def checkUserReceiveTask(_user_id, _task_id):
     task_record = Receiver_Task.query.filter_by(user_id=_user_id,task_id=_task_id).first()
@@ -28,6 +35,115 @@ def checkUserReceiveTask(_user_id, _task_id):
         return None
     else:
         return task_record
+
+# 打印任务信息
+def printSingleTask(task):
+    participant_ids = []
+    ongoing_participant_ids = []
+    waiting_examine_participant_ids = []
+    finished_participant_ids = []
+
+    for par in task.received_tasks:
+        par_user_id = par.user_id
+        participant_ids.append(par_user_id)
+        if par.status == 'on going':
+            ongoing_participant_ids.append(par_user_id)
+        elif par.status == 'waiting examine':
+            waiting_examine_participant_ids.append(par_user_id)
+        elif par.status == 'finished':
+            finished_participant_ids.append(par_user_id)
+
+    return {"task_id": task.id, 
+                    "creator_user_id": task.user_id,
+                    "creator_organization_id": task.organization_id,
+                    "status": task.status,
+                    "title": task.title,
+                    "description": task.description,
+                    "tags": json.loads(task.tags),
+                    "participant_number_limit": task.participant_number_limit,
+                    "reward_for_one_participant": task.reward_for_one_participant,
+                    "post_time": task.post_time,
+                    "receive_end_time": task.receive_end_time,
+                    "finish_deadline_time": task.finish_deadline_time,
+                    "user_limit": json.loads(task.user_limit),
+                    "steps": json.loads(task.steps),
+                    "participant_ids": participant_ids,
+                    "ongoing_participant_ids": ongoing_participant_ids,
+                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
+                    "finished_participant_ids": finished_participant_ids
+                    }
+
+# 打印任务简介
+def printTaskBrief(task):
+    return {"task_id": task.id,
+            "task_name": task.title,
+            "task_status": task.status}
+# 打印参与者信息
+def printUserInfoOfTask(task):
+    participant_ids = []
+    ongoing_participant_ids = []
+    waiting_examine_participant_ids = []
+    finished_participant_ids = []
+
+    for par in task.received_tasks:
+        par_user_id = par.user_id
+        participant_ids.append(par_user_id)
+        if par.status == 'on going':
+            ongoing_participant_ids.append(par_user_id)
+        elif par.status == 'waiting examine':
+            waiting_examine_participant_ids.append(par_user_id)
+        elif par.status == 'finished':
+            finished_participant_ids.append(par_user_id)
+
+    return {"task_id": task.id, 
+            "participant_ids": participant_ids,
+            "ongoing_participant_ids": ongoing_participant_ids,
+            "waiting_examine_participant_ids": waiting_examine_participant_ids,
+            "finished_participant_ids": finished_participant_ids
+            }
+
+# 打印公共任务信息
+def printPublicSingleTask(task):
+    participant_ids = []
+    ongoing_participant_ids = []
+    waiting_examine_participant_ids = []
+    finished_participant_ids = []
+
+    organization_name = None
+    user = queryUserById(task.user.id)
+    if task.organization is not None:
+        organization = queryOrganizationByID(task.organization.id)
+        organization_name = organization.name
+    for par in task.received_tasks:
+        par_user_id = par.user_id
+        participant_ids.append(par_user_id)
+        if par.status == 'on going':
+            ongoing_participant_ids.append(par_user_id)
+        elif par.status == 'waiting examine':
+            waiting_examine_participant_ids.append(par_user_id)
+        elif par.status == 'finished':
+            finished_participant_ids.append(par_user_id)
+
+    return {        "task_id": task.id, 
+                    "creator_user_email": user.email,
+                    "creator_user_phone_number": user.phone_number,
+                    "creator_organization_name": organization_name,
+
+                    "status": task.status,
+                    "title": task.title,
+                    "description": task.description,
+                    "tags": json.loads(task.tags),
+
+                    "current_participant_number":len(participant_ids),
+                    "participant_number_limit": task.participant_number_limit,
+                    "reward_for_one_participant": task.reward_for_one_participant,
+                    "post_time": task.post_time,
+                    "receive_end_time": task.receive_end_time,
+                    "finish_deadline_time": task.finish_deadline_time,
+                    "user_limit": json.loads(task.user_limit),
+                    "steps": json.loads(task.steps)
+                    }
+
 
 # 检查用户是否完成了某个任务
 def checkFinishTask(received_task_record):
