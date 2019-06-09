@@ -53,20 +53,32 @@ def printSingleTask(task):
         elif par.status == 'finished':
             finished_participant_ids.append(par_user_id)
 
+        
+    task_tag_info = None
+    if task.tags is not None:
+        task_tag_info = json.loads(task.tags)
+
+    user_limit_info = None
+    if task.user_limit is not None:
+        user_limit_info = json.loads(task.user_limit)
+
+    steps_info = None
+    if task.steps is not None:
+        steps_info = json.loads(task.steps)
     return {"task_id": task.id, 
                     "creator_user_id": task.user_id,
                     "creator_organization_id": task.organization_id,
                     "status": task.status,
                     "title": task.title,
                     "description": task.description,
-                    "tags": json.loads(task.tags),
+                    "tags": task_tag_info,
                     "participant_number_limit": task.participant_number_limit,
                     "reward_for_one_participant": task.reward_for_one_participant,
                     "post_time": task.post_time,
                     "receive_end_time": task.receive_end_time,
                     "finish_deadline_time": task.finish_deadline_time,
-                    "user_limit": json.loads(task.user_limit),
-                    "steps": json.loads(task.steps),
+                    "user_limit": user_limit_info,
+                    "steps": steps_info,
                     "participant_ids": participant_ids,
                     "ongoing_participant_ids": ongoing_participant_ids,
                     "waiting_examine_participant_ids": waiting_examine_participant_ids,

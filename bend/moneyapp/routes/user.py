@@ -44,7 +44,7 @@ def login():
     if user:
         bcrypt = Bcrypt(current_app)
         if bcrypt.check_password_hash(user.password, password):
-            token = jwt.encode({'id': user.id, 'exp': datetime.utcnow() + timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
+            token = jwt.encode({'id': user.id, 'exp': datetime.utcnow() + timedelta(hours=24)}, current_app.config['SECRET_KEY'])
             return jsonify({"user_id":user.id, "access_token": token.decode('UTF-8')}), 200
         else:
             return jsonify({"error_code": "404", "error_msg": "account not found/password incorrect"}), 404
