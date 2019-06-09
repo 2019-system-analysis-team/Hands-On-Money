@@ -46,7 +46,7 @@ def createTask(d):
     else:
         status = 'not onging'
 
-    if 'steps' in d:
+    if 'steps' in d and d['steps'] is not None:
         steps_number = len(json.loads(d['steps']))
     
     task.status = status

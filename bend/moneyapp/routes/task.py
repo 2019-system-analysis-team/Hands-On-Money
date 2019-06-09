@@ -80,9 +80,9 @@ def check_user_tasks(current_user, user_id):
     task_info = []
 
     for task in current_user.tasks:
-        task_info.append(printSingleTask(task))
+        task_info.append(printTaskBrief(task))
 
-    return jsonify(task_info), 200
+    return jsonify({"task": task_info}), 200
 
 
 # RESTful 组织查询自己创建的任务
@@ -103,10 +103,34 @@ def check_organization_tasks(current_user, user_id, organization_id):
 
     task_info = []
 
-    for task in organization.tasks:
-        task_info.append(printSingleTask(task))
+    for task in current_user.tasks:
+        if task.organization is not None:
+            task_info.append(printTaskBrief(task))
 
-    return jsonify(task_info), 200
+    return jsonify({"task": task_info}), 200
+
+# RESRful 个人查询自己创建的任务详情
+@routes.route('/users/<user_id>/my_tasks/<task_id>', methods=['GET'])
+@token_required
+def get_created_task_detail(current_user, user_id, task_id):
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+
+    task = checkUserCreateTask(user_id, task_id)
+
+    if task is None:
+        return jsonify({
+            "error_code": "401",
+            "error_msg": "Insufficient permission, you don't create this task"
+            }), 401
+
+    else:
+        result_msg = printSingleTask(task)
+
+        return jsonify(result_msg), 200
+        
+
+
 
 
 # RESTful 查询自己已接受的任务
@@ -138,11 +162,13 @@ def delete_user_task(current_user, user_id, task_id):
     if not task.user.id == int(current_user.id):
         return jsonify({"error_code":"500", "error_msg": "insufficient permission"}), 500
 
+    task_name = task.title
     deleteTask(user_id, task_id, None)
-    return jsonify({"msg": "Delete " + str(task.title) + " successfully."}), 200
-
+    #return jsonify({"msg": "Delete " + str(task.title) + " successfully."}), 200
+    return jsonify({"task_id": task_id,
+                    "task_name": task_name}), 200
 # RESTful 删除组织任务
-@routes.route('/users/<user_id>/organization/<organization_id>/tasks/<task_id>', methods=['DELETE'])
+@routes.route('/users/<user_id>/organizations/<organization_id>/tasks/<task_id>', methods=['DELETE'])
 @token_required
 def delete_organization_task(current_user, user_id, task_id, organization_id):
     if current_user.id != int(user_id):
@@ -156,8 +182,12 @@ def delete_organization_task(current_user, user_id, task_id, organization_id):
     if not record or record.status == "member":
         return jsonify({"error_code":"500", "error_msg": "insufficient permission"}), 500
 
+    task_name = task.title
     deleteTask(user_id, task_id, organization_id)
-    return jsonify({"msg": "Delete " + str(task.title) + " successfully."}), 200
+    #return jsonify({"msg": "Delete " + str(task.title) + " successfully."}), 200
+    return jsonify({"task_id": task_id,
+                    "task_name": task_name}), 200
+    #return jsonify({"msg": "Delete " + str(task.title) + " successfully."}), 200
 
 # RESTful 接受任务
 @routes.route('/users/<user_id>/tasks/<task_id>', methods=['POST'])
@@ -224,8 +254,8 @@ def mark_task_finished(current_user, user_id, task_id, finisher_id):
         return jsonify({"error_code": "500",
                         "error_msg": str(e)}), 500 
     else:
-        result_msg = printSingleTask(task)
-
+        #result_msg = printSingleTask(task)
+        result_msg = printUserInfoOfTask(task)
         return jsonify(result_msg), 200
 
         # status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
@@ -440,15 +470,29 @@ def owner_set_status():
         result = {'status':'fail'}     
     return jsonify(result)
 
-
+# RESTful 任务详情 （可以查询任意任务）
+@routes.route('/users/<user_id>/tasks/<task_id>', methods=['GET'])
+@token_required
+def search_public_tasks(current_user, user_id, task_id):
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+    task = queryTaskById(task_id)
+    if task is None:
+        return jsonify({"error_code": "404", "error_msg": "Task Not Found"}), 404
+    else:
+        result = printPublicSingleTask(task)
+        return jsonify(result), 200
 # RESTful 任务查询
-@routes.route('/users/<user_id>/tasks/search', methods=['GET'])
+@routes.route('/users/<user_id>/tasks', methods=['GET'])
 @token_required
 def search_all_tasks(current_user, user_id):
     if current_user.id != int(user_id):
         return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+    try:
+        d = request.get_json()
+    except Exception as e:
+        return jsonify({"error_code": "400", "error_msg": "Please specify some limitations"}), 400
 
-    d = request.get_json()
 
     
     task_diff_set = searchTask(d)
@@ -462,39 +506,3 @@ def search_all_tasks(current_user, user_id):
 
 
 
-# util func
-def printSingleTask(task):
-    participant_ids = []
-    ongoing_participant_ids = []
-    waiting_examine_participant_ids = []
-    finished_participant_ids = []
-
-    for par in task.received_tasks:
-        par_user_id = par.user_id
-        participant_ids.append(par_user_id)
-        if par.status == 'on going':
-            ongoing_participant_ids.append(par_user_id)
-        elif par.status == 'waiting examine':
-            waiting_examine_participant_ids.append(par_user_id)
-        elif par.status == 'finished':
-            finished_participant_ids.append(par_user_id)
-
-    return {"task_id": task.id, 
-                    "creator_user_id": task.user_id,
-                    "creator_organization_id": task.organization_id,
-                    "status": task.status,
-                    "title": task.title,
-                    "description": task.description,
-                    "tags": json.loads(task.tags),
-                    "participant_number_limit": task.participant_number_limit,
-                    "reward_for_one_participant": task.reward_for_one_participant,
-                    "post_time": task.post_time,
-                    "receive_end_time": task.receive_end_time,
-                    "finish_deadline_time": task.finish_deadline_time,
-                    "user_limit": json.loads(task.user_limit),
-                    "steps": json.loads(task.steps),
-                    "participant_ids": participant_ids,
-                    "ongoing_participant_ids": ongoing_participant_ids,
-                    "waiting_examine_participant_ids": waiting_examine_participant_ids,
-                    "finished_participant_ids": finished_participant_ids
-                    }

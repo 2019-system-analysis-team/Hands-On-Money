@@ -805,7 +805,7 @@ DELETE http://localhost:5000/users/2/organization/1
 
 ##### 个人创建任务
 
-@app.route('/users/<user_id>/task', methods=\['POST'\])
+@app.route('/users/<user_id>/tasks', methods=\['POST'\])
 
 ```
 POST http://localhost:5000/users/7/tasks
@@ -980,10 +980,10 @@ POST http://localhost:5000/users/7/organizations/1/tasks
 
 ##### 用户查询自己创建的任务
 
-@app.route('/users/<user_id>/tasks', methods=\['GET'\])
+@app.route('/users/<user_id>/my_tasks', methods=\['GET'\])
 
 ```
-POST http://localhost:5000/users/9/my_tasks
+POST http://localhost:5000/users/7/my_tasks
 ```
 ```
 // Request
@@ -991,160 +991,25 @@ POST http://localhost:5000/users/9/my_tasks
 ```
 ```
 // Response
-[
-    {
-        "task_id": 5,
-        "creator_user_id": 9,
-        "creator_organization_id": null,
-        "status": "on going",
-        "title": "task9",
-        "description": "task9",
-        "tags": [
-            "tag1",
-            "tag2",
-            "tag3"
-        ],
-        "participant_number_limit": 10,
-        "reward_for_one_participant": 0.1,
-        "post_time": "Mon, 22 Apr 2019 11:28:42 GMT",
-        "receive_end_time": "Mon, 22 Apr 2019 12:28:42 GMT",
-        "finish_deadline_time": "Tue, 23 Apr 2019 11:28:42 GMT",
-        "user_limit": {
-            "age_upper": 0,
-            "age_lower": 1,
-            "grades": [
-                "grade1",
-                "grade1"
-            ],
-            "sexes": [
-                "sex_type1",
-                "sex_type2",
-                "sex_type3"
-            ],
-            "schools": [
-                "school_name1",
-                "school_name2"
-            ]
+{
+    "task": [
+        {
+            "task_id": 1,
+            "task_name": "task9",
+            "task_status": "on going"
         },
-        "steps": [
-            {
-                "title": "step1",
-                "description": "string"
-            },
-            {
-                "title": "step2",
-                "description": "string"
-            }
-        ],
-        "participant_ids": [],
-        "ongoing_participant_ids": [],
-        "waiting_examine_participant_ids": [],
-        "finished_participant_ids": []
-    },
-    {
-        "task_id": 6,
-        "creator_user_id": 9,
-        "creator_organization_id": null,
-        "status": "on going",
-        "title": "task9-2",
-        "description": "task9-2",
-        "tags": [
-            "tag1",
-            "tag2",
-            "tag3"
-        ],
-        "participant_number_limit": 10,
-        "reward_for_one_participant": 0.1,
-        "post_time": "Mon, 22 Apr 2019 11:43:38 GMT",
-        "receive_end_time": "Mon, 22 Apr 2019 12:43:38 GMT",
-        "finish_deadline_time": "Tue, 23 Apr 2019 11:43:38 GMT",
-        "user_limit": {
-            "age_upper": 0,
-            "age_lower": 1,
-            "grades": [
-                "grade1",
-                "grade1"
-            ],
-            "sexes": [
-                "sex_type1",
-                "sex_type2",
-                "sex_type3"
-            ],
-            "schools": [
-                "school_name1",
-                "school_name2"
-            ]
-        },
-        "steps": [
-            {
-                "title": "step1",
-                "description": "string"
-            },
-            {
-                "title": "step2",
-                "description": "string"
-            }
-        ],
-        "participant_ids": [],
-        "ongoing_participant_ids": [],
-        "waiting_examine_participant_ids": [],
-        "finished_participant_ids": []
-    },
-    {
-        "task_id": 7,
-        "creator_user_id": 9,
-        "creator_organization_id": null,
-        "status": "on going",
-        "title": "task9-3",
-        "description": "task9-3",
-        "tags": [
-            "tag1",
-            "tag2",
-            "tag3"
-        ],
-        "participant_number_limit": 10,
-        "reward_for_one_participant": 0.1,
-        "post_time": "Mon, 22 Apr 2019 13:13:11 GMT",
-        "receive_end_time": "Mon, 22 Apr 2019 14:13:11 GMT",
-        "finish_deadline_time": "Tue, 23 Apr 2019 13:13:11 GMT",
-        "user_limit": {
-            "age_upper": 0,
-            "age_lower": 1,
-            "grades": [
-                "grade1",
-                "grade1"
-            ],
-            "sexes": [
-                "sex_type1",
-                "sex_type2",
-                "sex_type3"
-            ],
-            "schools": [
-                "school_name1",
-                "school_name2"
-            ]
-        },
-        "steps": [
-            {
-                "title": "step1",
-                "description": "string"
-            },
-            {
-                "title": "step2",
-                "description": "string"
-            }
-        ],
-        "participant_ids": [],
-        "ongoing_participant_ids": [],
-        "waiting_examine_participant_ids": [],
-        "finished_participant_ids": []
-    }
-]
+        {
+            "task_id": 2,
+            "task_name": "task10",
+            "task_status": "on going"
+        }
+    ]
+}
 ```
 
 ##### 组织查询自己创建的任务
 
-@app.route('/users/<user_id>/organization/<organization_id>/tasks',
+@app.route('/users/<user_id>/organizations/<organization_id>/my_tasks',
 methods=\['GET'\])
 
 ```
@@ -1156,58 +1021,112 @@ POST http://localhost:5000/users/9/organizations/1/my_tasks
 ```
 ```
 // Response
-[
-    {
-        "task_id": 8,
-        "creator_user_id": 9,
-        "creator_organization_id": 1,
-        "status": "on going",
-        "title": "task9-org",
-        "description": "task9-org",
-        "tags": [
-            "tag1",
-            "tag2",
-            "tag3"
-        ],
-        "participant_number_limit": 10,
-        "reward_for_one_participant": 10,
-        "post_time": "Mon, 22 Apr 2019 13:27:50 GMT",
-        "receive_end_time": "Mon, 22 Apr 2019 14:27:50 GMT",
-        "finish_deadline_time": "Tue, 23 Apr 2019 13:27:50 GMT",
-        "user_limit": {
-            "age_upper": 0,
-            "age_lower": 1,
-            "grades": [
-                "grade1",
-                "grade1"
-            ],
-            "sexes": [
-                "sex_type1",
-                "sex_type2",
-                "sex_type3"
-            ],
-            "schools": [
-                "school_name1",
-                "school_name2"
-            ]
+{
+    "task": [
+        {
+            "task_id": 3,
+            "task_name": "task1-org",
+            "task_status": "on going"
         },
-        "steps": [
-            {
-                "title": "step1",
-                "description": "string"
-            },
-            {
-                "title": "step2",
-                "description": "string"
-            }
-        ],
-        "participant_ids": [],
-        "ongoing_participant_ids": [],
-        "waiting_examine_participant_ids": [],
-        "finished_participant_ids": []
-    }
-]
+        {
+            "task_id": 4,
+            "task_name": "task2-org",
+            "task_status": "on going"
+        }
+    ]
+}
 ```
+##### 查询自己的任务详情
+
+@app.route('/users/<user_id>/my_tasks/<task_id>', methods=['GET'])
+
+###### test case 1: 查询属于自己的任务
+
+```
+GET http://localhost:5000/users/7/my_tasks/1
+```
+
+```
+// Request
+// ...
+```
+
+```
+// Response
+{
+    "task_id": 1,
+    "creator_user_id": 7,
+    "creator_organization_id": null,
+    "status": "on going",
+    "title": "task9",
+    "description": "task9",
+    "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+    ],
+    "participant_number_limit": 10,
+    "reward_for_one_participant": 0.1,
+    "post_time": "Wed, 05 Jun 2019 06:51:22 GMT",
+    "receive_end_time": "Wed, 05 Jun 2019 07:51:22 GMT",
+    "finish_deadline_time": "Thu, 06 Jun 2019 06:51:22 GMT",
+    "user_limit": {
+        "age_upper": 0,
+        "age_lower": 1,
+        "grades": [
+            "grade1",
+            "grade1"
+        ],
+        "sexes": [
+            "sex_type1",
+            "sex_type2",
+            "sex_type3"
+        ],
+        "schools": [
+            "school_name1",
+            "school_name2"
+        ]
+    },
+    "steps": [
+        {
+            "title": "step1",
+            "description": "string"
+        },
+        {
+            "title": "step2",
+            "description": "string"
+        }
+    ],
+    "participant_ids": [
+        8
+    ],
+    "ongoing_participant_ids": [
+        8
+    ],
+    "waiting_examine_participant_ids": [],
+    "finished_participant_ids": []
+}
+```
+
+###### test case 2: 查询不属于自己的任务或者任务不存在
+
+```
+GET http://localhost:5000/users/7/my_tasks/3
+```
+
+```
+// Request
+// ...
+```
+
+```
+// Response
+{
+    "error_code": "401",
+    "error_msg": "Insufficient permission, you don't create this task"
+}
+```
+
 ##### 查询自己已接收的任务
 
 @app.route('/users/<user_id>/received_tasks', methods=\['GET'\])
@@ -1335,12 +1254,12 @@ GET http://localhost:5000/users/8/received_tasks
 
 ##### *任务查询
 
-@app.route('/users/<user_id>/tasks/search', methods=['GET'])
+@app.route('/users/<user_id>/tasks', methods=['GET'])
 
 ###### test case 1：查找给female的任务
 
 ```
-GET http://localhost:5000/users/1/tasks/search
+GET http://localhost:5000/users/1/tasks
 ```
 
 ```
@@ -1452,7 +1371,7 @@ GET http://localhost:5000/users/1/tasks/search
 ###### test case 2：查找steps不超过1的任务
 
 ```
-PUT http://localhost:5000/users/1/tasks/search
+PUT http://localhost:5000/users/1/tasks
 ```
 
 ```
@@ -1513,7 +1432,7 @@ PUT http://localhost:5000/users/1/tasks/search
 ###### test case 3：找到所有task1-org组织创建的任务
 
 ```
-PUT http://localhost:5000/users/1/tasks/search
+PUT http://localhost:5000/users/1/tasks
 ```
 
 ```
@@ -1641,6 +1560,134 @@ POST http://localhost:5000/users/2/tasks/8
 }
 ```
 
+##### 任务详情
+
+@app.route('/users/<user_id>/tasks/<task_id>', methods=\['GET'\])
+
+###### test case 1: 查询无组织（只有发布者没有发布组织）的任务
+
+```
+GET http://localhost:5000/users/7/tasks/1
+```
+
+```
+// Request
+// ...
+```
+
+```
+// Response
+{
+    "task_id": 1,
+    "creator_user_email": "test",
+    "creator_user_phone_number": "test",
+    "creator_organization_name": null,
+    "status": "on going",
+    "title": "task9",
+    "description": "task9",
+    "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+    ],
+    "current_participant_number": 1,
+    "participant_number_limit": 10,
+    "reward_for_one_participant": 0.1,
+    "post_time": "Wed, 05 Jun 2019 06:51:22 GMT",
+    "receive_end_time": "Wed, 05 Jun 2019 07:51:22 GMT",
+    "finish_deadline_time": "Thu, 06 Jun 2019 06:51:22 GMT",
+    "user_limit": {
+        "age_upper": 0,
+        "age_lower": 1,
+        "grades": [
+            "grade1",
+            "grade1"
+        ],
+        "sexes": [
+            "sex_type1",
+            "sex_type2",
+            "sex_type3"
+        ],
+        "schools": [
+            "school_name1",
+            "school_name2"
+        ]
+    },
+    "steps": [
+        {
+            "title": "step1",
+            "description": "string"
+        },
+        {
+            "title": "step2",
+            "description": "string"
+        }
+    ]
+}
+```
+
+###### test case 2: 查询有发布组织的任务
+
+```
+GET http://localhost:5000/users/7/tasks/2
+```
+
+```
+// Request
+// ...
+```
+
+```
+// Response
+{
+    "task_id": 2,
+    "creator_user_email": "test",
+    "creator_user_phone_number": "test",
+    "creator_organization_name": "zhutou1",
+    "status": "on going",
+    "title": "task1",
+    "description": "task1",
+    "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+    ],
+    "current_participant_number": 2,
+    "participant_number_limit": 10,
+    "reward_for_one_participant": 10,
+    "post_time": "Wed, 05 Jun 2019 06:54:03 GMT",
+    "receive_end_time": "Wed, 05 Jun 2019 07:54:03 GMT",
+    "finish_deadline_time": "Thu, 06 Jun 2019 06:54:03 GMT",
+    "user_limit": {
+        "age_upper": 0,
+        "age_lower": 1,
+        "grades": [
+            "grade1",
+            "grade1"
+        ],
+        "sexes": [
+            "sex_type1",
+            "sex_type2",
+            "sex_type3"
+        ],
+        "schools": [
+            "school_name1",
+            "school_name2"
+        ]
+    },
+    "steps": [
+        {
+            "title": "step1",
+            "description": "string"
+        },
+        {
+            "title": "step2",
+            "description": "string"
+        }
+    ]
+}
+```
+
 ##### 任务完成
 
 @app.route('/users/<user_id>/tasks/<task_id>/steps/<step_id>',
@@ -1718,7 +1765,7 @@ methods=\['PUT'\])
 ###### test case 1：正常标记用户完成任务
 
 ```
-PUT http://localhost:5000/users/1/tasks/1/finisher/4
+PUT http://localhost:5000/users/7/tasks/1/finisher/8
 ```
 ```
 // Request
@@ -1728,63 +1775,15 @@ PUT http://localhost:5000/users/1/tasks/1/finisher/4
 // Response 200 OK
 {
     "task_id": 1,
-    "creator_user_id": 1,
-    "creator_organization_id": null,
-    "status": "on going",
-    "title": "task1",
-    "description": "task1",
-    "tags": [
-        "tag1",
-        "tag2",
-        "tag3"
-    ],
-    "participant_number_limit": 10,
-    "reward_for_one_participant": 10,
-    "post_time": "Tue, 23 Apr 2019 07:37:52 GMT",
-    "receive_end_time": "Tue, 23 Apr 2019 08:37:52 GMT",
-    "finish_deadline_time": "Wed, 24 Apr 2019 07:37:52 GMT",
-    "user_limit": {
-        "age_upper": 0,
-        "age_lower": 1,
-        "grades": [
-            "grade1",
-            "grade1"
-        ],
-        "sexes": [
-            "sex_type1",
-            "sex_type2",
-            "sex_type3"
-        ],
-        "schools": [
-            "school_name1",
-            "school_name2"
-        ]
-    },
-    "steps": [
-        {
-            "title": "step1",
-            "description": "string"
-        },
-        {
-            "title": "step2",
-            "description": "string"
-        }
-    ],
     "participant_ids": [
-        2,
-        3,
-        4
+        8
     ],
-    "ongoing_participant_ids": [
-        3
-    ],
+    "ongoing_participant_ids": [],
     "waiting_examine_participant_ids": [],
     "finished_participant_ids": [
-        2,
-        4
+        8
     ]
 }
-
 ```
 
 ###### test case 2：该用户已经被标记完成
@@ -2121,7 +2120,7 @@ PUT http://localhost:5000/users/1/organization/1/tasks/3
 ###### test case 1：正常删除任务
 
 ```
-DELETE http://localhost:5000/users/1/tasks/1
+DELETE http://localhost:5000/users/7/tasks/1
 ```
 ```
 // Request
@@ -2130,9 +2129,9 @@ DELETE http://localhost:5000/users/1/tasks/1
 ```
 // Response 200 OK
 {
-    "msg": "Delete task1-modify successfully."
+    "task_id": "1",
+    "task_name": "task9"
 }
-
 ```
 
 ###### test case 2：删除不属于自己的任务
@@ -2155,13 +2154,13 @@ DELETE http://localhost:5000/users/1/tasks/4
 
 ##### 删除组织任务
 
-@app.route('/users/<user_id>/organization/<organization_id>/tasks/<task_id>',
+@app.route('/users/<user_id>/organizations/<organization_id>/tasks/<task_id>',
 methods=\['DELETE'\])
 
 ###### test case 1：正常删除任务
 
 ```
-DELETE http://localhost:5000/users/1/organization/1/tasks/3
+DELETE http://localhost:5000/users/7/organizations/1/tasks/2
 ```
 ```
 // Request
@@ -2170,9 +2169,9 @@ DELETE http://localhost:5000/users/1/organization/1/tasks/3
 ```
 // Response 200 OK
 {
-    "msg": "Delete task1-org successfully."
+    "task_id": "2",
+    "task_name": "task1"
 }
-
 ```
 
 #### 接收者评价系统
