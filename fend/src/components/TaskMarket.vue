@@ -239,10 +239,12 @@
                                     </FormItem>
                             </Card>
  
- 
-                            <FormItem style="margin-top: 30px;">
-                                <Button type="primary" @click="handleReset('formValidate')">重置</Button>
-                            </FormItem>
+                            <!-- <Col span="4" offset="3"> -->
+                                <FormItem style="margin-top: 30px;">
+                                    <Button type="primary" @click="showdrawer = false;" style="margin-left: 70px;">确定</Button>
+                                    <Button @click="handleReset('formValidate')" style="margin-left: 15px;">重置</Button>
+                                </FormItem>
+                            <!-- </Col> -->
 
 
                         </Row>
@@ -256,7 +258,7 @@
 				</Card>
 
                 <Card :bordered="false" style="top: 20px;">
-                    <p slot="title">查询结果 (点击任务名查看详细信息)</p>
+                    <p slot="title">查询结果 (点击任务所在行查看详细信息)</p>
                     <Table :columns="taskInfoCol" :data="taskInfoData"></Table>
                 </Card>
 
@@ -320,44 +322,165 @@
                     {
                         title: '任务名',
                         key: 'name',
+
                         render: (h, params) => {
-                            return h('div', [
-                                h('a', {
-                                    props: {
-                                        type: 'warning',
-                                        size: 'small'
-                                    },
-                                    style: {
-                                        marginRight: '5px'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            window.open("https://www.baidu.com");
-                                        }
+                            return h('div', {
+                                // props: {
+                                //     type: 'warning',
+                                //     size: 'small'
+                                // },
+                                style: {
+                                    // marginRight: '5px'
+                                    padding: '15px 23px',
+                                    marginLeft: '-18px',
+                                    width: '300px',
+                                    height: '47px',
+                                    cursor: 'pointer'
+                                },
+                                on: {
+                                    click: () => {
+                                        // window.open("https://www.baidu.com");
+                                        //this.$Message.error('' + params.index);
+                                        //console.log(params.index);
+                                        this.$router.push({
+                                            path: '/', 
+                                            name: 'taskinfoforcreate',
+                                        });	
                                     }
-                                }, 'Coding' + params.index)
-                            ]);
+                                }
+                            }, this.taskInfoData[params.index].name)
                         }
+
                     },
                     {
                         title: 'tag',
-                        key: 'tag'
+                        key: 'tag',
+                        render: (h, params) => {
+                            return h('div', {
+                                style: {
+                                    // marginRight: '5px'
+                                    padding: '15px 23px',
+                                    marginLeft: '-18px',
+                                    width: '300px',
+                                    height: '47px',
+                                    cursor: 'pointer'
+                                },
+                                on: {
+                                    click: () => {
+                                        //this.$Message.error('' + params.index);
+                                        //console.log(params.index);
+                                        this.$router.push({
+                                            path: '/', 
+                                            name: 'taskinfoforcreate',
+                                        });	                                        
+                                    }
+                                }
+                            }, this.taskInfoData[params.index].tag)
+                        }                        
                     },
                     {
                         title: '发布方',
-                        key: 'boss'
+                        key: 'boss',
+                        render: (h, params) => {
+                            return h('div', {
+                                style: {
+                                    // marginRight: '5px'
+                                    padding: '15px 23px',
+                                    marginLeft: '-18px',
+                                    width: '300px',
+                                    height: '47px',
+                                    cursor: 'pointer'
+                                },
+                                on: {
+                                    click: () => {
+                                        //this.$Message.error('' + params.index);
+                                        //console.log(params.index);
+                                        this.$router.push({
+                                            path: '/', 
+                                            name: 'taskinfoforcreate',
+                                        });	                                        
+                                    }
+                                }
+                            }, this.taskInfoData[params.index].boss)
+                        }                        
                     },
                     {
                         title: '状态',
-                        key: 'status'
+                        key: 'status',
+                        render: (h, params) => {
+                            return h('div', {
+                                style: {
+                                    // marginRight: '5px'
+                                    padding: '15px 23px',
+                                    marginLeft: '-18px',
+                                    width: '300px',
+                                    height: '47px',
+                                    cursor: 'pointer'
+                                },
+                                on: {
+                                    click: () => {
+                                        //this.$Message.error('' + params.index);
+                                        //console.log(params.index);
+                                        this.$router.push({
+                                            path: '/', 
+                                            name: 'taskinfoforcreate',
+                                        });	                                        
+                                    }
+                                }
+                            }, this.taskInfoData[params.index].status)
+                        }                          
                     },
                     {
                         title: '发布时间',
-                        key: 'reltime'
+                        key: 'reltime',
+                        render: (h, params) => {
+                            return h('div', {
+                                style: {
+                                    // marginRight: '5px'
+                                    padding: '15px 23px',
+                                    marginLeft: '-18px',
+                                    width: '300px',
+                                    height: '47px',
+                                    cursor: 'pointer'
+                                },
+                                on: {
+                                    click: () => {
+                                        //this.$Message.error('' + params.index);
+                                        //console.log(params.index);
+                                        this.$router.push({
+                                            path: '/', 
+                                            name: 'taskinfoforcreate',
+                                        });	                                        
+                                    }
+                                }
+                            }, this.taskInfoData[params.index].reltime)
+                        }                        
                     },
                     {
                         title: '截止时间',
-                        key: 'ddltime'
+                        key: 'ddltime',
+                        render: (h, params) => {
+                            return h('div', {
+                                style: {
+                                    // marginRight: '5px'
+                                    padding: '15px 23px',
+                                    marginLeft: '-18px',
+                                    width: '300px',
+                                    height: '47px',
+                                    cursor: 'pointer'
+                                },
+                                on: {
+                                    click: () => {
+                                        //this.$Message.error('' + params.index);
+                                        //console.log(params.index);
+                                        this.$router.push({
+                                            path: '/', 
+                                            name: 'taskinfoforcreate',
+                                        });	                                        
+                                    }
+                                }
+                            }, this.taskInfoData[params.index].ddltime)
+                        }                        
                     },
                     {
                         title: '设置',
@@ -692,7 +815,7 @@
 	/* font-size: 26px; */
     font-size: 24px;
     border: solid 1px blue;
-	margin-left: 14%;
+	margin-left: 12%;
 	margin-top: 1%;
 	border-radius: 4px;
 	text-align: center;
@@ -712,7 +835,7 @@
 	text-align: center;
 	font-size: 18px;
 	padding: 9px;
-	width: 8%;
+	width: 10%;
     height: 43px;
     top: 2px;
 	transition: all 0.5s;
@@ -733,7 +856,7 @@
 	text-align: center;
 	font-size: 18px;
 	padding: 9px;
-	width: 10%;
+	width: 12%;
     height: 43px;
     top: 2px;
 	transition: all 0.5s;
