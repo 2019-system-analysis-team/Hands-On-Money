@@ -183,12 +183,8 @@
 						{ required: true, message: '任务类型不能为空',trigger: 'blur' }
 					],
                 },
-				tasktags:['无'],
+				tasktags:['心理实验'],
 				tagList: [
-					{
-					    value: '无',
-					    label: '无'
-					},
                     {
                         value: '心理实验',
                         label: '心理实验'
@@ -198,12 +194,8 @@
                         label: '问卷'
                     },
                     {
-                        value: '拿外卖',
-                        label: '拿外卖'
-                    },
-                    {
-                        value: '其他',
-                        label: '其他'
+                        value: '代跑腿',
+                        label: '代跑腿'
                     }
                 ],
 				gradeList:[
