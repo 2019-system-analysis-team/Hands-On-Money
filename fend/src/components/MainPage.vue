@@ -30,11 +30,6 @@
 						</Submenu>
                     </div>
                     <div class="layout-nav" v-if="isLogin">
-						<MenuItem name="5">
-							<Tooltip content="创建一个新任务">
-								<Icon type="md-add-circle" size="45" color="#eee" @click="createNewTask"/>
-							</Tooltip>
-						</MenuItem>
 						<Submenu name="1">
 							 <template slot="title">
 								<Icon type="ios-ionic"></Icon>
@@ -42,7 +37,7 @@
 							 </template>
 							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
 							<MenuItem name="1-2" @click.native="createNewTask()">新建任务</MenuItem>
-							<MenuItem name="1-3">所有任务</MenuItem>
+							<MenuItem name="1-3" to="/taskmarket">任务市场</MenuItem>
                         </Submenu>
                         <Submenu name="2">
 							<template slot="title">
@@ -218,7 +213,7 @@
                     paddingBottom: '53px',
                     position: 'static'
                 },
-				messagesNumber:100,
+				messagesNumber:0,
 				haveTask: false,
 				inputName: '',
 				inputPassword: '',
@@ -281,6 +276,7 @@
 						_this.userID = '';
 						window.localStorage.removeItem('token');
 						window.localStorage.removeItem('userID');
+						this.$Message.success('退出登录成功');
 					}).catch(function (error) {
 						console.log(error);
 					});
@@ -290,7 +286,7 @@
 				this.topup = true;
 			},
 			recharge(){
-				this.$Message.success('充值成功!');
+				this.$Message.success('充值成功');
 				this.money = this.topupData.value + this.money;
 				this.topup = false;
 			},
@@ -347,7 +343,7 @@
 										_this.$Message.error('用户不存在或者密码错误');
 									}
 									if(error.response.status == 400){
-										_this.$Message.error('后端抽风?');
+										_this.$Message.error('用户不存在或者密码错误');
 									}
 									_this.inputName = '';
 									_this.inputPassword = '';
@@ -388,7 +384,7 @@
     left: 20px;
 }
 .layout-nav{
-    width: 600px;
+    width: 530px;
     margin: 0 auto;
     margin-right: 0px;
 }

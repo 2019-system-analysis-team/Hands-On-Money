@@ -12,7 +12,7 @@
 							 </template>
 							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
 							<MenuItem name="1-2" @click.native = "createNewTask()">新建任务</MenuItem>
-							<MenuItem name="1-3">所有任务</MenuItem>
+							<MenuItem name="1-3" to="/taskmarket">任务市场</MenuItem>
                         </Submenu>
                         <Submenu name="2">
 							<template slot="title">
@@ -46,8 +46,8 @@
             </Header>
 			<Content>
 				<div class="content-head">
-					<Avatar :src="organProfilePhotoPath" style="background-color: #87d068;" size="large">{{formValidate.name}}</Avatar>
-					<span style="font-size: 30px;vertical-align: middle;margin-left: 10px;">{{formValidate.name}}</span>
+					<Avatar :src="organProfilePhotoPath" style="background-color: #87d068;" size="large">{{organName}}</Avatar>
+					<span style="font-size: 30px;vertical-align: middle;margin-left: 10px;">{{organName}}</span>
 				</div>
 				<Tabs type="card" id="tabs" value="组织" v-model="tabs" :animated="false">
 					<TabPane label="组织任务" name="组织任务">
@@ -114,55 +114,10 @@
 									<Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 2,maxRows: 8}" :disabled="organInfodisabled"></Input>
 								</FormItem>
 								<FormItem>
-									<Button type="primary" @click="handleSubmit('formValidate')" style="margin-left:89%">修改信息</Button>
+									<Button v-show="isCreater" type="primary" @click="handleSubmit('formValidate')" style="margin-left:89%">修改信息</Button>
 								</FormItem>
 							</Form>
 						</Card>					
-					</TabPane>
-					<TabPane label="头像修改" name="头像修改">
-						<Card dis-hover style="height:380px">
-							<p slot="title">请上传新的头像</p>
-							<Form ref="photo" :label-width="80" class="form">
-								<FormItem label="头像" prop="photo">
-									<div class="demo-upload-list" v-for="item in uploadList">
-										<template v-if="item.status === 'finished'">
-											<img :src="item.url">
-											<div class="demo-upload-list-cover">
-												<Icon type="ios-eye-outline" @click.native="handleView(item.name)"></Icon>
-											</div>
-										</template>
-										<template v-else>
-											<Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
-										</template>
-									</div>
-									<Tooltip content="点击上传头像">
-										<Upload
-											ref="upload"
-											:headers ="jwt"
-											:show-upload-list="false"
-											:default-file-list="defaultList"
-											:on-success="handleSuccess"
-											:format="['jpeg']"
-											:max-size="2048"
-											:on-format-error="handleFormatError"
-											:on-exceeded-size="handleMaxSize"
-											:before-upload="handleBeforeUpload"
-											:on-error="handleError"
-											accept="image/jpeg"
-											type="drag"
-											:action= "organProfilePhotoUrl"
-											style="display: inline-block;width:78px;">
-											<div style="width: 78px;height:78px;line-height: 78px;">
-												<Icon type="ios-camera" size="40"></Icon>
-											</div>
-										</Upload>
-									</Tooltip>
-									<Modal title="浏览头像" v-model="visible">
-										<img :src="'https://o5wwk8baw.qnssl.com/' + imgName + '/avatar'" v-if="visible" style="width: 100%">
-									</Modal>
-								</FormItem>
-							</Form>
-						</Card>
 					</TabPane>
 					<TabPane label="管理成员" name="管理成员">
 						<Card dis-hover style="height: 500px">
@@ -227,6 +182,33 @@
 							</Col>
 						</Card>		
 					</TabPane>
+					<TabPane label="组织钱包" name="组织钱包">
+						<Card dis-hover style="height:380px">
+							<p slot="title">组织账户信息如下</p>
+							<Form  :model="organtopupData" :label-width="80" class="form">
+								<FormItem label="组织余额" prop="yue">
+									{{organMoney}}
+								</FormItem>
+								<FormItem label="充值金额" label-position="top">
+								<InputNumber
+											:max="10000"
+											:min="1"
+											 v-model="organtopupData.value"
+											></InputNumber>
+								</FormItem>
+								<FormItem label="支付方式" label-position="top">
+									<Select v-model="organtopupData.mode">
+										<Option value="支付宝">支付宝</Option>
+										<Option value="微信支付">微信支付</Option>
+										<Option value="信用卡">信用卡</Option>
+									</Select>
+								</FormItem>
+								<FormItem>
+									<Button type="primary" @click="chargeForOrgan" style="margin-left:89%">充值</Button>
+								</FormItem>
+							</Form>
+						</Card>					
+					</TabPane>
 					<TabPane label="删除组织" name="删除组织" v-show="isCreater">
 						<Card dis-hover style="height:380px">
 							<p slot="title">请确认要删除组织</p>
@@ -266,7 +248,6 @@
 							<Option value="信用卡">信用卡</Option>
 						</Select>
 					</FormItem>
-				</Row>
 			</Form>
 			<div class="demo-drawer-footer">
 				<Button style="margin-right: 8px" @click="topup = false">取消</Button>
@@ -321,11 +302,15 @@
                     position: 'static'
                 },
 				money:0,
+				organMoney:0,
                 topupData: {
                     value: 1,
 					mode: '支付宝',
                 },
-				
+				organtopupData: {
+				    value: 1,
+					mode: '支付宝',
+				},
 				taskclass:'全部任务',
 				classifications: [
 					{
@@ -371,6 +356,7 @@
 					 name: '',
 					 desc: ''
 				},
+				organName:'',
 				ruleValidate: {
 					 name: [
 						 { required: true, validator: validateNameCheck, trigger: 'blur' }
@@ -417,11 +403,11 @@
             },
 			getEventData:function() {
 				this.selectTasks = this.allTasks;
-				let routerParams = this.$route.params.organID;
-				//console.log(routerParams);
-		
-				if(routerParams == null)
+	
+				let orID = window.localStorage.getItem('organID');
+				if(orID == null)
 				{
+					this.$Message.error('未知组织');
 					// 返回主页
 					this.$router.push({
 						path: '/', 
@@ -429,8 +415,8 @@
 					});	
 				}
 
-				this.organID = routerParams;
-				let uID = window.localStorage.getItem('userID')
+				this.organID = orID;
+				let uID = window.localStorage.getItem('userID');
 			
 				if(uID == null || uID == ""){
 					//跳转到主页
@@ -455,6 +441,7 @@
 						 }
 				}).then(function (response){
 					console.log(response);	
+					_this.organName = response.data.name;
 					_this.formValidate.name = response.data.name;
 					_this.formValidate.desc = response.data.bio;
 					 _this.allMembersShortInfo = response.data.members;
@@ -512,7 +499,7 @@
 				});
 			
 			    var url = "/users/" + uID + "/organizations/" + this.organID + "/my_tasks";
-				/*
+				
 				this.$axios({
 						 method:"get",
 						 url:url,
@@ -522,7 +509,7 @@
 				}).then(function (response){
 					console.log("所有任务");	
 					console.log(response);	
-					_this.allTasks = response.data.tasks;
+					_this.allTasks = response.data.task;
 					for(var i=0; i < _this.allTasks.length;i++){
 						if(_this.allTasks[i].status == "inprogress"){
 							_this.inprogressTasks.push(_this.allTasks[i]);
@@ -530,77 +517,22 @@
 							_this.finishedTasks.push(_this.allTasks[i]);
 						}
 					}
-					this.selectTasks = this.allTasks;
+					_this.selectTasks = _this.allTasks;
 				}).catch(function (error) {
+					
 					_this.$Message.error('请先登录!');
 					//跳转到主页
+					
 					_this.$router.push({
 						path: '/', 
 						name: 'mainpage'
 					});
+					
 				});
-				*/
+				
 			    this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 				
 			},
-			handleView (name) {
-                this.imgName = name;
-                this.visible = true;
-            },
-            handleSuccess (res, file) {
-				//从服务器获得图片路径，更改组织头像
-				//TODO-------------------------------------------------------
-				/*
-				var url = "/users/:" + this.$data.userID.toString();
-				var jwt = "JWT " + window.localStorage.getItem('token');
-				this.$axios({
-						 method:"get",
-						 url:url,
-						 headers:{
-							'Authorization': jwt,
-						 }
-				}).then(function (response){
-					console.log(response);
-					this.$data.profilePhotoPath =  response.data.profile_photo_path;
-					file.url = response.data.profile_photo_path;
-					file.name = '头像';
-				}).catch(function (error) {
-
-				});
-				*/
-				this.$Message.success('修改头像成功!');
-            },
-            handleFormatError (file) {
-                this.$Notice.warning({
-                    title: '文件格式不正确',
-                    desc: '文件 ' + file.name + ' 的格式不正确, 请选择 jpeg .'
-                });
-            },
-            handleMaxSize (file) {
-                this.$Notice.warning({
-                    title: '超出文件大小限制',
-                    desc: '文件  ' + file.name + ' 太大, 不能超过 2M.'
-                });
-            },
-			handleError(error, file){
-				if(this.$data.organProfilePhotoPath != ""){
-					file.url = this.$data.organProfilePhotoPath;
-					file.name = '头像';
-				}
-				this.$Message.error('修改头像失败!');
-			},
-            handleBeforeUpload () {
-				// 如果之前上传过则删除
-                const check = this.uploadList.length == 1;
-                if (check) {
-					this.$refs.upload.fileList.splice(0, 1);
-                }
-				else
-				{
-					return !check;
-				}
-                return check;
-            },
 			GotoTopup (){
 				this.topup = true;
 			},
@@ -608,6 +540,10 @@
 				this.$Message.success('充值成功!');
 				this.money = this.topupData.value + this.money;
 				this.topup = false;
+			},
+			chargeForOrgan(){
+				this.$Message.success('为组织充值成功!');
+				this.organMoney = this.organtopupData.value + this.organMoney;
 			},
 			logout (){
 				var _this = this;
@@ -649,6 +585,7 @@
                     if (valid) {
 						var jwt = "JWT " + window.localStorage.getItem('token');
 						var url = "/users/"+ this.$data.userID +"/organizations/" + this.organID;
+						console.log("修改内容:" + this.$data.formValidate.name + "简介:" + this.$data.formValidate.desc);
 						if(name == "formValidate"){
 							this.$axios({
 								 method:"put",
@@ -675,6 +612,7 @@
 								 }
 							}).then(function (response){
 								_this.$Message.success('删除成功!');
+								window.localStorage.removeItem('organID');
 								//跳转到我的组织
 								_this.$router.push({
 									path: '/', 
@@ -682,7 +620,7 @@
 								});
 							}).catch(function (error) {
 								console.log(error);
-								_this.$Message.error('删除失败!');
+								_this.$Message.error('权限不够，删除失败');
 							});								
 						}
                     } else {
@@ -699,8 +637,9 @@
 					var jwt = "JWT " + window.localStorage.getItem('token');
 					var url = "/users/"+ this.$data.userID.toString() +"/organizations/" + this.organID.toString() + "/members";
 					if (valid) {
+						
 						if(this.addMemberValidate.addMemberType == '邮箱'){
-							//console.log('通过邮件添加' + this.$data.addMemberValidate.addMemberInfo + " " +  this.$data.addMemberValidate.addMemberStatus);
+							console.log('通过邮件添加' + this.$data.addMemberValidate.addMemberInfo + " " +  this.$data.addMemberValidate.addMemberStatus);
 							this.$axios({
 								 method:"post",
 								 url: url,
@@ -719,7 +658,7 @@
 								console.log(error);
 							});						
 						}else{
-							//console.log('通过电话添加' + this.$data.addMemberValidate.addMemberInfo + " " +  this.$data.addMemberValidate.addMemberStatus);
+							console.log('通过电话添加' + this.$data.addMemberValidate.addMemberInfo + " " +  this.$data.addMemberValidate.addMemberStatus);
 							this.$axios({
 								 method:"post",
 								 url: url,
@@ -736,11 +675,15 @@
 								_this.$router.go(0);
 							}).catch(function (error) {
 								console.log(error);
+								_this.$Message.error('信息填写错误!');
 							});								
 						}
 					}
+					else
+					{
+						this.$Message.error('信息填写错误!');
+					}
 				});
-				this.$Message.error('信息填写错误!');
             },
             addMembercancel () {
                 this.$Message.info('取消添加成员');
@@ -772,6 +715,7 @@
 			modifyMemberStatus(item){
 				var url_all = "/users/"+this.userID+"/organizations/"+this.organID+"/members/"+item.userID;
 				var jwt = "JWT " + window.localStorage.getItem('token');
+				console.log("修改的权限:" + item.status);
 				this.$axios({
 					 method:"put",
 					 url: url_all,
@@ -841,9 +785,6 @@
 				});					
 			}
         },
-        mounted () {
-            this.uploadList = this.$refs.upload.fileList;
-        }
     }
 </script>
 <style scoped>

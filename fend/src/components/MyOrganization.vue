@@ -12,7 +12,7 @@
 							 </template>
 							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
 							<MenuItem name="1-2" @click.native ="createNewTask()">新建任务</MenuItem>
-							<MenuItem name="1-3">所有任务</MenuItem>
+							<MenuItem name="1-3" to="/taskmarket">任务市场</MenuItem>
                         </Submenu>
                         <Submenu name="2">
 							<template slot="title">
@@ -240,7 +240,9 @@
             },
 			goOrganInfo(index){
                 // 去组织的详情页面
+				
 				if(this.SelectType == 0){
+					window.localStorage.setItem('organID', this.allOrganizations[index].organization_id);
 					this.$router.push({
 						path: '/', 
 						name: 'organizationInfo',
@@ -249,6 +251,7 @@
 						},
 					});		
 				}else if(this.SelectType == 1){
+					window.localStorage.setItem('organID', this.manageOrganizations[index].organization_id);
 					this.$router.push({
 						path: '/', 
 						name: 'organizationInfo',
@@ -257,6 +260,7 @@
 						},
 					});						
 				}else if(this.SelectType == 2){
+					window.localStorage.setItem('organID', this.createOrganizations[index].organization_id);
 					this.$router.push({
 						path: '/', 
 						name: 'organizationInfo',
@@ -265,6 +269,7 @@
 						},
 					});						
 				}else if(this.SelectType == 3){
+					window.localStorage.setItem('organID', this.joinOrganizations[index].organization_id);
 					this.$router.push({
 						path: '/', 
 						name: 'organizationInfo',

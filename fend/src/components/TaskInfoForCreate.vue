@@ -12,7 +12,7 @@
 							 </template>
 							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
 							<MenuItem name="1-2" @click.native = "createNewTask()">新建任务</MenuItem>
-							<MenuItem name="1-3">所有任务</MenuItem>
+							<MenuItem name="1-3" to="/taskmarket">任务市场</MenuItem>
                         </Submenu>
                         <Submenu name="2">
 							<template slot="title">

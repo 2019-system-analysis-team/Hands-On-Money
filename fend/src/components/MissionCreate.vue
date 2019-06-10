@@ -72,11 +72,14 @@
                                 <!-- <Button id="addbutton" class="addstepStyle" type="primary" @click="addStepClick()">增加步骤</Button> -->
                                 <Card style="height: 380px; overflow: auto;">
                                 <Card v-for="cardItem in citems" :key="cardItem.id">
-                                    步骤{{cardItem.number + 1}}描述:
+									<div slot="title">
+									    步骤{{cardItem.number + 1}}
+									</div>
                                     <div slot="extra">
                                         <Button :size="delButtonSize" type="error" ghost @click="delStepClick(cardItem.number)">删除</Button>
                                     </div>
-                                    <Input v-model="cardItem.description"  style="padding-top:5px;" type="textarea" :autosize="{minRows: 2,maxRows: 10}"></Input>
+									标题：<Input v-model="cardItem.title" placeholder="请输入该步骤的标题" ></Input>
+									描述：<Input v-model="cardItem.description" type="textarea" :autosize="{minRows: 2,maxRows: 10}"></Input>
                                 </Card>
                                 </Card>
                             </Col>
@@ -350,7 +353,7 @@
 						_this.user_limit.sexes = response.data.user_limit.sexes;
 						_this.user_limit.schools = response.data.user_limit.schools;
 						for(var i=0; i< response.data.steps.length;i++){
-							 _this.citems.push({id: (_this.citemcount)++, number: _this.citemnum++,description:response.data.steps[i].description});
+							 _this.citems.push({id: (_this.citemcount)++, number: _this.citemnum++,description:response.data.steps[i].description,title:response.data.steps[i].title});
 						}
 					}).catch(function (error) {
 						console.log(error);
@@ -369,7 +372,7 @@
 				});		
             },
             addStepClick: function() {
-                this.citems.push({id: (this.citemcount)++, number: this.citemnum++,description:''});
+                this.citems.push({id: (this.citemcount)++, number: this.citemnum++,description:'',title:''});
                 //console.log("length " + this.citems.length);
             },
             delStepClick: function(delItemNum) {
@@ -417,7 +420,7 @@
 			handleSubmit (name) {
 				 this.$refs[name].validate((valid) => {
 					 if (valid){
-						
+						console.log("正在检验");
 						// 任务类型不能为空
 						if(this.tasktags.length == 0){
 							 this.$Message.error('请至少选择一个任务类型!');
@@ -452,13 +455,16 @@
 							}
 						}
 						var steps = [];
+						//console.log(this.citems);
 						for(var i =0 ;i < this.citems.length;i++){
-							var test = {};
-							var title = "步骤" + (this.citems[i].number+1);
-							this.$set(test,'title',title);
+							var test={};
+							this.$set(test,'title',this.citems[i].title);
 							this.$set(test,'description',this.citems[i].description);
 							steps.push(test);
 						}
+						
+						
+						
 						/*
 						*   POST /users/:user_id/tasks HTTP/1.1
 							//or request: organization creating task 
@@ -477,6 +483,13 @@
 							url += "/" + this.taskID;
 						}
 						if(!this.isTaskChange){
+							console.log("创建任务时候传到后端的参数:");
+							console.log("任务名:" + this.formValidate.taskName + " 简介:" + this.formValidate.missionbrief);
+							console.log(this.tasktags);
+							console.log("参与者:" + this.formValidate.memnumber + " 报酬:" +this.formValidate.reward);
+							console.log("创建任务时间:" +this.getLocalTime()+ "接收截止日期:" +this.formValidate.receive_end_time + "完成截止日期" + this.formValidate.finish_deadline_time);
+							console.log(this.user_limit);
+							console.log(steps);
 							this.$axios({
 									 method:"post",
 									 url:url,
@@ -571,7 +584,12 @@
 						
 						console.log("提交成功");
 					 }
-				 })
+					 else
+					 {
+						 console.log("奇怪的错误");
+					 }
+				 });
+				 console.log("进去");
 			},
 			changeUserLimit(){
 				if(this.haveUserLimit == true)

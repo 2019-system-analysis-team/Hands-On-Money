@@ -12,7 +12,7 @@
 							 </template>
 							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
 							<MenuItem name="1-2" @click.native="createNewTask()">新建任务</MenuItem>
-							<MenuItem name="1-3">所有任务</MenuItem>
+							<MenuItem name="1-3" to="/taskmarket">任务市场</MenuItem>
                         </Submenu>
                         <Submenu name="2">
 							<template slot="title">
@@ -187,6 +187,9 @@
 									</Tooltip>
 									<Modal title="浏览头像" v-model="visible">
 										<img :src= "profilePhotoPath" v-if="visible" style="width: 100%">
+										<div slot="footer">
+											<Button type="info" size="large" long @click="visible = false;">确认</Button>
+										</div>
 									</Modal>
 								</FormItem>
 							</Form>
@@ -196,8 +199,11 @@
 						<Card dis-hover style="height:380px">
 							<p slot="title">请输入新的密码</p>
 							<Form ref="pwdValidate" :model="pwdValidate" :rules="pwdRuleValidate" :label-width="80" class="form">
+									<FormItem label="旧密码" prop="oldpasswd" >
+										<Input type="password" v-model="pwdValidate.oldpasswd" placeholder="请输入您的旧密码" :disabled="disabledPwd"></Input>
+									</FormItem>
 									<FormItem label="新密码" prop="passwd" >
-										<Input type="password" v-model="pwdValidate.passwd" placeholder="请输入您的密码" :disabled="disabledPwd"></Input>
+										<Input type="password" v-model="pwdValidate.passwd" placeholder="请输入您的新密码" :disabled="disabledPwd"></Input>
 									</FormItem>
 									<FormItem label="确认密码" prop="passwdCheck" >
 										<Input type="password" v-model="pwdValidate.passwdCheck" placeholder="请再次输入您的密码" :disabled="disabledPwd"></Input>
@@ -264,6 +270,15 @@
                     callback(new Error('请再次输入您的密码'));
                 } else if (value !== this.pwdValidate.passwd) {
                     callback(new Error('两次输入的密码不一致'));
+                } else {
+                    callback();
+                }
+            };
+            const validateoldPassCheck = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入您的旧密码'));
+                } else if (value === this.pwdValidate.passwd) {
+                    callback(new Error('新密码和旧密码不能相同'));
                 } else {
                     callback();
                 }
@@ -359,7 +374,8 @@
                 },
 				pwdValidate:{
                     passwd: '',
-                    passwdCheck: ''
+                    passwdCheck: '',
+					oldpasswd:'',
 				},
                 defaultList: [{name:'profile',url:'default.jpg'}],
                 imgName: '',
@@ -372,7 +388,10 @@
                     ],
                     passwdCheck: [
                         { required: true, validator: validatePassCheck, trigger: 'blur' }
-                    ]			
+                    ],
+                    oldpasswd: [
+                        { required: true, validator: validateoldPassCheck, trigger: 'blur' }
+                    ]	
 				},
             }
         },
@@ -390,6 +409,7 @@
 				let uID = window.localStorage.getItem('userID');
 
 				if(uID == null || uID == ""){
+					_this.$Message.error('请先登录!');
 					//跳转到主页
 					this.$router.push({
 						path: '/', 
@@ -403,7 +423,7 @@
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				//设置jwt认证头部
 				this.$set(this.jwt,'Authorization',jwt);
-				console.log(this.jwt);
+				//console.log(this.jwt);
 	
 				var _this = this;
 				this.$axios({
@@ -425,11 +445,13 @@
 					_this.$data.money = response.data.balance;
 					_this.$data.profilePhotoPath =  _this.$profilePath + response.data.profile_photo_path;
 					window.localStorage.setItem('MyProfilePhotoPath', _this.$data.profilePhotoPath);
-					_this.$set(_this.$data.defaultList[0],'name',_this.$data.profilePhotoName);
-					_this.$set(_this.$data.defaultList[0],'url',_this.$data.profilePhotoPath);
-					console.log(_this.defaultList);
+					var test = {};
+					_this.$set(test,'name',_this.profilePhotoName);
+					_this.$set(test,'status','finished');
+					_this.$set(test,'url',_this.profilePhotoPath);
+					_this.uploadList.push(test);
 				}).catch(function (error) {
-					_this.$Message.error('请先登录!');
+					_this.$Message.error('获取个人信息失败');
 					//跳转到主页
 					_this.$router.push({
 						path: '/', 
@@ -536,25 +558,7 @@
                 this.visible = true;
             },
             handleSuccess (res, file) {
-				//从服务器获得图片路径
-				var _this = this;
-				var url = "/users/" + this.$data.userID;
-				var jwt = "JWT " + window.localStorage.getItem('token');
-				this.$axios({
-						 method:"get",
-						 url:url,
-						 headers:{
-							'Authorization': jwt,
-						 }
-				}).then(function (response){
-					console.log(response);
-					_this.$data.profilePhotoPath =  _this.$profilePath + response.data.profile_photo_path;
-					file.url =  _this.$profilePath + response.data.profile_photo_path;
-					file.name = '头像';
-				}).catch(function (error) {
 
-				});
-				this.$Message.success('修改头像成功!');
             },
             handleFormatError (file) {
                 this.$Notice.warning({
@@ -569,7 +573,7 @@
                 });
             },
 			handleError(error, dom, file){
-				console.log(file);
+				//console.log(file);
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				var _this = this;
 				let param = new FormData(); // 创建form对象
@@ -583,25 +587,41 @@
 						'Content-Type': 'multipart/form-data',
 					 }
 				}).then(function (response){
-					console.log(response.data);
+					//console.log(response.data);
 					_this.$Message.success('修改头像成功!');
-					_this.$router.go(0);
+					//_this.$router.go(0);
+					var url = "/users/" + _this.$data.userID;
+					_this.$axios({
+							 method:"get",
+							 url:url,
+							 headers:{
+								'Authorization': jwt,
+							 }
+					}).then(function (response){
+						_this.profilePhotoPath =  _this.$profilePath + response.data.profile_photo_path;
+						window.localStorage.setItem('MyProfilePhotoPath', _this.profilePhotoPath);
+						var test = {};
+						_this.$set(test,'name',_this.profilePhotoName);
+						_this.$set(test,'status','finished');
+						_this.$set(test,'url',_this.profilePhotoPath);
+						const check = _this.uploadList.length == 1;
+						
+						if (check) {
+							_this.uploadList.splice(0, 1);
+						}
+						_this.uploadList.push(test);
+						//console.log(_this.defaultList);
+					}).catch(function (error) {
+						_this.$Message.error('获取个人信息失败');
+					});
+				
 				}).catch(function (error) {
 					console.log(error);
 				});
 				
 			},
             handleBeforeUpload () {
-				// 如果之前上传过则删除
-                const check = this.uploadList.length == 1;
-                if (check) {
-					this.$refs.upload.fileList.splice(0, 1);
-                }
-				else
-				{
-					return !check;
-				}
-                return check;
+                return true;
             },
 			GotoTopup (){
 				this.topup = true;
@@ -638,11 +658,7 @@
 					name: 'missioncreate'
 				});		
 			}
-        },
-        mounted () {
-            this.uploadList = this.$refs.upload.fileList;
-        },
-		
+        },		
     }
 </script>
 <style scoped>

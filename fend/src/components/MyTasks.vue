@@ -12,7 +12,7 @@
 							 </template>
 							<MenuItem name="1-1" to="/mytasks">我的任务</MenuItem>
 							<MenuItem name="1-2" @click.native = "createNewTask()">新建任务</MenuItem>
-							<MenuItem name="1-3">所有任务</MenuItem>
+							<MenuItem name="1-3" to="/taskmarket">任务市场</MenuItem>
                         </Submenu>
                         <Submenu name="2">
 							<template slot="title">
@@ -154,11 +154,7 @@
                 },
 				showTaskInfomation:{
 				},
-				selectTasks:[{
-					"task_id": 123,
-					"task_name": "name123",
-					"status": "已完成"
-				},],
+				selectTasks:[],
 				allTasks:[],
 				finishedTasks:[],
 				inprogressTasks:[],
@@ -204,7 +200,7 @@
             },
 			getEventData:function() {
 				let uID = window.localStorage.getItem('userID');
-				/*
+				
 				if(uID == null || uID == ""){
 					//跳转到主页
 					this.$router.push({
@@ -212,12 +208,12 @@
 						name: 'mainpage'
 					});
 				}
-				*/
+				
 				this.$data.userID = uID;
 				var _this = this;
 				var url = "/users/" + uID + "/my_tasks";
 				var jwt = "JWT " + window.localStorage.getItem('token');
-				/*
+				
 				this.$axios({
 					 method:"get",
 					 url:url,
@@ -225,7 +221,7 @@
 						'Authorization': jwt,
 					 }
 				}).then(function (response){
-					_this.createdTasks = response.data.tasks;
+					_this.createdTasks = response.data.task;
 					for(var i=0; i<_this.createdTasks.length;i++){
 						if(_this.createdTasks[i].status == "已完成"){
 							_this.finishedTasks.push(_this.createdTasks[i]);
@@ -236,12 +232,7 @@
 					}			
 					_this.selectTasks = _this.allTasks;	
 				}).catch(function (error) {
-					_this.$Message.error('请先登录!');
-					//跳转到主页
-					_this.$router.push({
-						path: '/', 
-						name: 'mainpage'
-					});
+					_this.$Message.error('获取我创建的任务失败!');
 				});
 				var url = "/users/" + uID + "/received_tasks";
 				this.$axios({
@@ -251,7 +242,8 @@
 						'Authorization': jwt,
 					 }
 				}).then(function (response){
-					_this.receivedTasks = response.data.tasks;
+					console.log(response);
+					_this.receivedTasks = response.data;
 					for(var i=0; i<_this.receivedTasks.length;i++){
 						if(_this.receivedTasks[i].status == "已完成"){
 							_this.finishedTasks.push(_this.receivedTasks[i]);
@@ -262,14 +254,8 @@
 					}
 					_this.selectTasks = _this.allTasks;			
 				}).catch(function (error) {
-					_this.$Message.error('请先登录!');
-					//跳转到主页
-					_this.$router.push({
-						path: '/', 
-						name: 'mainpage'
-					});
+					_this.$Message.error('获取已接收的任务失败!');
 				});
-				*/
 			    this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 			},
 			GotoTopup (){
@@ -342,6 +328,7 @@
 				 this.showTaskInfo = false;
 			},
 			ToTaskInfo(taskID){
+				//如果是自己接收的任务则跳转到接收的任务界面
 				this.$router.push({
 					path: '/', 
 					name: 'taskinfoforcreate',
