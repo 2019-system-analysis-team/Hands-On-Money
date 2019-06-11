@@ -89,11 +89,12 @@ class Transaction(db.Model):
 
 class Feedback_Review(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	task_owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-	task_owner = db.relationship('User', backref=db.backref('feedback_reviews', lazy='dynamic'))
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	user = db.relationship('User', backref=db.backref('feedback_reviews', lazy='dynamic'))
 	organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'))
 	organization = db.relationship('Organization', backref=db.backref('feedback_reviews', lazy='dynamic'))
-	task_receiver_id = db.Column(db.Integer, nullable=False)
+	receiver_id = db.Column(db.Integer, nullable=False)
+	task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
 	task = db.relationship('Task', backref=db.backref('feedback_reviews', lazy='dynamic'))
 	title = db.Column(db.String(100), nullable=False, default='Feedback review')
 	content = db.Column(db.Text, nullable=False, default='default good review')
