@@ -167,7 +167,7 @@ def creating_user():
             #user_id = addUser(nickname, email, hashed_password, phone_number, newFileName)
             user_id = addUser2(new_dict, hashed_password)
             
-            token = jwt.encode({'id': user_id, 'exp': datetime.utcnow() + timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
+            token = jwt.encode({'id': user_id, 'exp': datetime.utcnow() + timedelta(hours=24)}, current_app.config['SECRET_KEY'])
 
 
             return jsonify({'user_id': user_id,
