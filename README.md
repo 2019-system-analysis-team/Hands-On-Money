@@ -807,6 +807,8 @@ DELETE http://localhost:5000/users/2/organization/1
 
 @app.route('/users/<user_id>/tasks', methods=\['POST'\])
 
+###### test case 1: 使用默认日期
+
 ```
 POST http://localhost:5000/users/7/tasks
 ```
@@ -890,22 +892,115 @@ POST http://localhost:5000/users/7/tasks
 }
 ```
 
+###### test case 2: 加上日期
+
+```
+POST http://localhost:5000/users/2/tasks
+```
+
+```
+// Request
+{
+    "title": "task9",
+    "description": "task9",
+    "tags": ["tag1", "tag2", "tag3"],
+    "participant_number_limit": 10,
+    "reward_for_one_participant": 0.1,
+    "post_time": "2019-6-11 11:08:11", 
+    "receive_end_time": "2019-6-12 11:08:11", 
+    "finish_deadline_time": "2019-6-13 11:08:11",
+    "user_limit": {
+        "age_upper": 0,
+        "age_lower": 1,
+        "grades": ["grade1", "grade1"],
+        "sexes": ["sex_type1", "sex_type2", "sex_type3"],
+        "schools": ["school_name1", "school_name2"]
+    },
+    "steps": [
+        {
+            "title": "step1",
+            "description": "string"
+        },
+        {
+            "title": "step2",
+            "description": "string"
+        }
+    ]
+}
+```
+
+```
+// Response
+{
+    "task_id": 2,
+    "creator_user_id": 2,
+    "creator_organization_id": null,
+    "status": "not ongoing",
+    "title": "task9",
+    "description": "task9",
+    "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+    ],
+    "participant_number_limit": 10,
+    "reward_for_one_participant": 0.1,
+    "post_time": "Tue, 11 Jun 2019 11:08:11 GMT",
+    "receive_end_time": "Wed, 12 Jun 2019 11:08:11 GMT",
+    "finish_deadline_time": "Thu, 13 Jun 2019 11:08:11 GMT",
+    "user_limit": {
+        "age_upper": 0,
+        "age_lower": 1,
+        "grades": [
+            "grade1",
+            "grade1"
+        ],
+        "sexes": [
+            "sex_type1",
+            "sex_type2",
+            "sex_type3"
+        ],
+        "schools": [
+            "school_name1",
+            "school_name2"
+        ]
+    },
+    "steps": [
+        {
+            "title": "step1",
+            "description": "string"
+        },
+        {
+            "title": "step2",
+            "description": "string"
+        }
+    ],
+    "participant_ids": [],
+    "ongoing_participant_ids": [],
+    "waiting_examine_participant_ids": [],
+    "finished_participant_ids": []
+}
+```
+
 ##### 组织创建任务
 
 @app.route('/users/<user_id>/organization/<organization_id>/tasks',
 methods=\['POST'\])
 
 ```
-POST http://localhost:5000/users/7/organizations/1/tasks
+POST http://localhost:5000/users/2/organizations/1/tasks
 ```
 ```
 // Request
 {
-    "title": "task1",
+    "title": "task1org",
     "description": "task1",
     "tags": ["tag1", "tag2", "tag3"],
     "participant_number_limit": 10,
     "reward_for_one_participant": 10,
+    "post_time": "2019-6-12 11:08:11", 
+    "receive_end_time": "2019-6-13 11:08:11", 
+    "finish_deadline_time": "2019-6-14 11:08:11",
     "user_limit": {
         "age_upper": 0,
         "age_lower": 1,
@@ -928,11 +1023,11 @@ POST http://localhost:5000/users/7/organizations/1/tasks
 ```
 // Response
 {
-    "task_id": 2,
-    "creator_user_id": 7,
+    "task_id": 4,
+    "creator_user_id": 2,
     "creator_organization_id": 1,
-    "status": "on going",
-    "title": "task1",
+    "status": "not ongoing",
+    "title": "task1org",
     "description": "task1",
     "tags": [
         "tag1",
@@ -941,9 +1036,9 @@ POST http://localhost:5000/users/7/organizations/1/tasks
     ],
     "participant_number_limit": 10,
     "reward_for_one_participant": 10,
-    "post_time": "Wed, 05 Jun 2019 06:54:03 GMT",
-    "receive_end_time": "Wed, 05 Jun 2019 07:54:03 GMT",
-    "finish_deadline_time": "Thu, 06 Jun 2019 06:54:03 GMT",
+    "post_time": "Wed, 12 Jun 2019 11:08:11 GMT",
+    "receive_end_time": "Thu, 13 Jun 2019 11:08:11 GMT",
+    "finish_deadline_time": "Fri, 14 Jun 2019 11:08:11 GMT",
     "user_limit": {
         "age_upper": 0,
         "age_lower": 1,
@@ -1252,7 +1347,7 @@ GET http://localhost:5000/users/8/received_tasks
 ]
 ```
 
-##### *任务查询
+##### *任务查询（时间筛选部分还需要考虑）
 
 @app.route('/users/<user_id>/tasks', methods=['GET'])
 
