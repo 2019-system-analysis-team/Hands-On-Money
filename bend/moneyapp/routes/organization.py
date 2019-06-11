@@ -136,7 +136,8 @@ def modify_organization(current_user, user_id, organization_id):
     info = request.get_json()
     
     # 组织名重复
-    if 'name' in info and queryOrganizationByName(info['name']).id != organization.id:
+    if 'name' in info and queryOrganizationByName(info['name']) and \
+                    queryOrganizationByName(info['name']).id != organization.id:
         return jsonify({"error_code": 500,
                         "error_msg": "duplicate organization name"}), 500
 
