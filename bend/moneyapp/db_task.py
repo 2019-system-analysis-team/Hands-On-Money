@@ -32,6 +32,9 @@ def createTask(d):
     for arg in items:
         if arg not in d and arg not in {'post_time', 'receive_end_time', 'finish_deadline_time'}:
             d[arg] = None
+        #elif arg in {'post_time', 'receive_end_time', 'finish_deadline_time'}:
+        #    datetime_str = d[arg]
+        #    d[arg] = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
         elif arg == 'tags' or arg == 'steps' or arg == 'user_limit':
             d[arg] = json.dumps(d[arg])
 
@@ -149,7 +152,7 @@ def searchTask(d):
     if 'title' in d:
         task_temp = task_temp.filter(Task.title.like('%' + d['title'] + '%'))
 
-    # 时间筛选还要再思考一下
+    # 时间筛选还要再思考一下!!!!
     if 'receive_end_time' in d:
         task_temp = task_temp.filter(Task.receive_end_time == d['receive_end_time'])
 

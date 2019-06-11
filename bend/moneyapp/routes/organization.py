@@ -136,7 +136,7 @@ def modify_organization(current_user, user_id, organization_id):
     info = request.get_json()
     
     # 组织名重复
-    if 'name' in info and queryOrganizationByName(info['name']):
+    if 'name' in info and queryOrganizationByName(info['name']).id != organization.id:
         return jsonify({"error_code": 500,
                         "error_msg": "duplicate organization name"}), 500
 
@@ -330,6 +330,7 @@ def member_delete(current_user, user_id, organization_id, member_id):
         return jsonify({"error_code": "404", "error_msg": "Member Not Found"}), 404
     
     # 删owner
+    record = queryRecord(int(member_id), int(organization_id))
     if record.status == 'owner':
         return jsonify({"error_code": "500", "error_msg": "cannot delete owner"}), 500
     

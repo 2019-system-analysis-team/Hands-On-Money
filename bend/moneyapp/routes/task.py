@@ -25,7 +25,13 @@ def user_create_task(current_user, user_id):
 
     d['user_id'] = int(user_id)
 
-
+    # string -> datetime
+    time_item = {'post_time', 'receive_end_time', 'finish_deadline_time'};
+    for item in time_item:
+        if item in d:
+            datetime_str = d[item]
+            d[item] = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+        
     task = createTask(request.get_json())
 
    
@@ -59,6 +65,13 @@ def organization_create_task(current_user, user_id, organization_id):
     d['user_id'] = int(user_id)
     d['organization_id'] = int(organization_id)
     
+    # string -> datetime
+    time_item = {'post_time', 'receive_end_time', 'finish_deadline_time'};
+    for item in time_item:
+        if item in d:
+            datetime_str = d[item]
+            d[item] = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+     
     # !!! balance判断
     #if checkBalance(user_id, None, float(reward_for_one_participant) * float(participant_number_limit)):
     task = createTask(d)
@@ -325,6 +338,13 @@ def set_user_task_pending(current_user, user_id, task_id):
 
     
         try:
+            # string -> datetime
+            time_item = {'post_time', 'receive_end_time', 'finish_deadline_time'};
+            for item in time_item:
+                if item in d:
+                    datetime_str = d[item]
+                    d[item] = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+             
             # !!! 到后面要把这个注释去掉 为了方便测试先注释掉
             #if checkBalance(user_id, None, float(money) * float(number)):
             modifyTask(int(task_id), int(user_id), None, d)
@@ -364,6 +384,13 @@ def set_org_task_pending(current_user, user_id, organization_id, task_id):
     # 修改
     else:
         try:
+            # string -> datetime
+            time_item = {'post_time', 'receive_end_time', 'finish_deadline_time'};
+            for item in time_item:
+                if item in d:
+                    datetime_str = d[item]
+                    d[item] = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+             
             # !!! 到后面要把这个注释去掉 为了方便测试先注释掉
             #if checkBalance(user_id, None, float(money) * float(number)):
             modifyTask(int(task_id), int(user_id), int(organization_id), d)
@@ -470,6 +497,7 @@ def owner_set_status():
         result = {'status':'fail'}     
     return jsonify(result)
 
+
 # RESTful 任务详情 （可以查询任意任务）
 @routes.route('/users/<user_id>/tasks/<task_id>', methods=['GET'])
 @token_required
@@ -482,6 +510,7 @@ def search_public_tasks(current_user, user_id, task_id):
     else:
         result = printPublicSingleTask(task)
         return jsonify(result), 200
+
 # RESTful 任务查询
 @routes.route('/users/<user_id>/tasks', methods=['GET'])
 @token_required
@@ -490,6 +519,13 @@ def search_all_tasks(current_user, user_id):
         return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
     try:
         d = request.get_json()
+        # string -> datetime
+        time_item = {'post_time', 'receive_end_time', 'finish_deadline_time'};
+        for item in time_item:
+            if item in d:
+                datetime_str = d[item]
+                d[item] = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+         
     except Exception as e:
         return jsonify({"error_code": "400", "error_msg": "Please specify some limitations"}), 400
 
