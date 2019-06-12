@@ -55,6 +55,9 @@
     - [评论系统](#%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F)
       - [用户新增评论](#%E7%94%A8%E6%88%B7%E6%96%B0%E5%A2%9E%E8%AF%84%E8%AE%BA)
       - [组织/用户回评](#%E7%BB%84%E7%BB%87%E7%94%A8%E6%88%B7%E5%9B%9E%E8%AF%84)
+    - [支付系统](#%E6%94%AF%E4%BB%98%E7%B3%BB%E7%BB%9F)
+      - [用户充值/用户给组织充值](#%E7%94%A8%E6%88%B7%E5%85%85%E5%80%BC%E7%94%A8%E6%88%B7%E7%BB%99%E7%BB%84%E7%BB%87%E5%85%85%E5%80%BC)
+      - [提现(仅用户可)](#%E6%8F%90%E7%8E%B0%E4%BB%85%E7%94%A8%E6%88%B7%E5%8F%AF)
 
 ## API
 
@@ -452,6 +455,13 @@ Content-Type: application/json
     "error_code": 404,
     "error_msg": "organization Not Found"
 }
+//response: create conflicted, duplicate name
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+{
+    "error_code": 409,
+    "error_msg": "create conflicted, duplicate organization name"
+}
 //response: not support img format
 HTTP/1.1 415 Unsupported Media Type
 Content-Type: application/json
@@ -482,14 +492,13 @@ or
 HTTP/1.1 201 Created
 
 //response: JWT missing/incorrect/timeout, redirect to login;
-//or you dont have permission to add member to such "status"
 HTTP/1.1 401 Unauthorized
 Content-Type: application/json
 {
     "error_code": 401,
     "error_msg": "Unauthorized"
 }
-or
+or //when you are not owner, add member to admin
 {
     "error_code": 401,
     "error_msg": "insufficient permission"
@@ -500,6 +509,13 @@ Content-Type: application/json
 {
     "error_code": 404,
     "error_msg": "user/organizations Not Found"
+}
+//response: member already in org, add member as a owner
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+{
+    "error_code": 409,
+    "error_msg": "Conflict"
 }
 ```
 
@@ -519,6 +535,7 @@ HTTP/1.1 200 OK
 
 //response: JWT missing/incorrect/timeout, redirect to login;
 //or you dont have permission to modify member to such "status"
+//or edit self permission
 HTTP/1.1 401 Unauthorized
 Content-Type: application/json
 {
@@ -536,6 +553,13 @@ Content-Type: application/json
 {
     "error_code": 404,
     "error_msg": "user/organizations Not Found"
+}
+//response: edit someone to owner
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+{
+    "error_code": 409,
+    "error_msg": "Conflict"
 }
 ```
 
@@ -568,6 +592,13 @@ Content-Type: application/json
 {
     "error_code": 404,
     "error_msg": "user/organizations Not Found"
+}
+//response: delete self or owner
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+{
+    "error_code": 409,
+    "error_msg": "Conflict"
 }
 ```
 
@@ -710,6 +741,13 @@ Content-Type: application/json
 {
     "error_code": 404,
     "error_msg": "user/organization Not Found"
+}
+//response: insufficient fund
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+{
+    "error_code": 409,
+    "error_msg": "Conflict"
 }
 ```
 
@@ -1099,4 +1137,40 @@ Content-Type: application/json
 ```
 ```json
 HTTP/1.1 201 CREATED
+```
+
+### 支付系统
+#### 用户充值/用户给组织充值
+```
+PUT /users/:user_id/balance HTTP/1.1
+PUT /users/:user_id/organizations/:organization_id/balance HTTP/1.1
+Content-Type: application/json
+{
+    "amount": 1
+}
+```
+```
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "amount": 11
+}
+```
+#### 提现(仅用户可)
+```
+PUT /users/:user_id/balance HTTP/1.1
+Content-Type: application/json
+{
+    "amount": -1
+}
+```
+```
+HTTP/1.1 200 OK
+Content-Type: application/json
+{
+    "amount": 9
+}
+// insufficient foud
+HTTP/1.1 409 conflict
+Content-Type: application/json
 ```
