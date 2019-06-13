@@ -28,7 +28,7 @@
 								钱包
 							</template>
 							<MenuItem name="3-1" @click.native="GotoTopup()">充值</MenuItem>
-							<MenuItem name="3-2">提现</MenuItem>
+							<MenuItem name="3-2" @click.native="WithdrawDeposit()">提现</MenuItem>
 							<MenuItem name="3-3">账户余额 : {{money}}</MenuItem>
 						</Submenu>
                     </div>
@@ -60,21 +60,28 @@
             <Footer class="layout-footer-center">2019-2019 &copy; SYSU</Footer>
         </Layout>
 		<Drawer
-			title="充值"
+			title="钱包操作"
 			v-model="topup"
 			width="400"
 			:mask-closable="true"
 			:styles="styles"
 		>
 			<Form :model="topupData">
-					<FormItem label="充值金额 : " label-position="top">
+					<FormItem label="充值金额 : " label-position="top" v-show="!isWithdraw">
 					<InputNumber
 								:max="10000"
 								:min="1"
 								 v-model="topupData.value"
 								></InputNumber>
 					</FormItem>
-					<FormItem label="支付方式" label-position="top">
+					<FormItem label="提现金额 : " label-position="top" v-show="isWithdraw">
+					<InputNumber
+								:max="10000"
+								:min="1"
+								 v-model="topupData.value"
+								></InputNumber>
+					</FormItem>
+					<FormItem label="支付方式" label-position="top" v-show="!isWithdraw">
 						<Select v-model="topupData.mode">
 							<Option value="支付宝">支付宝</Option>
 							<Option value="微信支付">微信支付</Option>
@@ -84,16 +91,18 @@
 				</Row>
 			</Form>
 			<div class="demo-drawer-footer">
-				<Button style="margin-right: 8px" @click="topup = false">取消</Button>
-				<Button type="primary" v-on:click="recharge">充值</Button>
+				<Button style="margin-right: 8px" @click="topup = false;isWithdraw = false;">取消</Button>
+				<Button type="primary" v-on:click="recharge" v-show="!isWithdraw">充值</Button>
+				<Button type="primary" v-on:click="withdraw" v-show="isWithdraw">提现</Button>
 			</div>
-		</Drawer>    
+		</Drawer> 
     </div>
 </template>
 <script>
   export default {
         data () {
             return {
+				isWithdraw:false,
 				userID: '',
                 tableOrganization: [
                     {
@@ -228,7 +237,7 @@
 						name: 'mainpage'
 					});
 				});
-
+			    this.money = window.localStorage.getItem('money');
 			   this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 			},
             handleReturnHomepage () {
@@ -281,11 +290,64 @@
 			},
 			GotoTopup (){
 				this.topup = true;
+				this.isWithdraw = false;
+			},
+			WithdrawDeposit(){
+				this.topup = true;
+				this.isWithdraw = true;
+			},
+			withdraw(){
+				//PUT /users/:user_id/balance HTTP/1.1
+				var _this = this;
+				var url_all = "/users/" + this.$data.userID + "/balance";
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+					 method:"put",
+					 url: url_all,
+					 data:{
+						 amount: -this.topupData.value,
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.$Message.success('提现成功');
+					_this.money = -_this.topupData.value + _this.money;
+					_this.topup = false;
+					_this.isWithdraw = false;
+					window.localStorage.setItem('money', _this.money);
+				}).catch(function (error) {
+					console.log(error);
+					_this.$Message.error('提现失败');
+					_this.topup = false;
+					_this.isWithdraw = false;
+				});				
 			},
 			recharge(){
-				this.$Message.success('充值成功!');
-				this.money = this.topupData.value + this.money;
-				this.topup = false;
+				//PUT /users/:user_id/balance HTTP/1.1
+				var _this = this;
+				var url_all = "/users/" + this.$data.userID + "/balance";
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+					 method:"put",
+					 url: url_all,
+					 data:{
+						 amount: this.topupData.value,
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.$Message.success('充值成功');
+					_this.money = _this.topupData.value + _this.money;
+					_this.topup = false;
+					window.localStorage.setItem('money', _this.money);
+				}).catch(function (error) {
+					console.log(error);
+					_this.$Message.error('充值失败');
+					_this.topup = false;
+				});
+
 			},
 			logout (){
 				var _this = this;
@@ -300,6 +362,8 @@
 				}).then(function (response){
 					window.localStorage.removeItem('token');
 					window.localStorage.removeItem('userID');
+					window.localStorage.removeItem('organID');
+					window.localStorage.removeItem('taskID');
 					_this.$router.push({
 						path: '/', 
 						name: 'mainpage'

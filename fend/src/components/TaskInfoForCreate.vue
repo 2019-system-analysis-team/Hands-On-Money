@@ -28,7 +28,7 @@
 								钱包
 							</template>
 							<MenuItem name="3-1" @click.native="GotoTopup()">充值</MenuItem>
-							<MenuItem name="3-2">提现</MenuItem>
+							<MenuItem name="3-2"  @click.native="WithdrawDeposit()">提现</MenuItem>
 							<MenuItem name="3-3">账户余额 : {{money}}</MenuItem>
 						</Submenu>
                     </div>
@@ -49,8 +49,8 @@
 					<TabPane label="基本信息" name="基本信息">
 						<Card dis-hover>
 							<div slot="extra">
-								<Button type="warning" shape="circle"  @click="toshowWithdrawInfo()">撤回任务</Button>
-								<Button type="primary" icon="ios-hammer-outline" shape="circle">修改任务</Button>
+								<Button type="warning" shape="circle"  @click="toshowWithdrawInfo()" v-show="isOngoing">撤回任务</Button>
+								<Button type="primary" icon="ios-hammer-outline" shape="circle" v-show="!isOngoing" @click="modifyTask()">修改任务</Button>
 							</div>	
 							<Modal v-model="showWithdrawInfo">
 								<div>
@@ -118,21 +118,28 @@
             <Footer class="layout-footer-center">2019-2019 &copy; SYSU</Footer>
         </Layout>
 		<Drawer
-			title="充值"
+			title="钱包操作"
 			v-model="topup"
 			width="400"
 			:mask-closable="true"
 			:styles="styles"
 		>
 			<Form :model="topupData">
-					<FormItem label="充值金额 : " label-position="top">
+					<FormItem label="充值金额 : " label-position="top" v-show="!isWithdraw">
 					<InputNumber
 								:max="10000"
 								:min="1"
 								 v-model="topupData.value"
 								></InputNumber>
 					</FormItem>
-					<FormItem label="支付方式" label-position="top">
+					<FormItem label="提现金额 : " label-position="top" v-show="isWithdraw">
+					<InputNumber
+								:max="10000"
+								:min="1"
+								 v-model="topupData.value"
+								></InputNumber>
+					</FormItem>
+					<FormItem label="支付方式" label-position="top" v-show="!isWithdraw">
 						<Select v-model="topupData.mode">
 							<Option value="支付宝">支付宝</Option>
 							<Option value="微信支付">微信支付</Option>
@@ -142,16 +149,18 @@
 				</Row>
 			</Form>
 			<div class="demo-drawer-footer">
-				<Button style="margin-right: 8px" @click="topup = false">取消</Button>
-				<Button type="primary" v-on:click="recharge">充值</Button>
+				<Button style="margin-right: 8px" @click="topup = false;isWithdraw = false;">取消</Button>
+				<Button type="primary" v-on:click="recharge" v-show="!isWithdraw">充值</Button>
+				<Button type="primary" v-on:click="withdraw" v-show="isWithdraw">提现</Button>
 			</div>
-		</Drawer>    
+		</Drawer>  
     </div>
 </template>
 <script>
   export default {
         data () {
             return {
+				isWithdraw:false,
 				showWithdrawInfo: false,
                 allParticipant: [
                     {
@@ -314,41 +323,7 @@
 					mode: '支付宝',
                 },
 				showTaskInfomation:{
-					"task_id": 123456,
-					"creator_user_email": "i@sirius.com",
-					"creator_user_phone_number": "13123456789",
-					"creator_organization_name": "name",
-					"status": "ongoing",
-					"title": "string",
-					"description": "string",
-					"tags": ["tag1", "tag2", "tag3"],
-					"current_participant_number": 3,
-					"participant_number_limit": 10,
-					"reward_for_one_participant": 2,
-					"post_time": "date_obj",
-					"receive_end_time": "date_obj",
-					"finish_deadline_time": "date_obj",
-					"user_limit": {
-						"age_upper": 8,
-						"age_lower": 18,
-						"grades": ["grade1", "grade1"],
-						"sexes": ["sex_type1", "sex_type2", "sex_type3"],
-						"schools": ["school_name1", "school_name2"]
-					},
-					"steps": [
-						{
-							"title": "string1",
-							"description": "string1"
-						},
-						{
-							"title": "string2",
-							"description": "string2"
-						}
-					],
-					"participant_ids": [123, 124, 125, 126],
-					"ongoing_participant_ids": [121, 128],
-					"waiting_examine_participant_ids": [125],
-					"finished_participant_ids": [126]
+
 				},
 				waiting_examine_participant_info:[],
 				ongoing_participant_info:[],
@@ -376,6 +351,7 @@
 				participantSelectType: 0,
 				isCreateByOrgan:false,
 				organID:null,
+				isOngoing:false,
             }
         },
 		created: function () { 
@@ -390,15 +366,16 @@
 				});		
             },
 			getEventData:function() {
-				/*
-				let routerParams = this.$route.params.taskID;
-				let organID = this.$route.params.organID;
+				
+				let organID = window.localStorage.getItem('organID');
 				if(organID != null){
 					this.isCreateByOrgan = true;
 					this.organID = organID;
 				}
 				
-				if(routerParams == null)
+
+				this.taskID = window.localStorage.getItem('taskID');
+				if(this.taskID == null)
 				{
 					// 返回主页
 					this.$router.push({
@@ -406,8 +383,7 @@
 						name: 'mainpage',
 					});	
 				}
-				this.taskID = routerParams;
-				let uID = window.localStorage.getItem('userID')
+				let uID = window.localStorage.getItem('userID');
 				if(uID == null || uID == ""){
 					//跳转到主页
 					this.$router.push({
@@ -416,7 +392,7 @@
 					});
 				}
 				
-				//this.$data.userID = uID;
+				this.$data.userID = uID;
 				
 				var _this = this;
 				var url = "/users/" + this.$data.userID;
@@ -435,101 +411,171 @@
 						'Authorization': jwt,
 					 }
 				}).then(function (response){
+					console.log("任务信息");
+					console.log(response);
 					_this.showTaskInfomation = response.data;
+					if(_this.showTaskInfomation.status == "not ongoing"){
+						_this.isOngoing = false;
+					}else{
+						_this.isOngoing = true;
+					}
 				}).catch(function (error) {
+					_this.$Message.error('获取任务信息失败!');
+						//跳转到主页
+						_this.$router.push({
+							path: '/', 
+							name: 'mainpage'
+						});
 					console.log(error);
 				});	
-				*/
-			   var _this = this;
-			   for(var i = 0 ;i < this.showTaskInfomation.participant_ids.length;i++){					
-					var url = "/users/" + this.showTaskInfomation.participant_ids[i];
-					var jwt = "JWT " + window.localStorage.getItem('token');
-					this.$axios({
-						 method:"get",
-						 url:url,
-						 headers:{
-							'Authorization': jwt,
-						 }
-					}).then(function (response){
-						var test = {};
-						_this.$set(test,'id',response.data.id);
-						_this.$set(test,'school',response.data.school);
-						_this.$set(test,'grade',response.data.grade);
-						_this.$set(test,'name',response.data.name);
-						_this.participant_info.push(test);
-					}).catch(function (error) {
 
-					});
+			   var _this = this;
+			   if(this.showTaskInfomation.participant_ids != null)
+			   {
+				   for(var i = 0 ;i < this.showTaskInfomation.participant_ids.length;i++){					
+						var url = "/users/" + this.showTaskInfomation.participant_ids[i];
+						var jwt = "JWT " + window.localStorage.getItem('token');
+						this.$axios({
+							 method:"get",
+							 url:url,
+							 headers:{
+								'Authorization': jwt,
+							 }
+						}).then(function (response){
+							var test = {};
+							_this.$set(test,'id',response.data.id);
+							_this.$set(test,'school',response.data.school);
+							_this.$set(test,'grade',response.data.grade);
+							_this.$set(test,'name',response.data.name);
+							_this.participant_info.push(test);
+						}).catch(function (error) {
+							_this.$Message.error('获取任务参与者的信息失败!');
+						});
+				   }
+				   for(var i = 0 ;i < this.showTaskInfomation.ongoing_participant_ids.length;i++){
+						var url = "/users/" + this.showTaskInfomation.ongoing_participant_ids[i];
+						var jwt = "JWT " + window.localStorage.getItem('token');
+						this.$axios({
+							 method:"get",
+							 url:url,
+							 headers:{
+								'Authorization': jwt,
+							 }
+						}).then(function (response){
+							var test = {};
+							_this.$set(test,'id',response.data.id);
+							_this.$set(test,'school',response.data.school);
+							_this.$set(test,'grade',response.data.grade);
+							_this.$set(test,'name',response.data.name);
+							_this.ongoing_participant_info.push(test);
+						}).catch(function (error) {
+							_this.$Message.error('获取任务参与者的信息失败!');
+						});
+				   }
+				   for(var i = 0 ;i < this.showTaskInfomation.waiting_examine_participant_ids.length;i++){
+						var url = "/users/" + this.showTaskInfomation.waiting_examine_participant_ids[i];
+						var jwt = "JWT " + window.localStorage.getItem('token');
+						this.$axios({
+							 method:"get",
+							 url:url,
+							 headers:{
+								'Authorization': jwt,
+							 }
+						}).then(function (response){
+							var test = {};
+							_this.$set(test,'id',response.data.id);
+							_this.$set(test,'school',response.data.school);
+							_this.$set(test,'grade',response.data.grade);
+							_this.$set(test,'name',response.data.name);
+							_this.waiting_examine_participant_info.push(test);
+						}).catch(function (error) {
+							_this.$Message.error('获取任务参与者的信息失败!');
+						});
+				   }
+				   for(var i = 0 ;i < this.showTaskInfomation.finished_participant_ids.length;i++){
+						var url = "/users/" + this.showTaskInfomation.finished_participant_ids[i];
+						var jwt = "JWT " + window.localStorage.getItem('token');
+						this.$axios({
+							 method:"get",
+							 url:url,
+							 headers:{
+								'Authorization': jwt,
+							 }
+						}).then(function (response){
+							var test = {};
+							_this.$set(test,'id',response.data.id);
+							_this.$set(test,'school',response.data.school);
+							_this.$set(test,'grade',response.data.grade);
+							_this.$set(test,'name',response.data.name);
+							_this.finished_participant_info.push(test);
+						}).catch(function (error) {
+							_this.$Message.error('获取任务参与者的信息失败!');
+						});
+				   }				   
 			   }
-			   for(var i = 0 ;i < this.showTaskInfomation.ongoing_participant_ids.length;i++){
-					var url = "/users/" + this.showTaskInfomation.ongoing_participant_ids[i];
-					var jwt = "JWT " + window.localStorage.getItem('token');
-					this.$axios({
-						 method:"get",
-						 url:url,
-						 headers:{
-							'Authorization': jwt,
-						 }
-					}).then(function (response){
-						var test = {};
-						_this.$set(test,'id',response.data.id);
-						_this.$set(test,'school',response.data.school);
-						_this.$set(test,'grade',response.data.grade);
-						_this.$set(test,'name',response.data.name);
-						_this.ongoing_participant_info.push(test);
-					}).catch(function (error) {
-					
-					});
-			   }
-			   for(var i = 0 ;i < this.showTaskInfomation.waiting_examine_participant_ids.length;i++){
-					var url = "/users/" + this.showTaskInfomation.waiting_examine_participant_ids[i];
-					var jwt = "JWT " + window.localStorage.getItem('token');
-					this.$axios({
-						 method:"get",
-						 url:url,
-						 headers:{
-							'Authorization': jwt,
-						 }
-					}).then(function (response){
-						var test = {};
-						_this.$set(test,'id',response.data.id);
-						_this.$set(test,'school',response.data.school);
-						_this.$set(test,'grade',response.data.grade);
-						_this.$set(test,'name',response.data.name);
-						_this.waiting_examine_participant_info.push(test);
-					}).catch(function (error) {
-					
-					});
-			   }
-			   for(var i = 0 ;i < this.showTaskInfomation.finished_participant_ids.length;i++){
-					var url = "/users/" + this.showTaskInfomation.finished_participant_ids[i];
-					var jwt = "JWT " + window.localStorage.getItem('token');
-					this.$axios({
-						 method:"get",
-						 url:url,
-						 headers:{
-							'Authorization': jwt,
-						 }
-					}).then(function (response){
-						var test = {};
-						_this.$set(test,'id',response.data.id);
-						_this.$set(test,'school',response.data.school);
-						_this.$set(test,'grade',response.data.grade);
-						_this.$set(test,'name',response.data.name);
-						_this.finished_participant_info.push(test);
-					}).catch(function (error) {
-					
-					});
-			   }
+				this.money = window.localStorage.getItem('money');
 			    this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 			},
 			GotoTopup (){
 				this.topup = true;
+				this.isWithdraw = false;
+			},
+			WithdrawDeposit(){
+				this.topup = true;
+				this.isWithdraw = true;
+			},
+			withdraw(){
+				//PUT /users/:user_id/balance HTTP/1.1
+				var _this = this;
+				var url_all = "/users/" + this.$data.userID + "/balance";
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+					 method:"put",
+					 url: url_all,
+					 data:{
+						 amount: -this.topupData.value,
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.$Message.success('提现成功');
+					_this.money = -_this.topupData.value + _this.money;
+					_this.topup = false;
+					_this.isWithdraw = false;
+					window.localStorage.setItem('money', _this.money);
+				}).catch(function (error) {
+					console.log(error);
+					_this.$Message.error('提现失败');
+					_this.topup = false;
+					_this.isWithdraw = false;
+				});				
 			},
 			recharge(){
-				this.$Message.success('充值成功!');
-				this.money = this.topupData.value + this.money;
-				this.topup = false;
+				//PUT /users/:user_id/balance HTTP/1.1
+				var _this = this;
+				var url_all = "/users/" + this.$data.userID + "/balance";
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+					 method:"put",
+					 url: url_all,
+					 data:{
+						 amount: this.topupData.value,
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.$Message.success('充值成功');
+					_this.money = _this.topupData.value + _this.money;
+					_this.topup = false;
+					window.localStorage.setItem('money', _this.money);
+				}).catch(function (error) {
+					console.log(error);
+					_this.$Message.error('充值失败');
+					_this.topup = false;
+				});
+
 			},
 			logout (){
 				var url_all = "/users/" + this.$data.userID.toString() + "/session";
@@ -541,8 +587,10 @@
 						'Authorization': jwt,
 					 }
 				}).then(function (response){
-					window.localStorage.setItem('token', "");
-					window.localStorage.setItem('userID', "");
+					window.localStorage.removeItem('token');
+					window.localStorage.removeItem('userID');
+					window.localStorage.removeItem('organID');
+					window.localStorage.removeItem('taskID');
 					this.$router.push({
 						path: '/', 
 						name: 'mainpage'
@@ -622,15 +670,24 @@
 				}).then(function (response){
 					_this.$Message.info('撤回任务成功');
 					_this.showWithdrawInfo = false;
+					_this.isOngoing = false;
 				}).catch(function (error) {
 					console.log(error);
 				});	
 			},
 			createNewTask() {
+				window.localStorage.removeItem('taskID');
+				window.localStorage.removeItem('organID');
 				this.$router.push({
 					path: '/', 
 					name: 'missioncreate'
 				});		
+			},
+			modifyTask(){
+				this.$router.push({
+					path: '/', 
+					name: 'missioncreate'
+				});	
 			}
         }
     }

@@ -28,7 +28,7 @@
 								钱包
 							</template>
 							<MenuItem name="3-1" @click.native="GotoTopup()">充值</MenuItem>
-							<MenuItem name="3-2">提现</MenuItem>
+							<MenuItem name="3-2" @click.native="WithdrawDeposit()">提现</MenuItem>
 							<MenuItem name="3-3">账户余额 : {{money}}</MenuItem>
 						</Submenu>
                     </div>
@@ -60,13 +60,13 @@
 							<div slot="extra" v-show="isManager || isCreater">
 								<Button type="primary" icon="ios-add" shape="circle" @click="createOrganTask">新建组织任务</Button>
 							</div>	
-							<Col span="8" v-for="item in selectTasks" :key="item.task_id" style="padding-left: 30px; padding-top: 50px;">
+							<Col  v-show="!TasksIsEmpty" span="8" v-for="item in selectTasks" :key="item.task_id" style="padding-left: 30px; padding-top: 50px;">
 								<Card>
 									<p slot="title">{{item.task_name}}</p>
 									<div slot="extra">
 										<Button type="primary" ghost @click="LookTaskInfo(item.task_id)">详情</Button>
 									</div>	
-									<p>{{item.status}}</p>
+									<p>{{item.task_status}}</p>
 									 
 								</Card>
 							</Col>
@@ -145,7 +145,7 @@
 									</FormItem>
 									<FormItem label="身份" >
 										<Select v-model="addMemberValidate.addMemberStatus" style="width:100px">
-											<Option value="manager">manager</Option>
+											<Option value="admin">admin</Option>
 											<Option value="member">member</Option>
 										</Select>	
 									</FormItem>
@@ -154,7 +154,7 @@
 							<Col span="5" v-for="item in allMembers" :key="item.id" style="padding-left: 30px; padding-top: 30px;">
 								<Card>
 									<p slot="title">成员信息</p>
-									<div slot="extra" v-show="isManager || isCreater">
+									<div slot="extra" v-show="(isManager || isCreater) && (item.status != 'owner')">
 										<Button type="error" ghost @click="deleteMember(item.userID)">删除</Button>
 									</div>	
 									<div style="width: 70%;float: left;">
@@ -164,7 +164,7 @@
 										<div v-show="isManager || isCreater">
 											身份 : 
 											<Select v-model="item.status" style="width:100px" v-if="(item.status != 'owner')" @on-change="changeStatus(item)">
-												<Option value="manager">manager</Option>
+												<Option value="admin">admin</Option>
 												<Option value="member">member</Option>
 											</Select>
 											<Select v-model="item.status" style="width:100px" disabled v-if="(item.status == 'owner')">
@@ -227,33 +227,42 @@
             <Footer class="layout-footer-center">2019-2019 &copy; SYSU</Footer>
         </Layout>
 		<Drawer
-			title="充值"
+			title="钱包操作"
 			v-model="topup"
 			width="400"
 			:mask-closable="true"
 			:styles="styles"
 		>
 			<Form :model="topupData">
-					<FormItem label="充值金额 : " label-position="top">
+					<FormItem label="充值金额 : " label-position="top" v-show="!isWithdraw">
 					<InputNumber
 								:max="10000"
 								:min="1"
 								 v-model="topupData.value"
 								></InputNumber>
 					</FormItem>
-					<FormItem label="支付方式" label-position="top">
+					<FormItem label="提现金额 : " label-position="top" v-show="isWithdraw">
+					<InputNumber
+								:max="10000"
+								:min="1"
+								 v-model="topupData.value"
+								></InputNumber>
+					</FormItem>
+					<FormItem label="支付方式" label-position="top" v-show="!isWithdraw">
 						<Select v-model="topupData.mode">
 							<Option value="支付宝">支付宝</Option>
 							<Option value="微信支付">微信支付</Option>
 							<Option value="信用卡">信用卡</Option>
 						</Select>
 					</FormItem>
+				</Row>
 			</Form>
 			<div class="demo-drawer-footer">
-				<Button style="margin-right: 8px" @click="topup = false">取消</Button>
-				<Button type="primary" v-on:click="recharge">充值</Button>
+				<Button style="margin-right: 8px" @click="topup = false;isWithdraw = false;">取消</Button>
+				<Button type="primary" v-on:click="recharge" v-show="!isWithdraw">充值</Button>
+				<Button type="primary" v-on:click="withdraw" v-show="isWithdraw">提现</Button>
 			</div>
-		</Drawer>    
+		</Drawer>        
     </div>
 </template>
 <script>
@@ -285,6 +294,7 @@
                 }
             };
             return {
+				isWithdraw:false,
 				profilePhotoPath: '',		
 				organProfilePhotoUrl:'',
 				organProfilePhotoPath: '',
@@ -322,6 +332,10 @@
 				        label: '进行中'
 				    },
 				    {
+				        value: '未进行',
+				        label: '未进行'
+				    },
+				    {
 				        value: '已结束',
 				        label: '已结束'
 				    },
@@ -343,7 +357,9 @@
 				finishedTasks:[
 
 				],
+				notgoingTasks:[],
 				selectTasks:[],
+				TasksIsEmpty:true,
 				deleteValidate: {
 					name: ''
 				},
@@ -445,10 +461,11 @@
 					_this.formValidate.name = response.data.name;
 					_this.formValidate.desc = response.data.bio;
 					 _this.allMembersShortInfo = response.data.members;
+					 _this.organMoney = response.data.balance;
 					for(var i=0; i < _this.allMembersShortInfo.length;i++){
 						var url = "/users/" + _this.allMembersShortInfo[i].user_id;
 						if(_this.allMembersShortInfo[i].user_id == _this.userID){
-							if(_this.allMembersShortInfo[i].status == 'manager'){
+							if(_this.allMembersShortInfo[i].status == 'admin'){
 								_this.isManager = true;
 							}else if(_this.allMembersShortInfo[i].status == 'owner'){
 								_this.isCreater = true;
@@ -490,12 +507,7 @@
 					}
 				}).catch(function (error) {
 					console.log(error);
-					_this.$Message.error('请先登录!');
-					//跳转到主页
-					_this.$router.push({
-						path: '/', 
-						name: 'mainpage'
-					});
+					_this.$Message.error('获取组织信息失败!');
 				});
 			
 			    var url = "/users/" + uID + "/organizations/" + this.organID + "/my_tasks";
@@ -511,39 +523,116 @@
 					console.log(response);	
 					_this.allTasks = response.data.task;
 					for(var i=0; i < _this.allTasks.length;i++){
-						if(_this.allTasks[i].status == "inprogress"){
+						if(_this.allTasks[i].task_status == "ongoing"){
 							_this.inprogressTasks.push(_this.allTasks[i]);
-						}else if(_this.allTasks[i].status == "finished"){
+						}else if(_this.allTasks[i].task_status == "finished"){
 							_this.finishedTasks.push(_this.allTasks[i]);
+						}else if(_this.allTasks[i].task_status == "not ongoing"){
+							_this.notgoingTasks.push(_this.allTasks[i]);
 						}
 					}
-					_this.selectTasks = _this.allTasks;
+					if(_this.allTasks.length != 0)
+					{
+						_this.selectTasks = _this.allTasks;
+						_this.TasksIsEmpty = false;
+					}
+					else
+					{
+						_this.TasksIsEmpty = true;
+					}
 				}).catch(function (error) {
 					
-					_this.$Message.error('请先登录!');
+					_this.$Message.error('获取组织任务失败!');
 					//跳转到主页
 					
-					_this.$router.push({
-						path: '/', 
-						name: 'mainpage'
-					});
 					
 				});
-				
+				  this.money = window.localStorage.getItem('money');
 			    this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 				
 			},
 			GotoTopup (){
 				this.topup = true;
+				this.isWithdraw = false;
+			},
+			WithdrawDeposit(){
+				this.topup = true;
+				this.isWithdraw = true;
+			},
+			withdraw(){
+				//PUT /users/:user_id/balance HTTP/1.1
+				var _this = this;
+				var url_all = "/users/" + this.$data.userID + "/balance";
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+					 method:"put",
+					 url: url_all,
+					 data:{
+						 amount: -this.topupData.value,
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.$Message.success('提现成功');
+					_this.money = -_this.topupData.value + _this.money;
+					_this.topup = false;
+					_this.isWithdraw = false;
+					window.localStorage.setItem('money', _this.money);
+				}).catch(function (error) {
+					console.log(error);
+					_this.$Message.error('提现失败');
+					_this.topup = false;
+					_this.isWithdraw = false;
+				});				
 			},
 			recharge(){
-				this.$Message.success('充值成功!');
-				this.money = this.topupData.value + this.money;
-				this.topup = false;
+				//PUT /users/:user_id/balance HTTP/1.1
+				var _this = this;
+				var url_all = "/users/" + this.$data.userID + "/balance";
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+					 method:"put",
+					 url: url_all,
+					 data:{
+						 amount: this.topupData.value,
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.$Message.success('充值成功');
+					_this.money = _this.topupData.value + _this.money;
+					_this.topup = false;
+					window.localStorage.setItem('money', _this.money);
+				}).catch(function (error) {
+					console.log(error);
+					_this.$Message.error('充值失败');
+					_this.topup = false;
+				});
+
 			},
 			chargeForOrgan(){
-				this.$Message.success('为组织充值成功!');
-				this.organMoney = this.organtopupData.value + this.organMoney;
+				//PUT /users/:user_id/organizations/:organization_id/balance
+				var _this = this;
+				var url_all = "/users/" + this.$data.userID + "/organizations/" + this.organID + "/balance";
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+					 method:"put",
+					 url: url_all,
+					 data:{
+						 amount: this.organtopupData.value,
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+				_this.$Message.success('为组织充值成功!');
+				_this.organMoney = _this.organtopupData.value + _this.organMoney;
+				}).catch(function (error) {
+					console.log(error);
+					_this.$Message.error('为组织充值失败');
+				});
 			},
 			logout (){
 				var _this = this;
@@ -556,8 +645,10 @@
 						'Authorization': jwt,
 					 }
 				}).then(function (response){
-					window.localStorage.setItem('token', "");
-					window.localStorage.setItem('userID', "");
+					window.localStorage.removeItem('token');
+					window.localStorage.removeItem('userID');
+					window.localStorage.removeItem('organID');
+					window.localStorage.removeItem('taskID');
 					_this.$router.push({
 						path: '/', 
 						name: 'mainpage'
@@ -568,11 +659,45 @@
 			},
 			selectChange(value){
 				if(value == '已结束'){
-					this.selectTasks = this.finishedTasks;
+					if(this.finishedTasks.length != 0)
+					{
+						this.selectTasks = this.finishedTasks;
+						this.TasksIsEmpty = false;
+					}
+					else
+					{
+						this.TasksIsEmpty = true;
+					}
 				}else if(value == '进行中'){
-					this.selectTasks = this.inprogressTasks;
+					if(this.inprogressTasks.length != 0)
+					{
+						this.selectTasks = this.inprogressTasks;
+						this.TasksIsEmpty = false;
+					}
+					else
+					{
+						this.TasksIsEmpty = true;
+					}
+				}else if(value == '未进行'){
+					if(this.notgoingTasks.length != 0)
+					{
+						this.selectTasks = this.notgoingTasks;
+						this.TasksIsEmpty = false;
+					}
+					else
+					{
+						this.TasksIsEmpty = true;
+					}
 				}else if(value == '全部任务'){
-					this.selectTasks = this.allTasks;
+					if(this.allTasks.length != 0)
+					{
+						this.selectTasks = this.allTasks;
+						this.TasksIsEmpty = false;
+					}
+					else
+					{
+						this.TasksIsEmpty = true;
+					}
 				}
 			},
             handleSubmit (name) {
@@ -656,6 +781,7 @@
 								_this.$router.go(0);
 							}).catch(function (error) {
 								console.log(error);
+								_this.$Message.error('添加信息填写错误或重复添加!');
 							});						
 						}else{
 							console.log('通过电话添加' + this.$data.addMemberValidate.addMemberInfo + " " +  this.$data.addMemberValidate.addMemberStatus);
@@ -675,13 +801,13 @@
 								_this.$router.go(0);
 							}).catch(function (error) {
 								console.log(error);
-								_this.$Message.error('信息填写错误!');
+								_this.$Message.error('添加信息填写错误或重复添加!');
 							});								
 						}
 					}
 					else
 					{
-						this.$Message.error('信息填写错误!');
+						this.$Message.error('添加信息填写错误或重复添加!');
 					}
 				});
             },
@@ -700,13 +826,7 @@
 					 }
 				}).then(function (response){
 					_this.$Message.success('删除成员成功!');
-					_this.$router.push({
-						path: '/', 
-						name: 'organizationInfo',
-						params: { 
-								organID: _this.organID,
-						},
-					});	
+					_this.$router.go(0);
 				}).catch(function (error) {
 					console.log(error);
 				});
@@ -716,6 +836,7 @@
 				var url_all = "/users/"+this.userID+"/organizations/"+this.organID+"/members/"+item.userID;
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				console.log("修改的权限:" + item.status);
+				var _this = this;
 				this.$axios({
 					 method:"put",
 					 url: url_all,
@@ -728,6 +849,7 @@
 				}).then(function (response){
 					console.log(response);
 					item.statusChanged = false;
+					_this.$Message.success('权限更改成功!');
 				}).catch(function (error) {
 					console.log(error);
 				});		
@@ -735,7 +857,7 @@
 			LookTaskInfo(taskID){
 				//console.log("taskID" + taskID);
 				this.showTaskInfo = true;				
-				var url = "/users/" + uID + "/organizations/" + this.organID + "/my_tasks/" + taskID;
+				var url = "/users/" + this.userID + "/organizations/" + this.organID + "/my_tasks/" + taskID;
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				var _this = this;
 				this.$axios({
@@ -745,6 +867,8 @@
 							'Authorization': jwt,
 						 }
 				}).then(function (response){
+					console.log("任务详情");
+					console.log(response);
 					_this.showTaskInfomation = response.data;
 					_this.$set(this.showTaskInfomation,'current',-1);
 				}).catch(function (error) {
@@ -760,6 +884,8 @@
 			},
 			ToTaskInfo(taskID){
 				//console.log("taskID" + taskID);
+				window.localStorage.setItem('taskID', taskID);
+				window.localStorage.setItem('organID', this.organID);
 				this.$router.push({
 					path: '/', 
 					name: 'taskinfoforcreate',
@@ -770,12 +896,16 @@
 				});			
 			},
 			createNewTask() {
+				window.localStorage.removeItem('taskID');
+				window.localStorage.removeItem('organID');
 				this.$router.push({
 					path: '/', 
 					name: 'missioncreate'
 				});		
 			},
 			createOrganTask(){
+				window.localStorage.removeItem('taskID');
+				window.localStorage.setItem('organID', this.organID);
 				this.$router.push({
 					path: '/', 
 					name: 'missioncreate',

@@ -289,7 +289,7 @@
 		},
         methods: {
 			getEventData:function() {
-				let routerParams = this.$route.params.organID;
+				let routerParams = window.localStorage.getItem("organID");
 				//console.log(routerParams);
 						
 				if(routerParams != null)
@@ -297,13 +297,16 @@
 					this.isOrganCreate = true;
 					this.organID = routerParams;
 				}
-				let task  =  this.$route.params.taskID;
+				let task  = window.localStorage.getItem("taskID");
 				if(task != null)
 				{
 					this.isTaskChange = true;
 					this.taskID = task;
+				}else
+				{
+					this.isTaskChange = false;
 				}
-				/*
+				
 				let uID = window.localStorage.getItem('userID')
 				if(uID == null || uID == ""){
 					//跳转到主页
@@ -312,12 +315,12 @@
 						name: 'mainpage'
 					});
 				}
-				*/
+				
 				
 				if(this.isTaskChange){
 					var _this = this;
 					var url = "/users/" + uID;
-					if(this.isCreateByOrgan){
+					if(this.isOrganCreate){
 						url += "/organizations/" + this.organID + "/my_tasks/" + this.taskID;
 					}
 					else{
@@ -504,6 +507,8 @@
 									//console.log(response);
 									var task_id = response.data.task_id;
 									if(_this.isOrganCreate){
+										window.localStorage.setItem('taskID', task_id);
+										window.localStorage.setItem('organID', _this.organID);
 										_this.$router.push({
 											path: '/', 
 											name: 'taskinfoforcreate',
@@ -513,6 +518,7 @@
 											},
 										});	
 									}else{
+										window.localStorage.setItem('taskID', task_id);
 										_this.$router.push({
 											path: '/', 
 											name: 'taskinfoforcreate',
@@ -549,6 +555,8 @@
 									//console.log(response);
 									var task_id = response.data.task_id;
 									if(_this.isOrganCreate){
+										window.localStorage.setItem('taskID', task_id);
+										window.localStorage.setItem('organID', _this.organID);
 										_this.$router.push({
 											path: '/', 
 											name: 'taskinfoforcreate',
@@ -558,6 +566,7 @@
 											},
 										});	
 									}else{
+										window.localStorage.setItem('taskID', task_id);
 										_this.$router.push({
 											path: '/', 
 											name: 'taskinfoforcreate',

@@ -92,6 +92,7 @@
 						}).then(function (response){
 							_this.$Message.success('组织注册成功!');
 							console.log(response);
+							window.localStorage.setItem('organID', response.data.organization_id);
 							// 去组织的详情页面
 							_this.$router.push({
 								path: '/', 
