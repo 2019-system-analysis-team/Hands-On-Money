@@ -1138,7 +1138,7 @@ POST http://localhost:5000/users/9/organizations/1/my_tasks
 ###### test case 1: 查询属于自己的任务
 
 ```
-GET http://localhost:5000/users/7/my_tasks/1
+GET http://localhost:5000/users/2/my_tasks/1
 ```
 
 ```
@@ -1150,8 +1150,9 @@ GET http://localhost:5000/users/7/my_tasks/1
 // Response
 {
     "task_id": 1,
-    "creator_user_id": 7,
-    "creator_organization_id": null,
+    "creator_user_email": "test2",
+    "creator_user_phone_number": "test2",
+    "creator_organization_name": null,
     "status": "on going",
     "title": "task9",
     "description": "task9",
@@ -1160,11 +1161,12 @@ GET http://localhost:5000/users/7/my_tasks/1
         "tag2",
         "tag3"
     ],
+    "current_participant_number": 0,
     "participant_number_limit": 10,
     "reward_for_one_participant": 0.1,
-    "post_time": "Wed, 05 Jun 2019 06:51:22 GMT",
-    "receive_end_time": "Wed, 05 Jun 2019 07:51:22 GMT",
-    "finish_deadline_time": "Thu, 06 Jun 2019 06:51:22 GMT",
+    "post_time": "2019-06-11 02:50:11",
+    "receive_end_time": "2019-06-11 03:50:11",
+    "finish_deadline_time": "2019-06-12 02:50:11",
     "user_limit": {
         "age_upper": 0,
         "age_lower": 1,
@@ -1192,12 +1194,8 @@ GET http://localhost:5000/users/7/my_tasks/1
             "description": "string"
         }
     ],
-    "participant_ids": [
-        8
-    ],
-    "ongoing_participant_ids": [
-        8
-    ],
+    "participant_ids": [],
+    "ongoing_participant_ids": [],
     "waiting_examine_participant_ids": [],
     "finished_participant_ids": []
 }
@@ -1219,6 +1217,75 @@ GET http://localhost:5000/users/7/my_tasks/3
 {
     "error_code": "401",
     "error_msg": "Insufficient permission, you don't create this task"
+}
+```
+
+##### 查询组织的任务详情
+
+@app.route('/users/<user_id>/my_tasks/<task_id>', methods=['GET'])
+
+###### test case 1: 正常查询
+
+```
+GET http://localhost:5000/users/2/organizations/1/my_tasks/9
+```
+
+```
+// Request
+```
+
+```
+// Response
+{
+    "task_id": 9,
+    "creator_user_email": "test2",
+    "creator_user_phone_number": "test2",
+    "creator_organization_name": "org111-kkwwwk",
+    "status": "not ongoing",
+    "title": "orgtask-2",
+    "description": "string",
+    "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+    ],
+    "current_participant_number": 0,
+    "participant_number_limit": 10,
+    "reward_for_one_participant": 0,
+    "post_time": "2012-02-12 22:11:11",
+    "receive_end_time": "2012-02-13 22:11:11",
+    "finish_deadline_time": "2012-02-16 22:11:11",
+    "user_limit": {
+        "age_upper": 0,
+        "age_lower": 1,
+        "grades": [
+            "grade1",
+            "grade1"
+        ],
+        "sexes": [
+            "sex_type1",
+            "sex_type2",
+            "sex_type3"
+        ],
+        "schools": [
+            "school_name1",
+            "school_name2"
+        ]
+    },
+    "steps": [
+        {
+            "title": "string",
+            "description": "string"
+        },
+        {
+            "title": "string",
+            "description": "string"
+        }
+    ],
+    "participant_ids": [],
+    "ongoing_participant_ids": [],
+    "waiting_examine_participant_ids": [],
+    "finished_participant_ids": []
 }
 ```
 

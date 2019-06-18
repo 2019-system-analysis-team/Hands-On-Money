@@ -27,6 +27,11 @@ def checkUserCreateTask(_user_id, _task_id):
     task = Task.query.filter_by(id=_task_id, user_id=_user_id).first()
     return task
 
+# 检查用户是否以组织成员身份创建了某个任务
+def checkUserOrgCreateTask(_organization_id, _task_id):
+    task = Task.query.filter_by(id=_task_id, organization_id=_organization_id).first()
+    return task
+
 
 # 检查用户是否接受了某个任务
 def checkUserReceiveTask(_user_id, _task_id):
@@ -43,7 +48,17 @@ def printSingleTask(task):
     waiting_examine_participant_ids = []
     finished_participant_ids = []
 
+    # 获取creator
+    creator = queryUserById(task.user_id)
+    org_name = None
+    
+    if task.organization:
+        org_name = task.organization.name
+
+    count = 0
+
     for par in task.received_tasks:
+        count += 1
         par_user_id = par.user_id
         participant_ids.append(par_user_id)
         if par.status == 'on going':
@@ -66,17 +81,20 @@ def printSingleTask(task):
     if task.steps is not None:
         steps_info = json.loads(task.steps)
     return {"task_id": task.id, 
-                    "creator_user_id": task.user_id,
-                    "creator_organization_id": task.organization_id,
+                    "creator_user_email": creator.email,
+                    "creator_user_phone_number": creator.phone_number,
+                   
+                    "creator_organization_name": org_name,
                     "status": task.status,
                     "title": task.title,
                     "description": task.description,
                     "tags": task_tag_info,
+                    "current_participant_number": count,
                     "participant_number_limit": task.participant_number_limit,
                     "reward_for_one_participant": task.reward_for_one_participant,
-                    "post_time": task.post_time,
-                    "receive_end_time": task.receive_end_time,
-                    "finish_deadline_time": task.finish_deadline_time,
+                    "post_time": task.post_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    "receive_end_time": task.receive_end_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    "finish_deadline_time": task.finish_deadline_time.strftime('%Y-%m-%d %H:%M:%S'),
                     "user_limit": user_limit_info,
                     "steps": steps_info,
                     "participant_ids": participant_ids,
@@ -149,9 +167,9 @@ def printPublicSingleTask(task):
                     "current_participant_number":len(participant_ids),
                     "participant_number_limit": task.participant_number_limit,
                     "reward_for_one_participant": task.reward_for_one_participant,
-                    "post_time": task.post_time,
-                    "receive_end_time": task.receive_end_time,
-                    "finish_deadline_time": task.finish_deadline_time,
+                    "post_time": task.post_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    "receive_end_time": task.receive_end_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    "finish_deadline_time": task.finish_deadline_time.strftime('%Y-%m-%d %H:%M:%S'),
                     "user_limit": json.loads(task.user_limit),
                     "steps": json.loads(task.steps)
                     }

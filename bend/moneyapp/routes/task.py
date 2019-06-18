@@ -93,7 +93,8 @@ def check_user_tasks(current_user, user_id):
     task_info = []
 
     for task in current_user.tasks:
-        task_info.append(printTaskBrief(task))
+        if task.organization is None:
+            task_info.append(printTaskBrief(task))
 
     return jsonify({"task": task_info}), 200
 
@@ -141,6 +142,36 @@ def get_created_task_detail(current_user, user_id, task_id):
         result_msg = printSingleTask(task)
 
         return jsonify(result_msg), 200
+
+# RESRful 组织查询创建的任务详情
+@routes.route('/users/<user_id>/organizations/<organization_id>/my_tasks/<task_id>', methods=['GET'])
+@token_required
+def get_created_task_org_detail(current_user, user_id, organization_id, task_id):
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+
+    organization = queryOrganizationByID(organization_id)
+    if not organization:
+        return jsonify({"error_code": "404", "error_msg": "organization Not Found"}), 404
+
+    record = queryRecord(current_user.id, organization_id)
+    if not record:
+        return jsonify({"error_code": "401",
+                        "error_msg": "insufficient permission"}), 401
+
+
+    task = checkUserOrgCreateTask(organization_id, task_id)
+
+    if task is None:
+        return jsonify({
+            "error_code": "401",
+            "error_msg": "Insufficient permission, you don't create this task"
+            }), 401
+
+    else:
+        result_msg = printSingleTask(task)
+
+        return jsonify(result_msg), 200
         
 
 
@@ -156,7 +187,7 @@ def get_received_task(current_user, user_id):
     task_info = []
 
     for received_task_record in current_user.received_tasks:
-        task_info.append(printSingleTask(received_task_record.task))
+        task_info.append(printTaskBrief(received_task_record.task))
 
     return jsonify(task_info), 200
 
@@ -525,7 +556,7 @@ def search_all_tasks(current_user, user_id):
             if item in d:
                 datetime_str = d[item]
                 d[item] = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
-         
+                
     except Exception as e:
         return jsonify({"error_code": "400", "error_msg": "Please specify some limitations. " + str(e)}), 400
 
