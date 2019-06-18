@@ -148,6 +148,9 @@ def searchTask(d):
     task_temp = Task.query
     # if d['status'] != None:
     #     task_temp = task_temp.filter_by(status=d['status'])
+    max_size = None
+    if 'size' in d:
+        max_size = int(d['size'])
 
     if 'title' in d:
         task_temp = task_temp.filter(Task.title.like('%' + d['title'] + '%'))
@@ -170,19 +173,21 @@ def searchTask(d):
     task_not_satisfy = set()
     
     for task in task_temp:
-        steps_number_of_task = len(json.loads(task.steps))
-        if 'steps_number_lower' in d:
-            if not steps_number_of_task >= d['steps_number_lower']:
-                task_not_satisfy.add(task)
-                continue
-        if 'steps_number_upper' in d:
-            if not steps_number_of_task <= d['steps_number_upper']:
-                task_not_satisfy.add(task)
-                continue
-        if 'tags' in d:
-            if not set(d['tags']).issubset(set(json.loads(task.tags))):
-                task_not_satisfy.add(task)
-                continue
+        if task.steps:
+            steps_number_of_task = len(json.loads(task.steps))
+            if 'steps_number_lower' in d:
+                if not steps_number_of_task >= d['steps_number_lower']:
+                    task_not_satisfy.add(task)
+                    continue
+            if 'steps_number_upper' in d:
+                if not steps_number_of_task <= d['steps_number_upper']:
+                    task_not_satisfy.add(task)
+                    continue
+        if task.tags:
+            if 'tags' in d:
+                if not set(d['tags']).issubset(set(json.loads(task.tags))):
+                    task_not_satisfy.add(task)
+                    continue
         
         creator_user = task.user
         if 'creator_user_email' in d:
@@ -230,7 +235,11 @@ def searchTask(d):
     task_temp_difference_set = task_temp - task_not_satisfy
     # for task in task_temp_difference_set:
     #     print(task.title)
-    return task_temp_difference_set
+    print(len(task_temp_difference_set))
+    result = list(task_temp_difference_set)
+    if max_size is not None:
+        result = result[0:max_size]
+    return result
 
 #------------------------------------------------------
 #todo
