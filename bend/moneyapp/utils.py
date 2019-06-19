@@ -255,7 +255,16 @@ def calculateTaskAvgComment(_task_id):
 
 
 
+# 检查用户是否已经写过回评
+def checkFeedbackCreated(user_id,task_id,receiver_id):
+    record = Feedback_Review.query.filter_by(user_id=_user_id, task_id=_task_id,receiver_id=receiver_id).first()
+    if record is None:
+        return False
+    else:
+        return True
 
-
-
+'''
+# 更新接收者的评分
+def updateAvgFeedback(_user_id):
+'''  
 
