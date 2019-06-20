@@ -390,7 +390,7 @@ def set_user_task_pending(current_user, user_id, task_id):
          
 
 # RESTful 组织撤回任务 + 修改任务
-@routes.route('/users/<user_id>/organization/<organization_id>/tasks/<task_id>', methods=['PUT'])
+@routes.route('/users/<user_id>/organizations/<organization_id>/tasks/<task_id>', methods=['PUT'])
 @token_required
 def set_org_task_pending(current_user, user_id, organization_id, task_id):
     # 是否登录者操作
