@@ -554,12 +554,20 @@ def search_all_tasks(current_user, user_id):
         #d = request.get_json()
         #暂时改成args
         #
-        d = request.args
+        d = request.args.to_dict()
+
+        if 'tags' in d:
+            d['tags'] = json.loads(d['tags'])
+
+        if 'user_limit' in d:
+            d['user_limit'] = json.loads(d['user_limit'])
+        
 
         # string -> datetime
         time_item = {'post_time', 'receive_end_time', 'finish_deadline_time'};
         for item in time_item:
             if item in d:
+
                 print(item)
                 datetime_str = d[item]
                 d[item] = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
