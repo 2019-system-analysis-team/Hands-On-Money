@@ -13,7 +13,7 @@ from .home import token_required
 
 ##=============== Organization =======================
 # RESTful 创建组织
-@routes.route('/users/<user_id>/organizations', methods=['POST'])
+@routes.route('/users/<user_id>/', methods=['POST'])
 @token_required
 def create_organization(current_user, user_id):
     if current_user.id != int(user_id):
@@ -238,7 +238,9 @@ def add_organization_member(current_user, user_id, organization_id):
     if record:
         return jsonify({"error_code": "500",
                         "error_msg": "duplicate member"}), 500
-    addMember(user.id, int(organization_id), "member")
+    #addMember(user.id, int(organization_id), "member") # fix
+    addMember(user.id, int(organization_id), status)
+    
     return jsonify({"msg": "add successfully."}), 201
 
 
