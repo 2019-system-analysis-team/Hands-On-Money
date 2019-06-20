@@ -562,6 +562,7 @@ def search_all_tasks(current_user, user_id):
                 d[item] = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
                 
     except Exception as e:
+        print(str(e))
         return jsonify({"error_code": "400", "error_msg": "Please specify some limitations. " + str(e)}), 400
 
 
