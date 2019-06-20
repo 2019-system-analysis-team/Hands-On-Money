@@ -141,9 +141,9 @@ def searchTask(d):
     #if d['']
     for arg in d:
         print(arg)
-    task_2 = queryTaskById(2)
-    task_2_limitation = json.loads(task_2.user_limit)
-    print(task_2_limitation['schools'])
+    # task_2 = queryTaskById(2)
+    # task_2_limitation = json.loads(task_2.user_limit)
+    # print(task_2_limitation['schools'])
 
     task_temp = Task.query
     # if d['status'] != None:

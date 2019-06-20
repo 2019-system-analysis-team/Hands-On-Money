@@ -546,14 +546,18 @@ def search_public_tasks(current_user, user_id, task_id):
 @routes.route('/users/<user_id>/tasks', methods=['GET'])
 @token_required
 def search_all_tasks(current_user, user_id):
+
     if current_user.id != int(user_id):
         return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
     try:
+        print('hhh')
         d = request.get_json()
+
         # string -> datetime
         time_item = {'post_time', 'receive_end_time', 'finish_deadline_time'};
         for item in time_item:
             if item in d:
+                print(item)
                 datetime_str = d[item]
                 d[item] = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
                 
