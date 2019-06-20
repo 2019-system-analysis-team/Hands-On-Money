@@ -551,7 +551,10 @@ def search_all_tasks(current_user, user_id):
         return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
     try:
         print('hhh')
-        d = request.get_json()
+        #d = request.get_json()
+        #暂时改成args
+        #
+        d = request.args
 
         # string -> datetime
         time_item = {'post_time', 'receive_end_time', 'finish_deadline_time'};
