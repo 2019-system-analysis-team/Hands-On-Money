@@ -549,32 +549,33 @@ def search_all_tasks(current_user, user_id):
 
     if current_user.id != int(user_id):
         return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
-    try:
-        print('hhh')
-        d = request.get_json()
+    # try:
+    #     print('hhh')
+    #     d = request.get_json()
 
-        # string -> datetime
-        time_item = {'post_time', 'receive_end_time', 'finish_deadline_time'};
-        for item in time_item:
-            if item in d:
-                print(item)
-                datetime_str = d[item]
-                d[item] = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+    #     # string -> datetime
+    #     time_item = {'post_time', 'receive_end_time', 'finish_deadline_time'};
+    #     for item in time_item:
+    #         if item in d:
+    #             print(item)
+    #             datetime_str = d[item]
+    #             d[item] = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
                 
-    except Exception as e:
-        print(str(e))
-        return jsonify({"error_code": "400", "error_msg": "Please specify some limitations. " + str(e)}), 400
+    # except Exception as e:
+    #     print(str(e))
+    #     return jsonify({"error_code": "400", "error_msg": "Please specify some limitations. " + str(e)}), 400
 
 
     
-    task_diff_set = searchTask(d)
+    # task_diff_set = searchTask(d)
 
-    task_info = []
+    # task_info = []
 
-    for task in task_diff_set:
-        task_info.append(printSingleTask(task))
+    # for task in task_diff_set:
+    #     task_info.append(printSingleTask(task))
         
-    return jsonify(task_info), 200
+    # return jsonify(task_info), 200
 
+    return jsonify({"info": "testing"}), 200
 
 
