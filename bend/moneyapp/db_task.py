@@ -47,7 +47,7 @@ def createTask(d):
     if task.post_time and task.receive_end_time and task.finish_deadline_time:
         status = "ongoing" if (datetime.utcnow() > task.post_time and datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
     else:
-        status = 'not onging'
+        status = 'pending'
 
     if 'steps' in d and d['steps'] is not None:
         steps_number = len(json.loads(d['steps']))
@@ -155,6 +155,8 @@ def searchTask(d):
     if 'title' in d:
         task_temp = task_temp.filter(Task.title.like('%' + d['title'] + '%'))
 
+    if 'status' in d:
+        task_temp = task_temp.filter(Task.status == d['status'])
     # 时间筛选还要再思考一下!!!!
     if 'receive_end_time' in d:
         task_temp = task_temp.filter(Task.receive_end_time == d['receive_end_time'])
