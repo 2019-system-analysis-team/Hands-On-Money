@@ -381,6 +381,7 @@ def set_user_task_pending(current_user, user_id, task_id):
             modifyTask(int(task_id), int(user_id), None, d)
         
         except Exception as e:
+            print(str(e))
             return jsonify({"error_code": "500", "error_msg": str(e)}), 500
 
 
@@ -427,6 +428,7 @@ def set_org_task_pending(current_user, user_id, organization_id, task_id):
             modifyTask(int(task_id), int(user_id), int(organization_id), d)
         
         except Exception as e:
+            print(str(e))
             return jsonify({"error_code": "500", "error_msg": str(e)}), 500
 
 
