@@ -140,6 +140,26 @@
 								<Button type="primary" @click="showTaskCancel">关闭</Button>
 							</div>
 						</Modal>
+						<Modal v-model="appraise.isShow">
+							<p slot="header" style="text-align:center">
+								<span>请评价此次任务</span>
+							</p>
+							<div>
+							<Card dis-hover>
+								<p >标题：</P> 
+								<Input v-model="appraise.title" placeholder="请输入想要评价的方面" ></Input>
+								<p >内容：</P> 
+								<Input v-model="appraise.content" placeholder="请输入评价的内容" ></Input>
+								<p >评分：</P> 
+								<Rate show-text allow-half v-model="appraise.rate">
+									<span style="color: #f5a623">{{ appraise.rate }}</span>
+								</Rate>
+							</Card>
+							</div>
+							<div slot="footer">
+								<Button type="primary" @click="sendRate">确认评价</Button>
+							</div>
+						</Modal>
 					</TabPane>
 				</Tabs>
             </Content>
@@ -188,6 +208,12 @@
   export default {
         data () {
             return {
+				appraise:{
+					isShow: false,
+					title: '',
+					content: '',
+					rate: 5,
+				},
 				isWithdraw:false,
 				showTaskStepInfo: false,
                 showQuestionList: false,
@@ -394,6 +420,31 @@
 			selectChange(value,index){
 				console.log("选择:"+this.choiceList[index]);
 			},
+			sendRate(){
+				//POST /users/:user_id/tasks/:task_id/comment
+				var _this = this;
+				var url_all = "/users/" + this.$data.userID + "/tasks/" + this.taskID + "/comment";
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+					 method:"post",
+					 url: url_all,
+					 data:{
+						title:  this.appraise.title,
+						content: this.appraise.content,
+						rate: this.appraise.rate
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.$Message.success('评价成功!');
+				}).catch(function (error) {
+					console.log(error);
+				});			
+				this.appraise.isShow = false;
+				this.showTaskStepInfo = false;
+				this.showQuestionList = false;
+			},
             show (index) {
 				if(this.showTaskInfomation.tags == '问卷'){
 					this.showQuestionList = true;
@@ -402,11 +453,11 @@
 				}
             },
 			showTaskCancel(){
-				 this.$Message.info('Clicked cancel');
+				 //this.$Message.info('Clicked cancel');
 				 this.showTaskStepInfo = false;
 			},
 			showQuestionListCancel(){
-			    this.$Message.info('Clicked cancel');
+			    //this.$Message.info('Clicked cancel');
 				this.showQuestionList = false;
 			},
 			FinishQuestionList(){
@@ -427,21 +478,23 @@
 			next () {
 				if(this.isNullStep){
 					 this.$Message.info("成功完成任务,等待对方确认");
+					 this.appraise.isShow = true;
 					 return;
 				}
                 if (this.current == this.showTaskInfomation.steps.length - 1) {
+					this.appraise.isShow = true;
                     this.$Message.info("成功完成任务,等待对方确认");
                 } else {
 					// PUT /users/:user_id/tasks/:task_id/steps/:step_id
 					var _this = this;
-					var url_all = "/users/" + this.$data.userID + "/tasks/" + this.taskID + "/steps/" + this.current;
+					var url_all = "/users/" + this.$data.userID + "/tasks/" + this.taskID + "/steps/" + (this.current+1);
 					var jwt = "JWT " + window.localStorage.getItem('token');
 					this.$axios({
 						 method:"put",
 						 url: url_all,
 						 data:{
 							task_id:  this.taskID,
-							task_finished_steps: this.current
+							task_finished_steps: this.current+1
 						 },
 						 headers:{
 							'Authorization': jwt,

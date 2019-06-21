@@ -50,6 +50,11 @@
 						<Card dis-hover style="height:380px">
 							<p slot="title">您的个人信息如下</p>
 							<Form ref="personalValidate" :model="personalValidate" :rules="personalRuleValidate" :label-width="80" class="form">
+								<FormItem label="综合评分" prop="rate">
+									<Rate show-text allow-half v-model="average_comment" disabled >
+										<span style="color: #f5a623">{{ average_comment }}</span>
+									</Rate>
+								</FormItem>	
 								<FormItem label="昵称" prop="nickname">
 									<Input v-model="personalValidate.nickname" placeholder="请输入您的昵称" :disabled="disabledPersonal"></Input>
 								</FormItem>	
@@ -402,6 +407,7 @@
                         { required: true, validator: validateoldPassCheck, trigger: 'blur' }
                     ]	
 				},
+				average_comment:0,
             }
         },
 		created: function () { 
@@ -453,6 +459,7 @@
 					_this.$data.infoValidate.gender = response.data.sex;		
 					_this.$data.money = response.data.balance;
 					_this.$data.profilePhotoPath =  _this.$profilePath + response.data.profile_photo_path;
+					_this.average_comment = response.data.average_comment;
 					window.localStorage.setItem('money',_this.$data.money);
 					window.localStorage.setItem('MyProfilePhotoPath', _this.$data.profilePhotoPath);
 					var test = {};

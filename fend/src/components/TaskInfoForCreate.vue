@@ -139,6 +139,26 @@
 					</TabPane>
 				</Tabs>
             </Content>
+			<Modal v-model="appraise.isShow">
+				<p slot="header" style="text-align:center">
+					<span>请评价该成员在此次任务中</span>
+				</p>
+				<div>
+				<Card dis-hover>
+					<p >标题：</P> 
+					<Input v-model="appraise.title" placeholder="请输入想要评价的方面" ></Input>
+					<p >内容：</P> 
+					<Input v-model="appraise.content" placeholder="请输入评价的内容" ></Input>
+					<p >评分：</P> 
+					<Rate show-text allow-half v-model="appraise.rate">
+						<span style="color: #f5a623">{{ appraise.rate }}</span>
+					</Rate>
+				</Card>
+				</div>
+				<div slot="footer">
+					<Button type="primary" @click="sendRate">确认评价</Button>
+				</div>
+			</Modal>
             <Footer class="layout-footer-center">2019-2019 &copy; SYSU</Footer>
         </Layout>
 		<Drawer
@@ -184,6 +204,13 @@
   export default {
         data () {
             return {
+				appraise:{
+					isShow: false,
+					title: '',
+					content: '',
+					rate: 5,
+					appId: 0,
+				},
 				isWithdraw:false,
 				showWithdrawInfo: false,
 				showdeleteTaskInfo: false,
@@ -415,7 +442,7 @@
 					console.log("任务信息");
 					console.log(response);
 					_this.showTaskInfomation = response.data;
-					if(_this.showTaskInfomation.status == "not ongoing"){
+					if(_this.showTaskInfomation.status == "pending"){
 						_this.isOngoing = false;
 					}else{
 						_this.isOngoing = true;
@@ -533,6 +560,41 @@
 				this.money = window.localStorage.getItem('money');
 			    this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 			},
+			sendRate(){
+				//POST /users/:user_id/tasks/:task_id/feedback/:user_id HTTP/1.1
+				// POST /users/:user_id/organizations/:organization_id/tasks/:task_id/feedback/:user_id HTTP/1.1
+				var _this = this;
+				var url_all = "/users/" + this.$data.userID ;
+				if(this.isCreateByOrgan){
+					url_all += "/organizations/" + this.organID + "/tasks/" + this.taskID;
+				}
+				else{
+					url_all += "/tasks/" + this.taskID;
+				}
+				url_all += '/feedback/' + this.appraise.appId;
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				this.$axios({
+					 method:"post",
+					 url: url_all,
+					 data:{
+						title:  this.appraise.title,
+						content: this.appraise.content,
+						rate: this.appraise.rate
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.$Message.success('评价成功!');
+				}).catch(function (error) {
+					console.log(error);
+				});			
+				this.appraise.appId = 0;
+				this.appraise.title = '';
+				this.appraise.content = '';
+				this.appraise.rate = 5;
+				this.appraise.isShow = false;
+			},
 			GotoTopup (){
 				this.topup = true;
 				this.isWithdraw = false;
@@ -641,6 +703,8 @@
 					 }
 				}).then(function (response){
 					_this.$Message.success('完成任务!');
+					_this.appraise.isShow = true;
+					_this.appraise.appId = deleteID;
 					_this.showTaskInfomation.ongoing_participant_ids = response.data.ongoing_participant_ids;
 					_this.showTaskInfomation.participant_ids = response.data.participant_ids;
 					_this.ongoing_participant_info.splice(index,1);

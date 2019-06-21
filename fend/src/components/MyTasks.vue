@@ -249,7 +249,7 @@
 							_this.finishedTasks.push(_this.createdTasks[i]);
 						}else if(_this.createdTasks[i].task_status == "ongoing"){
 							_this.inprogressTasks.push(_this.createdTasks[i]);
-						}else if(_this.createdTasks[i].task_status == "not ongoing"){
+						}else if(_this.createdTasks[i].task_status == "pending"){
 							_this.notgoingTasks.push(_this.createdTasks[i]);
 						}
 						_this.allTasks.push(_this.createdTasks[i]);
@@ -283,7 +283,7 @@
 							_this.finishedTasks.push(_this.receivedTasks[i]);
 						}else if(_this.receivedTasks[i].task_status == "ongoing"){
 							_this.inprogressTasks.push(_this.receivedTasks[i]);
-						}else if(_this.receivedTasks[i].task_status == "not ongoing"){
+						}else if(_this.receivedTasks[i].task_status == "pending"){
 							_this.notgoingTasks.push(_this.receivedTasks[i]);
 						}
 						_this.allTasks.push(_this.receivedTasks[i]);

@@ -99,7 +99,7 @@
 								</div>
 							<div slot="footer">
 								<Button type="text" @click="showTaskCancel">确定</Button>
-								<Button type="primary" @click="ToTaskInfo(showTaskInfomation.task_id)">编辑</Button>
+								<Button type="primary" @click="ToTaskInfo(showTaskInfomation.task_id)" v-show="isManager || isCreater">编辑</Button>
 							</div>
 						</Modal>
 					</TabPane>
@@ -107,6 +107,11 @@
 						<Card dis-hover style="height:380px">
 							<p slot="title">组织信息如下</p>
 							<Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" class="form">
+								<FormItem label="综合评分" prop="rate">
+									<Rate show-text allow-half v-model="average_comment" disabled >
+										<span style="color: #f5a623">{{ average_comment }}</span>
+									</Rate>
+								</FormItem>	
 								<FormItem label="组织名称" prop="name">
 									<Input v-model="formValidate.name" placeholder="请输入组织名称" :disabled="organInfodisabled"></Input>
 								</FormItem>
@@ -301,7 +306,7 @@
 				organProfilePhotoName: '',
 				
 				organInfodisabled: true,
-					
+				average_comment:0,
 				userID: '',
 				tabs: '组织任务',
 				topup: false,
@@ -462,6 +467,7 @@
 					_this.formValidate.desc = response.data.bio;
 					 _this.allMembersShortInfo = response.data.members;
 					 _this.organMoney = response.data.balance;
+					 _this.average_comment = response.data.average_comment;
 					for(var i=0; i < _this.allMembersShortInfo.length;i++){
 						var url = "/users/" + _this.allMembersShortInfo[i].user_id;
 						if(_this.allMembersShortInfo[i].user_id == _this.userID){
@@ -527,7 +533,7 @@
 							_this.inprogressTasks.push(_this.allTasks[i]);
 						}else if(_this.allTasks[i].task_status == "finished"){
 							_this.finishedTasks.push(_this.allTasks[i]);
-						}else if(_this.allTasks[i].task_status == "not ongoing"){
+						}else if(_this.allTasks[i].task_status == "pending"){
 							_this.notgoingTasks.push(_this.allTasks[i]);
 						}
 					}
