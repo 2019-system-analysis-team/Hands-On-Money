@@ -40,8 +40,16 @@
                     <div slot="footer">
                         <Button type="primary" ghost @click="showTaskCancel">确定</Button>
                         <Button type="primary" @click="ToTaskInfo(displayData.task_id)" v-if="!isAcceptableTask">编辑</Button>
-                        <Button type="success" @click="testAccept();" v-if="isAcceptableTask">接受</Button>
+                        <Button type="success" @click="confirmAccept = true;" v-if="isAcceptableTask">接受</Button>
                     </div>
+                </Modal>
+
+                <Modal v-model="confirmAccept"
+                    title="确认"
+                    @on-ok="acceptMission()"
+                    width='400'
+                    :styles="{top: '300px'}">
+                    <p style="font-size: 15px">您确定要接受这个任务吗？</p>
                 </Modal>
 
 				<Card :bordered="false">
@@ -251,20 +259,44 @@
 
                                     <FormItem prop="schools">
                                         <Col span="5">
-                                            <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">学校</label>
+                                            <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">学院</label>
                                         </Col>
                                         <Col span="6">
                                             <Select v-model="formValidate.schools" multiple style="width: 230px;">
-                                                <Option value="school_name1">中山大学</Option>
-                                                <Option value="school_name2">广东外语外贸大学</Option>
-                                                <Option value="school_name3">华南理工大学</Option>
-                                                <Option value="school_name4">广东药科大学</Option>
-                                                <Option value="school_name5">广州中医药大学</Option>
-                                                <Option value="school_name6">广州美术学院</Option>
-                                                <Option value="school_name7">广州大学</Option>
-                                                <Option value="school_name8">广州工业大学</Option>
-                                                <Option value="school_name9">星海音乐学院</Option>
-                                                <Option value="school_name10">华南师范大学</Option>
+                                                <Option value="中国语言文学系">中国语言文学系</Option>
+                                                <Option value="历史学系">历史学系</Option>
+                                                <Option value="哲学系">哲学系</Option>
+                                                <Option value="社会学与人类学学院">社会学与人类学学院</Option>
+                                                <Option value="博雅学院">博雅学院</Option>
+                                                <Option value="岭南学院">岭南学院</Option>
+                                                <Option value="外国语学院">外国语学院</Option>
+                                                <Option value="法学院">法学院</Option>
+                                                <Option value="政治与公共事务管理学院">政治与公共事务管理学院</Option>
+                                                <Option value="管理学院">管理学院</Option>
+                                                <Option value="马克思主义学院">马克思主义学院</Option>
+                                                <Option value="心理学系">心理学系</Option>
+                                                <Option value="传播与设计学院">传播与设计学院</Option>
+                                                <Option value="资讯管理学院">资讯管理学院</Option>
+                                                <Option value="艺术学院">艺术学院</Option>
+                                                <Option value="数学学院">数学学院</Option>
+                                                <Option value="物理学院">物理学院</Option>
+                                                <Option value="化学学院">化学学院</Option>
+                                                <Option value="地理科学与规划学院">地理科学与规划学院</Option>
+                                                <Option value="生命科学学院">生命科学学院</Option>
+                                                <Option value="工学院">工学院</Option>
+                                                <Option value="材料科学与工程学院">材料科学与工程学院</Option>
+                                                <Option value="电子与信息工程学院">电子与信息工程学院</Option>
+                                                <Option value="数据科学与计算机学院">数据科学与计算机学院</Option>
+                                                <Option value="国家保密学院">国家保密学院</Option>
+                                                <Option value="网络安全学院">网络安全学院</Option>
+                                                <Option value="环境科学与工程学院">环境科学与工程学院</Option>
+                                                <Option value="系统科学与工程学院">系统科学与工程学院</Option>
+                                                <Option value="中山医学院">中山医学院</Option>
+                                                <Option value="光华口腔医学院">光华口腔医学院</Option>
+                                                <Option value="公共卫生学院">公共卫生学院</Option>
+                                                <Option value="药学院">药学院</Option>
+                                                <Option value="护理学院">护理学院</Option>
+                                                <Option value="逸仙学院">逸仙学院</Option>
                                             </Select>
                                         </Col>
                                     </FormItem>
@@ -305,6 +337,8 @@
   export default {
         data () {
             return {
+                chosenTaskId: 0,
+                confirmAccept: false,
                 ownerMessage: '',
                 isAcceptableTask: true,
                 showTaskInfo: false,
@@ -562,12 +596,108 @@
             this.getEventData();
 		},
         methods: {
-            testAccept() {
-                alert("Waiting to be improved");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            acceptMission() {
+                var jwt = "JWT " + window.localStorage.getItem('token');
+                var uID = window.localStorage.getItem('userID');
+                if(uID == null || uID == ""){
+                    this.$router.push({
+                        path: '/', 
+                        name: 'mainpage'
+                    });
+                }
+                var url = "/users/" + uID + "/tasks/" + this.$data.chosenTaskId;
+                var _this = this;
+                this.$axios({
+                    method:"post",
+                    url:url,
+                    headers:{
+                        'Authorization': jwt,
+                    }
+                }).then(function (response){
+                    _this.$Message.success('接受任务成功!');
+                }).catch(function (error) {
+                    _this.$Message.error('接受任务失败!');
+                    console.log(error);
+                });
             },
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             showTaskAllInfo(paraDisData) {
+                this.$data.chosenTaskId = paraDisData.task_id;
+                // console.log(this.$data.chosenTaskId);
                 this.$data.showTaskInfo = true;
                 this.$data.displayData = paraDisData;
                 if(paraDisData.creator_organization_name == null)
@@ -637,6 +767,7 @@
                             reltime: response.data[i].post_time,
                             ddltime: response.data[i].receive_end_time,
                             status: response.data[i].status,
+                            taskid: response.data[i].task_id,
                             tag:  temptags,
                             num: i
                         };
@@ -741,7 +872,7 @@
                         }).then(function (response){
                             // _this.$Message.success('success');
                             _this.$data.returnData = response;
-                            console.log(response);
+                            // console.log(response);
                             for(var i = 0; i < response.data.length; ++i) {
                                 var temptags = "";
                                 var tempboss = response.data[i].creator_organization_name;
