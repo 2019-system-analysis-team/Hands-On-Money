@@ -35,7 +35,7 @@
 					<div>
 						<Submenu name="4">
 							<template slot="title">
-								<Avatar :src="profilePhotoPath" style="background-color: #87d068"></Avatar>
+								<Avatar :src="profilePhotoPath" style="background-color: #515a6e"></Avatar>
 							</template>
 							<MenuItem name="4-1" to="/userinfomodify">个人信息</MenuItem>
 							<MenuItem name="4-2" @click.native="logout()">退出</MenuItem>
@@ -49,18 +49,30 @@
 					<TabPane label="基本信息" name="基本信息">
 						<Card dis-hover>
 							<div slot="extra">
+								<Button type="error" shape="circle"  @click="deleteTask()" v-show="!isOngoing">删除任务</Button>
 								<Button type="warning" shape="circle"  @click="toshowWithdrawInfo()" v-show="isOngoing">撤回任务</Button>
 								<Button type="primary" icon="ios-hammer-outline" shape="circle" v-show="!isOngoing" @click="modifyTask()">修改任务</Button>
 							</div>	
 							<Modal v-model="showWithdrawInfo">
 								<div>
 									<p style="text-align:center; font-size: 16px;">
-										<span>您真的要撤回该任务吗？撤回操作不可逆!</span>
+										<span>您真的要撤回该任务吗？</span>
 									</p>
 								</div>
 								<div slot="footer">
 									<Button type="text" @click="showWithdrawInfoCancel">取消</Button>
 									<Button type="error" @click="withdrawTask">确认撤回</Button>
+								</div>
+							</Modal>
+							<Modal v-model="showdeleteTaskInfo">
+								<div>
+									<p style="text-align:center; font-size: 16px;">
+										<span>您真的要删除该任务吗？删除操作不可逆!</span>
+									</p>
+								</div>
+								<div slot="footer">
+									<Button type="text" @click="showdeleteTaskInfoCancel">取消</Button>
+									<Button type="error" @click="deleteTaskTrue">确认删除</Button>
 								</div>
 							</Modal>
 							<p slot="title" class="info">{{showTaskInfomation.title}}</p>
@@ -69,7 +81,7 @@
 							<p class="info">当前参与者人数 : {{showTaskInfomation.current_participant_number}}</p>
 							<p class="info">参与者人数上限 : {{showTaskInfomation.participant_number_limit}}</p>
 							<p class="info">完成奖励代币 : {{showTaskInfomation.reward_for_one_participant}}</p>
-							<p class="info">创建者名字 : {{showTaskInfomation.creator_organization_name}}</p>
+							<p class="info">任务所属组织 : {{showTaskInfomation.creator_organization_name}}</p>
 							<p class="info">创建者邮箱 : {{showTaskInfomation.creator_user_email}}</p>
 							<p class="info">创建者电话 : {{showTaskInfomation.creator_user_phone_number}}</p>
 							<p class="info">任务发布时间 : {{showTaskInfomation.post_time}}</p>
@@ -77,6 +89,15 @@
 							<p class="info">最迟完成任务时间 : {{showTaskInfomation.finish_deadline_time}}</p>
 						    <Collapse simple>
 								<Panel name="1">
+									用户限制
+									<p slot="content">
+										年龄下限 : {{showTaskInfomation.user_limit.age_upper}} 年龄上限 : {{showTaskInfomation.user_limit.age_lower}}</br>
+										年级 : <tag v-for="item in showTaskInfomation.user_limit.grades" :key="item.grades">{{item}}</tag></br>
+										性别 : <tag v-for="item in showTaskInfomation.user_limit.sexes" :key="item.sexes">{{item}}</tag></br>
+										学校 : <tag v-for="item in showTaskInfomation.user_limit.schools" :key="item.schools">{{item}}</tag>
+									</p>
+								</Panel>
+								<Panel name="2" v-show="showTaskInfomation.tags !=  '问卷'">
 									步骤
 									<p slot="content">
 										<Timeline>
@@ -87,13 +108,16 @@
 										</Timeline>
 									</p>
 								</Panel>
-								<Panel name="2">
-									用户限制
-									<p slot="content">
-										年龄下限 : {{showTaskInfomation.user_limit.age_upper}} 年龄上限 : {{showTaskInfomation.user_limit.age_lower}}</br>
-										年级 : <tag v-for="item in showTaskInfomation.user_limit.grades" :key="item.grades">{{item}}</tag></br>
-										性别 : <tag v-for="item in showTaskInfomation.user_limit.sexes" :key="item.sexes">{{item}}</tag></br>
-										学校 : <tag v-for="item in showTaskInfomation.user_limit.schools" :key="item.schools">{{item}}</tag>
+								<Panel name="2" v-show="showTaskInfomation.tags ==  '问卷'">
+									问卷浏览
+									<p slot="content" style="background:#eee;padding: 20px">
+										<Card v-for="(item,index) in showTaskInfomation.steps" :key="item.title"  dis-hover>
+												问题 {{index+1}} : {{item.title}}
+											<p v-show="item.description != '' ">单选选项：</P>
+											<RadioGroup v-show="item.description != '' ">
+												<Radio v-for="single in item.forsingle" :key="single.label" disabled><span>{{single.label}}</span></Radio>
+											</RadioGroup>
+										</Card>
 									</p>
 								</Panel>
 							</Collapse>
@@ -162,6 +186,7 @@
             return {
 				isWithdraw:false,
 				showWithdrawInfo: false,
+				showdeleteTaskInfo: false,
                 allParticipant: [
                     {
                         title: '名字',
@@ -209,30 +234,6 @@
                         title: '年级',
                         key: 'grade'
                     },
-                    {
-                        title: '设置',
-                        key: 'action',
-                        width: 150,
-                        align: 'center',
-                        render: (h, params) => {
-                            return h('div', [
-                                h('Button', {
-                                    props: {
-                                        type: 'primary',
-                                        size: 'small'
-                                    },
-                                    style: {
-                                        marginRight: '5px'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.show(params.index)
-                                        }
-                                    }
-                                }, '完成任务')
-                            ]);
-                        }
-                    }
                 ],
 				waitingExamineParticipant: [
                     {
@@ -274,10 +275,10 @@
                                     },
                                     on: {
                                         click: () => {
-											
+                                            this.show(params.index)
                                         }
                                     }
-                                }, '确认参与')
+                                }, '完成任务')
                             ]);
                         }
                     }
@@ -419,6 +420,22 @@
 					}else{
 						_this.isOngoing = true;
 					}
+					if(_this.showTaskInfomation.tags == '问卷'){
+						for(var k = 0; k < _this.showTaskInfomation.steps.length; k++){
+							//console.log(_this.showTaskInfomation.steps[k]);
+							if(_this.showTaskInfomation.steps[k].description != ''){
+								var tempsigle = [];
+								var temp = _this.showTaskInfomation.steps[k].description.split('&');
+								//console.log(temp);
+								for(var g = 1; g<temp.length;g++){
+									var test = {};
+									_this.$set(test,'label',temp[g]);
+									tempsigle.push(test);
+								}
+								_this.$set(_this.showTaskInfomation.steps[k],'forsingle',tempsigle);
+							}
+						}
+					}
 				}).catch(function (error) {
 					_this.$Message.error('获取任务信息失败!');
 						//跳转到主页
@@ -540,13 +557,13 @@
 					 }
 				}).then(function (response){
 					_this.$Message.success('提现成功');
-					_this.money = -_this.topupData.value + _this.money;
+					_this.money = response.data.balance;
 					_this.topup = false;
 					_this.isWithdraw = false;
 					window.localStorage.setItem('money', _this.money);
 				}).catch(function (error) {
 					console.log(error);
-					_this.$Message.error('提现失败');
+					_this.$Message.error('提现失败，余额不足');
 					_this.topup = false;
 					_this.isWithdraw = false;
 				});				
@@ -567,7 +584,7 @@
 					 }
 				}).then(function (response){
 					_this.$Message.success('充值成功');
-					_this.money = _this.topupData.value + _this.money;
+					_this.money = response.data.balance;
 					_this.topup = false;
 					window.localStorage.setItem('money', _this.money);
 				}).catch(function (error) {
@@ -645,6 +662,41 @@
 			},
 			showWithdrawInfoCancel(){
 				this.showWithdrawInfo = false;
+			},
+			deleteTask(){
+				this.showdeleteTaskInfo = true;
+			},
+			showdeleteTaskInfoCancel(){
+				this.showdeleteTaskInfo = false;
+			},
+			deleteTaskTrue(){
+				var _this = this;
+				var url = "/users/" + this.$data.userID;
+				if(this.isCreateByOrgan){
+					url += "/organizations/" + this.organID + "/tasks/" + this.taskID;
+				}
+				else{
+					url += "/tasks/" + this.taskID;
+				}
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				
+				this.$axios({
+					 method:"delete",
+					 url: url,
+					 data:{
+						task_id: this.taskID,
+						task_name: this.showTaskInfomation.title,
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.$Message.info('删除任务成功');
+				    window.localStorage.removeItem('taskID');
+					_this.$router.back();  
+				}).catch(function (error) {
+					console.log(error);
+				});					
 			},
 			withdrawTask() {
 				var _this = this;

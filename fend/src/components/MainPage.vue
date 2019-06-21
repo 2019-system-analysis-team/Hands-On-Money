@@ -65,7 +65,7 @@
 					<div class="layout-button" v-if="isLogin">
 						<Submenu name="4">
 							<template slot="title">
-								<Avatar :src="profilePhotoPath" style="background-color: #87d068"></Avatar>
+								<Avatar :src="profilePhotoPath" style="background-color: #515a6e"></Avatar>
 							</template>
 							<MenuItem name="4-1" to="/userinfomodify">个人信息</MenuItem>
 							<MenuItem name="4-2" @click.native="logout()">退出</MenuItem>
@@ -263,6 +263,8 @@
 					_this.isLogin = false;
 					window.localStorage.removeItem('token');
 					window.localStorage.removeItem('userID');
+					window.localStorage.removeItem('organID');
+					window.localStorage.removeItem('taskID');
 				});
 		
 			},
@@ -289,7 +291,7 @@
 						window.localStorage.removeItem('userID');
 						window.localStorage.removeItem('organID');
 						window.localStorage.removeItem('taskID');
-						this.$Message.success('退出登录成功');
+						_this.$Message.success('退出登录成功');
 					}).catch(function (error) {
 						console.log(error);
 					});
@@ -319,13 +321,13 @@
 					 }
 				}).then(function (response){
 					_this.$Message.success('提现成功');
-					_this.money = -_this.topupData.value + _this.money;
+					_this.money = response.data.balance;
 					_this.topup = false;
 					_this.isWithdraw = false;
 					window.localStorage.setItem('money', _this.money);
 				}).catch(function (error) {
 					console.log(error);
-					_this.$Message.error('提现失败');
+					_this.$Message.error('提现失败,余额不足');
 					_this.topup = false;
 					_this.isWithdraw = false;
 				});				
@@ -346,7 +348,7 @@
 					 }
 				}).then(function (response){
 					_this.$Message.success('充值成功');
-					_this.money = _this.topupData.value + _this.money;
+					_this.money = response.data.balance;
 					window.localStorage.setItem('money', _this.money);
 					_this.topup = false;
 				}).catch(function (error) {

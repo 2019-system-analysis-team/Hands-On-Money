@@ -13,12 +13,19 @@
 				<Card :bordered="false">
                     <div slot="title">
                         <Row>
-                            <Col span="22">
+                            <Col span="20" v-show="isQuestionnaire">
 					            <p>请填写下列信息</p>
                             </Col>
-                            <Col span="1">
-                                <Button id="addbutton" class="addstepStyle" type="primary" @click="addStepClick()">增加步骤</Button>
+							<Col span="22" v-show="!isQuestionnaire">
+							    <p>请填写下列信息</p>
+							</Col>
+                            <Col span="2" v-show="isQuestionnaire">
+                                <Button class="addstepStyle" type="primary" @click="addSingleChoice()">添加单选</Button>
                             </Col>
+							<Col span="1">
+							    <Button class="addstepStyle" type="primary" @click="addStepClick()" v-show="!isQuestionnaire">增加步骤</Button>
+								<Button class="addstepStyle" type="primary" @click="addProblem()" v-show="isQuestionnaire">添加问答</Button>
+							</Col>
                         </Row>
                     </div>
 					<Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" id="form">
@@ -31,7 +38,7 @@
                                     <Input v-model="formValidate.missionbrief" type="textarea" :autosize="{minRows: 2,maxRows: 5}"></Input>
                                 </FormItem>
                                 <FormItem label="任务类型" prop="missiontype">
-									<Select v-model="tasktags" multiple :max-tag-count="2">
+									<Select v-model="teskTag" @on-change="selectChange">
 										<Option v-for="item in tagList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 									</Select>
                                 </FormItem>
@@ -70,16 +77,35 @@
                             </Col>
                             <Col span="10" offset="2"z>
                                 <!-- <Button id="addbutton" class="addstepStyle" type="primary" @click="addStepClick()">增加步骤</Button> -->
-                                <Card style="height: 380px; overflow: auto;">
+                                <Card style="height: 500px; overflow: auto;">
                                 <Card v-for="cardItem in citems" :key="cardItem.id">
-									<div slot="title">
+									<div slot="title" v-show="cardItem.state == '非问卷'">
 									    步骤{{cardItem.number + 1}}
 									</div>
+									<div slot="title" v-show="cardItem.state != '非问卷'">
+									    问题{{cardItem.number + 1}}
+									</div>
                                     <div slot="extra">
+										<Poptip placement="bottom" v-show="cardItem.state == '问卷单选'">
+											<Button size="small">添加选项内容</Button>
+											<div slot="content">
+												<Input v-model="tempSingleText" placeholder="请输入选项内容" ></Input></br>
+												<Button @click="addAsingle(tempSingleText,cardItem.id)">添加</Button>
+											</div>
+										</Poptip>
                                         <Button :size="delButtonSize" type="error" ghost @click="delStepClick(cardItem.number)">删除</Button>
                                     </div>
-									标题：<Input v-model="cardItem.title" placeholder="请输入该步骤的标题" ></Input>
-									描述：<Input v-model="cardItem.description" type="textarea" :autosize="{minRows: 2,maxRows: 10}"></Input>
+									<p v-show="cardItem.state == '非问卷'">标题：</P> 
+									<p v-show="cardItem.state != '非问卷'">问题：</P> 
+									<Input v-show="cardItem.state == '非问卷'" v-model="cardItem.title" placeholder="请输入该步骤的标题" ></Input>
+									<Input v-show="cardItem.state == '问卷问题'" v-model="cardItem.title" placeholder="请输入要回答的问题" ></Input>
+									<Input v-show="cardItem.state == '问卷单选'" v-model="cardItem.title" placeholder="请输入要进行选择的问题" ></Input>
+									<p v-show="cardItem.state == '非问卷'">描述：</P>
+									<p v-show="cardItem.state == '问卷单选'">单选选项：</P>
+									<RadioGroup v-show="cardItem.state == '问卷单选'">
+										<Radio v-for="single in cardItem.forsingle" :key="single.label" disabled><span>{{single.label}}</span></Radio>
+									</RadioGroup>
+									<Input  v-show="cardItem.state == '非问卷'" v-model="cardItem.description" type="textarea" :autosize="{minRows: 2,maxRows: 10}"></Input>
                                 </Card>
                                 </Card>
                             </Col>
@@ -149,6 +175,7 @@
 				callback();
 			};
             return {
+				tempSingleText:'',
                 delButtonSize: 'small',
                 citemcount: 1,
                 citemnum: 0,
@@ -183,6 +210,7 @@
 						{ required: true, message: '任务类型不能为空',trigger: 'blur' }
 					],
                 },
+				teskTag:'心理实验',
 				tasktags:['心理实验'],
 				tagList: [
                     {
@@ -282,6 +310,8 @@
 				isTaskChange:false,
 				organID:0,
 				taskID:0,
+				isQuestionnaire: false,
+				isfirstEnter: true,
             }
         },
 		created: function () { 
@@ -347,14 +377,35 @@
 						_this.user_limit.grades = response.data.user_limit.grades;
 						_this.user_limit.sexes = response.data.user_limit.sexes;
 						_this.user_limit.schools = response.data.user_limit.schools;
-						for(var i=0; i< response.data.steps.length;i++){
-							 _this.citems.push({id: (_this.citemcount)++, number: _this.citemnum++,description:response.data.steps[i].description,title:response.data.steps[i].title});
+						_this.teskTag = response.data.tags;
+						// 需要根据任务类型来区分 TODO
+						if(_this.teskTag != '问卷'){
+							for(var i=0; i< response.data.steps.length;i++){
+								_this.citems.push({id: (_this.citemcount)++, number: _this.citemnum++,description:response.data.steps[i].description,title:response.data.steps[i].title,state:'非问卷',forsingle:[]});
+							}	
+						}else{
+							for(var i=0; i< response.data.steps.length;i++){
+								if(response.data.steps[i].description == ''){
+									_this.citems.push({id: (_this.citemcount)++, number: _this.citemnum++,description:response.data.steps[i].description,title:response.data.steps[i].title,state:'问卷问题',forsingle:[]});
+								}
+								else{
+									var tempsigle = [];
+									var temp = response.data.steps[i].description.split('&');
+									console.log(temp);
+									for(var k = 1; k<temp.length;k++){
+										var test = {};
+										_this.$set(test,'label',temp[k]);
+										tempsigle.push(test);
+									}
+									_this.citems.push({id: (_this.citemcount)++, number: _this.citemnum++,description:response.data.steps[i].description,title:response.data.steps[i].title,state:'问卷单选',forsingle:tempsigle});
+								}
+							}								
 						}
+
 					}).catch(function (error) {
 						console.log(error);
 					});	
 				}
-
 			},
             handleReset (name) {
                 this.$refs[name].resetFields();
@@ -366,9 +417,14 @@
 					name: 'mainpage',
 				});		
             },
+			addProblem(){
+				this.citems.push({id: (this.citemcount)++, number: this.citemnum++,description:'',title:'',state:'问卷问题',forsingle:[]});
+			},
+			addSingleChoice(){
+				this.citems.push({id: (this.citemcount)++, number: this.citemnum++,description:'',title:'',state:'问卷单选',forsingle:[]});
+			},
             addStepClick: function() {
-                this.citems.push({id: (this.citemcount)++, number: this.citemnum++,description:'',title:''});
-                //console.log("length " + this.citems.length);
+				this.citems.push({id: (this.citemcount)++, number: this.citemnum++,description:'',title:'',state:'非问卷',forsingle:[]});
             },
             delStepClick: function(delItemNum) {
                // console.log(delItemNum);
@@ -377,6 +433,25 @@
                 this.$data.citems.splice(delItemNum, 1);
                 --this.$data.citemnum;
             },
+			addAsingle(tempSingleText,id){
+				if(tempSingleText == '' || tempSingleText == null)
+					return;
+
+				for(var i=0;i<this.citems.length;i++)
+				{
+					if(this.citems[i].id == id)
+					{
+						var test = {};
+						this.$set(test,'label',tempSingleText);
+						this.citems[i].forsingle.push(test);
+
+						this.citems[i].description = this.citems[i].description + "&" + tempSingleText;
+						tempSingleText = '';
+						
+						console.log(this.citems[i].description);
+					}
+				}
+			},
 			receiveTimeChange(date){
 				this.formValidate.receive_end_time = date;
 			},
@@ -481,6 +556,7 @@
 							console.log("创建任务时候传到后端的参数:");
 							console.log("任务名:" + this.formValidate.taskName + " 简介:" + this.formValidate.missionbrief);
 							console.log(this.tasktags);
+							this.tasktags[0] = this.teskTag; 
 							console.log("参与者:" + this.formValidate.memnumber + " 报酬:" +this.formValidate.reward);
 							console.log("创建任务时间:" +this.getLocalTime()+ "接收截止日期:" +this.formValidate.receive_end_time + "完成截止日期" + this.formValidate.finish_deadline_time);
 							console.log(this.user_limit);
@@ -533,6 +609,7 @@
 							
 							});
 						}else{
+							this.tasktags[0] = this.teskTag; 
 							this.$axios({
 									 method:"put",
 									 url:url,
@@ -602,7 +679,22 @@
 					this.user_limit.schools = [];
 				}
 				return !this.haveUserLimit;
-			}
+			},
+			selectChange(value){
+				if(this.isfirstEnter && (value == '问卷' || value == '代跑腿')){
+					this.isfirstEnter = false;
+					if(value == '问卷') this.isQuestionnaire = true;
+					return;
+				}
+				if(value == '问卷'){
+					this.isQuestionnaire = true;
+				}else{
+					this.isQuestionnaire = false;
+				}
+				this.citems = [];
+				this.citemcount = 1;
+				this.citemnum = 0;
+			},
         }
     }
 </script>

@@ -23,7 +23,7 @@
                                     name="text" 
                                     class="mainInputStyle" 
                                     placeholder="输入任务名称"
-                                    onkeypress="checkPress(event)">
+                                    v-model="formValidate.title">
                                 <button type="button" id="searchButton" class="searchButtonStyle" @click="handleSubmit('formValidate')">
                                     <span>搜索</span>
                                 </button>
@@ -278,21 +278,21 @@
 				ageoptionsList:[],
                 formValidate: {
                     size: 100,
-                    creator_user_email: '',
-                    creator_user_phone_number: '',
-                    creator_organization_name: '',
-                    status: '',
-                    title: '',
-                    tags: '',
+                    creator_user_email: 'qq@qq.com',
+                    creator_user_phone_number: '13123456789',
+                    creator_organization_name: 'none',
+                    status: 'ongoing',
+                    title: 'first',
+                    tags: [],
                     reward_for_one_participant_lower: 0,
                     reward_for_one_participant_upper: 999,
                     receive_end_time: '',
                     finish_deadline_time: '',
                     age_upper: 30,
                     age_lower: 10,
-                    grades: '',
-                    sexes: '',
-                    schools: '',
+                    grades: [],
+                    sexes: [],
+                    schools: [],
                     steps_number_upper: 100,
                     steps_number_lower: 0
                 },
@@ -516,28 +516,7 @@
                         boss: 'Tencent',
                         reltime: '2016-10-03',
                         ddltime: '2016-11-03'
-                    },
-                    {
-                        name: 'Coding2',
-                        tag: 'second',
-                        boss: 'Huawei',
-                        reltime: '2016-11-02',
-                        ddltime: '2016-11-04'
-                    },
-                    {
-                        name: 'Coding3',
-                        tag: 'third',
-                        boss: 'Samsung',
-                        reltime: '2016-11-11',
-                        ddltime: '2016-11-13'
-                    },
-                    {
-                        name: 'Coding4',
-                        tag: 'forth',
-                        boss: 'Individual',
-                        reltime: '2016-10-29',
-                        ddltime: '2016-11-31'
-                    },
+                    }
                 ]
 
             }
@@ -613,76 +592,40 @@
 
 
 			getEventData:function() {
-				// let routerParams = this.$route.params.organID;
-				// //console.log(routerParams);
-						
-				// if(routerParams != null)
-				// {
-				// 	this.isOrganCreate = true;
-				// 	this.organID = routerParams;
-				// }
-				// let task  =  this.$route.params.taskID;
-				// if(task != null)
-				// {
-				// 	this.isTaskChange = true;
-				// 	this.taskID = task;
-				// }
-				// /*
 				// let uID = window.localStorage.getItem('userID')
-				// if(uID == null || uID == ""){
-				// 	//跳转到主页
-				// 	this.$router.push({
-				// 		path: '/', 
-				// 		name: 'mainpage'
-				// 	});
-				// }
-				// */
-				
-				// if(this.isTaskChange){
-				// 	var _this = this;
-				// 	var url = "/users/" + uID;
-				// 	if(this.isCreateByOrgan){
-				// 		url += "/organizations/" + this.organID + "/my_tasks/" + this.taskID;
-				// 	}
-				// 	else{
-				// 		url += "/my_tasks/" + this.taskID;
-				// 	}
-				// 	var jwt = "JWT " + window.localStorage.getItem('token');	
-				// 	this.$axios({
+			
+				// // if(uID == null || uID == ""){
+				// // 	//跳转到主页
+				// // 	this.$router.push({
+				// // 		path: '/', 
+				// // 		name: 'mainpage'
+				// // 	});
+				// // }
+		
+				// var url = "/users/" + uID + "/organizations";
+				// this.$data.userID = uID;
+				// var jwt = "JWT " + window.localStorage.getItem('token');
+		
+				// var _this = this;
+				// this.$axios({
 				// 		 method:"get",
-				// 		 url: url,
+				// 		 url:url,
 				// 		 headers:{
 				// 			'Authorization': jwt,
 				// 		 }
-				// 	}).then(function (response){
-				// 		console.log(response.data);
-				// 		_this.formValidate.taskName = response.data.title;
-				// 		_this.formValidate.missionbrief = response.data.description;
-				// 		_this.formValidate.memnumber = response.data.participant_number_limit;
-				// 		_this.formValidate.reward = response.data.reward_for_one_participant;
-				// 		_this.formValidate.receive_end_time = response.data.receive_end_time;
-				// 		_this.formValidate.finish_deadline_time = response.data.finish_deadline_time;
-				// 		_this.haveUserLimit = true;
-				// 		_this.user_limit.age_upper = response.data.user_limit.age_upper;
-				// 		_this.user_limit.age_lower = response.data.user_limit.age_lower;
-				// 		_this.user_limit.grades = response.data.user_limit.grades;
-				// 		_this.user_limit.sexes = response.data.user_limit.sexes;
-				// 		_this.user_limit.schools = response.data.user_limit.schools;
-				// 		for(var i=0; i< response.data.steps.length;i++){
-				// 			 _this.citems.push({id: (_this.citemcount)++, number: _this.citemnum++,description:response.data.steps[i].description});
-				// 		}
-				// 	}).catch(function (error) {
-				// 		console.log(error);
-				// 	});	
-				// }
-
-
-
+				// }).then(function (response){
+                //     var tempOrganizations = response.data.organizations;
+                //     for(var i = 0; i < tempOrganizations)
+				// }).catch(function (error) {
+                //     _this.$Message.error('error');
+                //     console.log(error);
+				// 	//跳转到主页
+				// 	_this.$router.push({
+				// 		path: '/', 
+				// 		name: 'mainpage'
+				// 	});
+				// });
 			},
-
-
-
-
 
 
 			handleSubmit (name) {
@@ -700,52 +643,116 @@
                             this.$Message.error('个人最低报酬不能大于个人最高报酬');
                                 return;
                         }
-						/*
-						*   POST /users/:user_id/tasks HTTP/1.1
-							//or request: organization creating task 
-							POST /users/:user_id/organizations/:organization_id/tasks HTTP/1.1
-						*/
-                        var _this = this;
-						var jwt = "JWT " + window.localStorage.getItem('token');
-						var url = "/users/"+ this.$data.userID +"/tasks";
 
+                        let uID = window.localStorage.getItem('userID');
+                        if(uID == null || uID == ""){
+                            this.$router.push({
+                                path: '/', 
+                                name: 'mainpage'
+                            });
+                        }
+                        var url = "/users/" + uID + "/tasks";
+                        this.$data.userID = uID;
+                        var jwt = "JWT " + window.localStorage.getItem('token');
+                        var _this = this;
                         this.$axios({
-                            method:"post",
+                            method:"get",
                             url:url,
-                            data:{
-                                size: this.formValidate.size,
-                                creator_user_email: this.formValidate.creator_user_email,
-                                creator_user_phone_number: this.formValidate.creator_user_phone_number,
-                                creator_organization_name: this.formValidate.creator_organization_name,
-                                status: this.formValidate.status,
-                                tags: this.tasktags,
-                                title: this.formValidate.title,
-                                reward_for_one_participant_upper: this.formValidate.reward_for_one_participant_upper,
-                                reward_for_one_participant_lower: this.formValidate.reward_for_one_participant_lower,
-                                receive_end_time: this.formValidate.receive_end_time,
-                                finish_deadline_time: this.formValidate.finish_deadline_time,
-                                age_upper: this.formValidate.age_upper,
-                                age_lower: this.formValidate.age_lower,
-                                grades: this.formValidate.grades,
-                                sexes: this.formValidate.sexes,
-                                schools: this.formValidate.schools,
-                                steps_number_upper: this.formValidate.steps_number_upper,
-                                steps_number_lower: this.formValidate.steps_number_lower,
-                            },
                             headers:{
                                 'Authorization': jwt,
+                            },
+                            data: {
+                                "size": 20,
+                                // creator_user_email: "i@sirius.com",
+                                // creator_user_phone_number: "13123456789",
+                                // creator_organization_name: "name",
+                                // status: "ongoing",
+                                // title: "sub_string",
+                                // tags: ["tag1", "tag2", "tag3"],
+                                // reward_for_one_participant_upper: 3,
+                                // reward_for_one_participant_lower: 1,
+                                // receive_end_time: "2014-2-12 13:23:22",
+                                // finish_deadline_time: "2015-2-1 23:22:21",
+                                // user_limit: {
+                                //     age_upper: 0,
+                                //     age_lower: 1,
+                                //     grades: ["grade1", "grade1"],
+                                //     sexes: ["sex_type1", "sex_type2", "sex_type3"],
+                                //     schools: ["school_name1", "school_name2"]
+                                // },
+                                // steps_number_upper: 5,
+                                // steps_number_lower: 1
                             }
-                        }).then(function (response) {
-                                console.log(response);
-                                 _this.$Message.success('任务查询成功!');
+                        }).then(function (response){
+                            _this.$Message.success('success');
                         }).catch(function (error) {
-                            _this.$Message.error('任务查询失败!');
-                            console.log(error);
+                            _this.$Message.error('failure');
                         });
-						console.log("提交成功");
+                        // console.log(this.$data.formValidate.creator_user_email);
+                        // console.log(this.$data.formValidate.creator_user_phone_number);
+                        // console.log(this.$data.formValidate.creator_organization_name);
+                        // console.log(this.$data.formValidate.status);
+                        // console.log(this.$data.formValidate.title);
+                        // console.log(this.$data.formValidate.reward_for_one_participant_upper);
+                        // console.log(this.$data.formValidate.reward_for_one_participant_lower);
+                        // console.log(this.$data.formValidate.receive_end_time);
+                        // console.log(this.$data.formValidate.finish_deadline_time);
+                        // console.log(this.$data.formValidate.age_upper);
+                        // console.log(this.$data.formValidate.age_lower);
+                        // console.log(this.$data.formValidate.steps_number_upper);
+                        // console.log(this.$data.formValidate.steps_number_lower);
 					 }
-				 })
+				})
 			},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -35,7 +35,7 @@
 					<div>
 						<Submenu name="4">
 							<template slot="title">
-								<Avatar :src="profilePhotoPath" style="background-color: #87d068"></Avatar>
+								<Avatar :src="profilePhotoPath" style="background-color: #515a6e"></Avatar>
 							</template>
 							<MenuItem name="4-1" to="/userinfomodify">个人信息</MenuItem>
 							<MenuItem name="4-2" @click.native="logout()">退出</MenuItem>
@@ -49,7 +49,8 @@
 					<TabPane label="基本信息" name="基本信息">
 						<Card dis-hover>
 							<div slot="extra">
-								<Button type="success" shape="circle"  @click="show()">完成任务</Button>
+								<Button type="success" shape="circle"  @click="show()" v-show="this.showTaskInfomation.tags != '问卷'">完成任务</Button>
+								<Button type="success" shape="circle"  @click="show()" v-show="this.showTaskInfomation.tags == '问卷'">填写问卷</Button>
 							</div>	
 							<p slot="title" class="info">{{showTaskInfomation.title}}</p>
 							标签 : <Tag v-for="item in showTaskInfomation.tags" :key="item" :name="item" color="cyan">{{ item }}</Tag>
@@ -57,7 +58,7 @@
 							<p class="info">当前参与者人数 : {{showTaskInfomation.current_participant_number}}</p>
 							<p class="info">参与者人数上限 : {{showTaskInfomation.participant_number_limit}}</p>
 							<p class="info">完成奖励代币 : {{showTaskInfomation.reward_for_one_participant}}</p>
-							<p class="info">创建者名字 : {{showTaskInfomation.creator_organization_name}}</p>
+							<p class="info">任务所属组织 : {{showTaskInfomation.creator_organization_name}}</p>
 							<p class="info">创建者邮箱 : {{showTaskInfomation.creator_user_email}}</p>
 							<p class="info">创建者电话 : {{showTaskInfomation.creator_user_phone_number}}</p>
 							<p class="info">任务发布时间 : {{showTaskInfomation.post_time}}</p>
@@ -65,6 +66,15 @@
 							<p class="info">最迟完成任务时间 : {{showTaskInfomation.finish_deadline_time}}</p>
 						    <Collapse simple>
 								<Panel name="1">
+									用户限制
+									<p slot="content">
+										年龄下限 : {{showTaskInfomation.user_limit.age_upper}} 年龄上限 : {{showTaskInfomation.user_limit.age_lower}}</br>
+										年级 : <tag v-for="item in showTaskInfomation.user_limit.grades" :key="item.grades">{{item}}</tag></br>
+										性别 : <tag v-for="item in showTaskInfomation.user_limit.sexes" :key="item.sexes">{{item}}</tag></br>
+										学校 : <tag v-for="item in showTaskInfomation.user_limit.schools" :key="item.schools">{{item}}</tag>
+									</p>
+								</Panel>
+								<Panel name="2" v-show="showTaskInfomation.tags !=  '问卷'">
 									步骤
 									<p slot="content">
 										<Timeline>
@@ -75,17 +85,43 @@
 										</Timeline>
 									</p>
 								</Panel>
-								<Panel name="2">
-									用户限制
-									<p slot="content">
-										年龄下限 : {{showTaskInfomation.user_limit.age_upper}} 年龄上限 : {{showTaskInfomation.user_limit.age_lower}}</br>
-										年级 : <tag v-for="item in showTaskInfomation.user_limit.grades" :key="item.grades">{{item}}</tag></br>
-										性别 : <tag v-for="item in showTaskInfomation.user_limit.sexes" :key="item.sexes">{{item}}</tag></br>
-										学校 : <tag v-for="item in showTaskInfomation.user_limit.schools" :key="item.schools">{{item}}</tag>
+								<Panel name="2" v-show="showTaskInfomation.tags ==  '问卷'">
+									问卷浏览
+									<p slot="content" style="background:#eee;padding: 20px">
+										<Card v-for="(item,index) in showTaskInfomation.steps" :key="item.title"  dis-hover>
+												问题 {{index+1}} : {{item.title}}
+											<p v-show="item.description != '' ">单选选项：</P>
+											<RadioGroup v-show="item.description != '' ">
+												<Radio v-for="single in item.forsingle" :key="single.label" disabled><span>{{single.label}}</span></Radio>
+											</RadioGroup>
+										</Card>
 									</p>
 								</Panel>
 							</Collapse>
 						</Card>
+						<Modal v-model="showQuestionList">
+							<p slot="header" style="text-align:center">
+								<span>请填写以下问卷</span>
+							</p>
+							<div>
+						
+									<p style="background:#eee;padding: 20px;height: 500px; overflow: auto;" >
+										<Card v-for="(item,index) in showTaskInfomation.steps" :key="item.title"  dis-hover>
+											<p>问题 {{index+1}} : {{item.title}}</P> 
+											<Input v-model="item.description" placeholder="请输入问题回答" v-show="item.forsingle == null || item.forsingle.length == 0"></Input>
+											<p v-show="item.forsingle != null && item.forsingle.length != 0">单选选项：</P>
+											<RadioGroup v-show="item.forsingle != null && item.forsingle.length != 0" v-model = "choiceList[index]" @on-change="selectChange(value,index)">
+												<Radio v-for="single in item.forsingle" :key="single.label" :label="single.label"></Radio>
+											</RadioGroup>
+										</Card>
+									</p>
+					
+							</div>
+							<div slot="footer">
+								<Button type="primary" @click="showQuestionListCancel">关闭</Button>
+								<Button type="primary" @click="FinishQuestionList">完成问卷</Button>
+							</div>
+						</Modal>
 						<Modal v-model="showTaskStepInfo">
 							<p slot="header" style="text-align:center">
 								<span>已完成步骤</span>
@@ -96,7 +132,8 @@
 									<Step :title="item.title" v-for="item in showTaskInfomation.steps" :key="item.title">
 									</Step>
 								</Steps>
-								<Button type="primary" @click="next" class="finshButton">完成当前步骤</Button>
+								<Button type="primary" @click="next" class="finshButton" v-show="!isNullStep">完成当前步骤</Button>
+								<Button type="primary" @click="next" class="finshButton" v-show="isNullStep">确认已完成任务</Button>
 							</Card>
 							</div>
 							<div slot="footer">
@@ -153,7 +190,7 @@
             return {
 				isWithdraw:false,
 				showTaskStepInfo: false,
-             
+                showQuestionList: false,
 				profilePhotoPath: '',
 				taskID: '',
 				userID: '',
@@ -177,6 +214,8 @@
 				current:0,
 				isCreateByOrgan:false,
 				organID:null,
+				isNullStep:false,
+				choiceList:[],
             }
         },
 		created: function () { 
@@ -238,6 +277,30 @@
 					console.log("任务信息");
 					console.log(response);
 					_this.showTaskInfomation = response.data;
+					if(_this.showTaskInfomation.steps.length == 0)
+					{
+						_this.isNullStep = true;
+					}
+					if(_this.showTaskInfomation.tags == '问卷'){
+						for(var k = 0; k < _this.showTaskInfomation.steps.length; k++){
+							//console.log(_this.showTaskInfomation.steps[k]);
+							if(_this.showTaskInfomation.steps[k].description != ''){
+								var tempsigle = [];
+								var temp = _this.showTaskInfomation.steps[k].description.split('&');
+								//console.log(temp);
+								for(var g = 1; g<temp.length;g++){
+									var test = {};
+									_this.$set(test,'label',temp[g]);
+									tempsigle.push(test);
+								}
+								_this.choiceList.push(tempsigle[0].label);
+								_this.$set(_this.showTaskInfomation.steps[k],'forsingle',tempsigle);
+							}else{
+								_this.choiceList.push('');
+							}
+						}
+						console.log(_this.choiceList);
+					}
 				}).catch(function (error) {
 					_this.$Message.error('获取任务信息失败!');
 					console.log(error);
@@ -269,13 +332,13 @@
 					 }
 				}).then(function (response){
 					_this.$Message.success('提现成功');
-					_this.money = -_this.topupData.value + _this.money;
+					_this.money = response.data.balance;
 					_this.topup = false;
 					_this.isWithdraw = false;
 					window.localStorage.setItem('money', _this.money);
 				}).catch(function (error) {
 					console.log(error);
-					_this.$Message.error('提现失败');
+					_this.$Message.error('提现失败，余额不足');
 					_this.topup = false;
 					_this.isWithdraw = false;
 				});				
@@ -296,7 +359,7 @@
 					 }
 				}).then(function (response){
 					_this.$Message.success('充值成功');
-					_this.money = _this.topupData.value + _this.money;
+					_this.money = response.data.balance;
 					_this.topup = false;
 					window.localStorage.setItem('money', _this.money);
 				}).catch(function (error) {
@@ -328,21 +391,44 @@
 					console.log(error);
 				});
 			},
-
+			selectChange(value,index){
+				console.log("选择:"+this.choiceList[index]);
+			},
             show (index) {
-				this.showTaskStepInfo = true;
-				/*
-                this.$Modal.info({
-                    title: '已完成步骤',
-                    content: `名字：${this.ongoing_participant_info[index].name}<br>`
-                })
-				*/
+				if(this.showTaskInfomation.tags == '问卷'){
+					this.showQuestionList = true;
+				}else{
+					this.showTaskStepInfo = true;
+				}
             },
 			showTaskCancel(){
 				 this.$Message.info('Clicked cancel');
 				 this.showTaskStepInfo = false;
 			},
+			showQuestionListCancel(){
+			    this.$Message.info('Clicked cancel');
+				this.showQuestionList = false;
+			},
+			FinishQuestionList(){
+				for(var i=0; i < this.choiceList.length;i++){
+					if(this.choiceList[i] != ''){
+						this.showTaskInfomation.steps[i].description = this.choiceList[i];
+					}
+				}
+				for(var i=0;i < this.showTaskInfomation.steps.length;i++){
+					if(this.showTaskInfomation.steps[i].description == ''){
+						 this.$Message.info("请将问卷填写完整");
+						 return;
+					}
+					console.log(this.showTaskInfomation.steps[i].description );
+				}
+				 this.$Message.info("填写问卷成功,等待对方确认");
+			},
 			next () {
+				if(this.isNullStep){
+					 this.$Message.info("成功完成任务,等待对方确认");
+					 return;
+				}
                 if (this.current == this.showTaskInfomation.steps.length - 1) {
                     this.$Message.info("成功完成任务,等待对方确认");
                 } else {
@@ -352,7 +438,7 @@
 					var jwt = "JWT " + window.localStorage.getItem('token');
 					this.$axios({
 						 method:"put",
-						 url: url_id,
+						 url: url_all,
 						 data:{
 							task_id:  this.taskID,
 							task_finished_steps: this.current

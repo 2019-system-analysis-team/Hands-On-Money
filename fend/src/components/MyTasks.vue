@@ -35,7 +35,7 @@
 					<div>
 						<Submenu name="4">
 							<template slot="title">
-								<Avatar :src="profilePhotoPath" style="background-color: #87d068"></Avatar>
+								<Avatar :src="profilePhotoPath" style="background-color: #515a6e"></Avatar>
 							</template>
 							<MenuItem name="4-1" to="/userinfomodify">个人信息</MenuItem>
 							<MenuItem name="4-2" @click.native="logout()">退出</MenuItem>
@@ -78,14 +78,14 @@
 									<p class="info">当前参与者人数 : {{showTaskInfomation.current_participant_number}}</p>
 									<p class="info">参与者人数上限 : {{showTaskInfomation.participant_number_limit}}</p>
 									<p class="info">完成奖励代币 : {{showTaskInfomation.reward_for_one_participant}}</p>
-									<p class="info">创建者名字 : {{showTaskInfomation.creator_organization_name}}</p>
+									<p class="info">任务所属组织 : {{showTaskInfomation.creator_organization_name}}</p>
 									<p class="info">创建者邮箱 : {{showTaskInfomation.creator_user_email}}</p>
 									<p class="info">创建者电话 : {{showTaskInfomation.creator_user_phone_number}}</p>
 									<p class="info">任务发布时间 : {{showTaskInfomation.post_time}}</p>
 									<p class="info">截止接受任务时间 : {{showTaskInfomation.receive_end_time}}</p>
 									<p class="info">最迟完成任务时间 : {{showTaskInfomation.finish_deadline_time}}</p>
-									<p class="info">步骤 : </p>
-									<Steps :current="showTaskInfomation.current">
+									<p class="info" v-show="showTaskInfomation.tags !=  '问卷' ">步骤 : </p>
+									<Steps :current="showTaskInfomation.current" v-show="showTaskInfomation.tags !=  '问卷'">
 										<Step :title="item.title" v-for="item in showTaskInfomation.steps" :key="item.title">
 										</Step>
 									</Steps>
@@ -327,13 +327,13 @@
 					 }
 				}).then(function (response){
 					_this.$Message.success('提现成功');
-					_this.money = -_this.topupData.value + _this.money;
+					_this.money = response.data.balance;
 					_this.topup = false;
 					_this.isWithdraw = false;
 					window.localStorage.setItem('money', _this.money);
 				}).catch(function (error) {
 					console.log(error);
-					_this.$Message.error('提现失败');
+					_this.$Message.error('提现失败,余额不足');
 					_this.topup = false;
 					_this.isWithdraw = false;
 				});				
@@ -354,7 +354,7 @@
 					 }
 				}).then(function (response){
 					_this.$Message.success('充值成功');
-					_this.money = _this.topupData.value + _this.money;
+					_this.money = response.data.balance;
 					_this.topup = false;
 					window.localStorage.setItem('money', _this.money);
 				}).catch(function (error) {
@@ -534,6 +534,8 @@
 				
 			},
 			createNewTask() {
+				window.localStorage.removeItem('organID');
+				window.localStorage.removeItem('taskID');
 				this.$router.push({
 					path: '/', 
 					name: 'missioncreate'
