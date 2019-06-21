@@ -13,7 +13,7 @@ from .home import token_required
 
 ##=============== Organization =======================
 # RESTful 创建组织
-@routes.route('/users/<user_id>/', methods=['POST'])
+@routes.route('/users/<user_id>/organizations', methods=['POST'])
 @token_required
 def create_organization(current_user, user_id):
     if current_user.id != int(user_id):
