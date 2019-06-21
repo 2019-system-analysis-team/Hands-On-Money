@@ -88,9 +88,10 @@ def printSingleTask(task):
     if task.steps is not None:
         steps_info = json.loads(task.steps)
     return {"task_id": task.id, 
+                    "user_id": creator.id, #???
                     "creator_user_email": creator.email,
                     "creator_user_phone_number": creator.phone_number,
-                   
+                    "creator_user_name": creator.nickname, # ????
                     "creator_organization_name": org_name,
                     "status": task.status,
                     "title": task.title,
@@ -162,10 +163,11 @@ def printPublicSingleTask(task):
             finished_participant_ids.append(par_user_id)
 
     return {        "task_id": task.id, 
+                    "user_id": user.id, #??
                     "creator_user_email": user.email,
                     "creator_user_phone_number": user.phone_number,
                     "creator_organization_name": organization_name,
-
+                    "creator_user_name": user.nickname, # ???
                     "status": task.status,
                     "title": task.title,
                     "description": task.description,
