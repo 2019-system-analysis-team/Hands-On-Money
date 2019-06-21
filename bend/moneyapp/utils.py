@@ -3,6 +3,13 @@ import json
 from flask import jsonify
 from datetime import datetime
 
+def createTransaction(_user_id, _organization_id, _money):
+    transaction = Transaction(user_id=_user_id, organization_id=_organization_id, money=_money, time=datetime.now())
+    db.session.add(transaction)
+    db.session.commit()
+    return transaction
+     
+
 def queryUserById(_id):
     user = User.query.filter_by(id=_id).first()
     return user

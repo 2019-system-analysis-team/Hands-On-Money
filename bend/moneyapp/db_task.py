@@ -45,7 +45,7 @@ def createTask(d):
     status = None
     steps_number = None
     if task.post_time and task.receive_end_time and task.finish_deadline_time:
-        status = "ongoing" if (datetime.utcnow() > task.post_time and datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
+        status = "ongoing" if (datetime.utcnow() > task.post_time and datetime.utcnow() < task.finish_deadline_time) else "pending"
     else:
         status = 'pending'
 

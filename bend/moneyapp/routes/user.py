@@ -141,6 +141,8 @@ def creating_user():
         hashed_password = bcrypt.generate_password_hash(d['password']).decode('utf-8')
         d.pop('password', None)
 
+        
+
         if request.files and request.files['file'] :
             file = request.files['file']
             filename = secure_filename(file.filename)

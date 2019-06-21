@@ -498,13 +498,14 @@ GET http://localhost:5000/users/2/organizations/1
 ```
 // Response 200 OK
 {
-    "name": "name11",
-    "bio": "bio11",
+    "name": "org111-kkwwwk",
+    "bio": "bio111",
+    "balance": 0,        // 新增balance
     "avg_comment": 5,
     "members": [
         {
             "user_id": 2,
-            "status": "admin"
+            "status": "owner"
         }
     ]
 }
@@ -1704,6 +1705,74 @@ PUT http://localhost:5000/users/1/tasks
 ]
 ```
 
+###### test case 4: 查找邮箱为test3@qq.com的用户创建的任务
+
+```
+GET http://localhost:5000/users/4/tasks?creator_user_email=test3@qq.com
+```
+
+```
+// Request
+// ...
+```
+
+```
+// Response
+[
+    {
+        "task_id": 12,
+        "creator_user_email": "test3@qq.com",
+        "creator_user_phone_number": "test3",
+        "creator_organization_name": null,
+        "status": "on going",
+        "title": "task3-1",
+        "description": "task3-1",
+        "tags": [
+            "tag1",
+            "tag2",
+            "tag3"
+        ],
+        "current_participant_number": 0,
+        "participant_number_limit": 10,
+        "reward_for_one_participant": 0.1,
+        "post_time": "2019-06-20 12:20:22",
+        "receive_end_time": "2019-06-20 13:20:22",
+        "finish_deadline_time": "2019-06-21 12:20:22",
+        "user_limit": {
+            "age_upper": 0,
+            "age_lower": 1,
+            "grades": [
+                "grade1",
+                "grade1"
+            ],
+            "sexes": [
+                "sex_type1",
+                "sex_type2",
+                "sex_type3"
+            ],
+            "schools": [
+                "school_name1",
+                "school_name2"
+            ]
+        },
+        "steps": [
+            {
+                "title": "step1",
+                "description": "string"
+            },
+            {
+                "title": "step2",
+                "description": "string"
+            }
+        ],
+        "participant_ids": [],
+        "ongoing_participant_ids": [],
+        "waiting_examine_participant_ids": [],
+        "finished_participant_ids": []
+    }
+]
+```
+
 ##### 任务接受
 
 @app.route('/users/<user_id>/tasks/<task_id>', methods=\['POST'\])
@@ -2529,6 +2598,135 @@ GET http://localhost:5000/tasks/1/reviews
             "rate": 1
         }
     ]
+}
+```
+
+#### 支付系统
+
+##### 用户充值
+
+```
+PUT http://localhost:5000/users/2/balance
+```
+
+```
+// Request
+{
+	"amount":5
+}
+```
+
+```
+// Response
+{
+    "balance": 5
+}
+```
+
+##### 用户给组织充值
+
+###### test case 1: 组织成员为组织充值
+
+```
+PUT http://localhost:5000/users/2/organizations/1/balance
+```
+
+```
+// Request
+{
+	"amount":5
+}
+```
+
+```
+// Response
+{
+    "balance": 10
+}
+```
+
+###### test case 2: 非组织成员为组织充值
+
+```
+PUT http://localhost:5000/users/1/organizations/1/balance
+```
+
+```
+// Request
+{
+    "amount":5
+}
+```
+
+```
+// Response
+{
+    "error_code": "401",
+    "error_msg": "insufficient permission"
+}
+```
+
+##### 提现(仅用户可)
+
+###### test case 1: 用户正常提现（金额足够）
+
+```
+PUT http://localhost:5000/users/2/balance
+```
+
+```
+// Request
+{
+    "amount":-5
+}
+```
+
+```
+// Response
+{
+    "amount": 5
+}
+```
+
+###### test case 2: 用户账户金额不足
+
+```
+PUT http://localhost:5000/users/1/balance
+```
+
+```
+// Request
+{
+    "amount":-5
+}
+```
+
+```
+// Response
+{
+    "error_code": 500,
+    "error_msg": "The balance is not enough!"
+}
+```
+
+###### test case 3: 尝试提现组织金额
+
+```
+PUT http://localhost:5000/users/2/organizations/1/balance
+```
+
+```
+// Request
+{
+    "amount":-1
+}
+```
+
+```
+// Response
+{
+    "error_code": 401,
+    "error_msg": "Can't withdraw the money of the organization"
 }
 ```
 

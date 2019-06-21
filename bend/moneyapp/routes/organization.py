@@ -82,6 +82,7 @@ def get_organization(current_user, user_id, organization_id):
     return jsonify({
         "name": organization.name,
         "bio": organization.bio,
+        "balance": organization.balance,
         "avg_comment": organization.average_comment,
         "members": members
     }), 200
@@ -240,7 +241,7 @@ def add_organization_member(current_user, user_id, organization_id):
                         "error_msg": "duplicate member"}), 500
     #addMember(user.id, int(organization_id), "member") # fix
     addMember(user.id, int(organization_id), status)
-    
+
     return jsonify({"msg": "add successfully."}), 201
 
 
