@@ -11,10 +11,43 @@
             </Header>
             <Content :style="{padding: '50px 50px'}">
 
+                <Modal v-model="showTaskInfo">
+                    <p slot="header" style="text-align:center">
+                        <Icon type="ios-information-circle"></Icon>
+                        <span>任务详情</span>
+                    </p>
+                    <div>
+                    <Card dis-hover>
+                        <p slot="title" class="info">{{displayData.title}}{{ownerMessage}}</p>
+                        标签 : <Tag v-for="item in displayData.tags" :key="item" :name="item" color="cyan">{{ item }}</Tag>
+                        <p class="info">任务描述 : {{displayData.description}}</p>
+                        <p class="info">当前参与者人数 : {{displayData.current_participant_number}}</p>
+                        <p class="info">参与者人数上限 : {{displayData.participant_number_limit}}</p>
+                        <p class="info">完成奖励代币 : {{displayData.reward_for_one_participant}}</p>
+                        <p class="info">创建者名字 : {{displayData.creator_organization_name}}</p>
+                        <p class="info">创建者邮箱 : {{displayData.creator_user_email}}</p>
+                        <p class="info">创建者电话 : {{displayData.creator_user_phone_number}}</p>
+                        <p class="info">任务发布时间 : {{displayData.post_time}}</p>
+                        <p class="info">截止接受任务时间 : {{displayData.receive_end_time}}</p>
+                        <p class="info">最迟完成任务时间 : {{displayData.finish_deadline_time}}</p>
+                        <p class="info">步骤 : </p>
+                        <Steps :current="displayData.current">
+                            <Step :title="item.title" v-for="item in displayData.steps" :key="item.title">
+                            </Step>
+                        </Steps>
+                    </Card>
+                    </div>
+                    <div slot="footer">
+                        <Button type="primary" ghost @click="showTaskCancel">确定</Button>
+                        <Button type="primary" @click="ToTaskInfo(displayData.task_id)" v-if="!isAcceptableTask">编辑</Button>
+                        <Button type="success" @click="testAccept();" v-if="isAcceptableTask">接受</Button>
+                    </div>
+                </Modal>
+
 				<Card :bordered="false">
 					<p slot="title">请填写下列条件信息</p>
 
-                    <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="110" id="form">
+                    <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="110" id="form" @keydown.native.enter.prevent ="handleSubmit('formValidate')">
 
                         <FormItem prop="title">
                             <div class="mainInputDivStyle">
@@ -23,7 +56,8 @@
                                     name="text" 
                                     class="mainInputStyle" 
                                     placeholder="输入任务名称"
-                                    onkeypress="checkPress(event)">
+                                    v-model="formValidate.title"
+                                    >
                                 <button type="button" id="searchButton" class="searchButtonStyle" @click="handleSubmit('formValidate')">
                                     <span>搜索</span>
                                 </button>
@@ -50,10 +84,10 @@
 
                                     <FormItem prop="size">
                                         <Col span="5">
-                                            <label style="right: 0px; width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">返回任务数量</label>
+                                            <label style="right: 0px; width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">返回任务最大数量</label>
                                         </Col>
                                         <Col span="6">
-                                            <InputNumber v-model="formValidate.size" ::min="0" empty></InputNumber>
+                                            <InputNumber v-model="formValidate.size" :min="0" empty></InputNumber>
                                         </Col>
                                     </FormItem>
 
@@ -93,9 +127,9 @@
                                         </Col>
                                         <Col span="6">
                                             <Select v-model="formValidate.status" style="width: 230px;">
-                                                <Option value="all">全部</Option>
+                                                <!-- <Option value="all">全部</Option> -->
                                                 <Option value="ongoing">正在进行</Option>
-                                                <Option value="finished">已结束</Option>
+                                                <Option value="not ongoing">未进行</Option>
                                             </Select>
                                         </Col>
                                     </FormItem>
@@ -105,7 +139,7 @@
                                             <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">Tag</label>
                                         </Col>
                                         <Col span="6">
-                                            <Select v-model="tasktags" multiple :max-tag-count="2" style="width: 230px;">
+                                            <Select v-model="formValidate.tags" multiple :max-tag-count="2" style="width: 230px;">
                                                 <Option v-for="item in tagList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                                             </Select>
                                         </Col>
@@ -116,7 +150,7 @@
                                             <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">单人最低报酬</label>
                                         </Col>
                                         <Col span="6">
-                                            <InputNumber v-model="formValidate.reward_for_one_participant_lower" ::min="0"></InputNumber>
+                                            <InputNumber v-model="formValidate.reward_for_one_participant_lower" :min="0"></InputNumber>
                                         </Col>
                                     </FormItem>
 
@@ -125,7 +159,7 @@
                                             <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">单人最高报酬</label>
                                         </Col>
                                         <Col span="6">
-                                            <InputNumber v-model="formValidate.reward_for_one_participant_upper" ::min="0"></InputNumber>
+                                            <InputNumber v-model="formValidate.reward_for_one_participant_upper" :min="0"></InputNumber>
                                         </Col>
                                     </FormItem>
 
@@ -185,7 +219,7 @@
                                             <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">参与者最大年龄</label>
                                         </Col>
                                         <Col span="6">
-                                            <InputNumber v-model="formValidate.age_upper" ::min="0"></InputNumber>
+                                            <InputNumber v-model="formValidate.age_upper" :min="0"></InputNumber>
                                         </Col>
                                     </FormItem>
 
@@ -194,12 +228,11 @@
                                             <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">年级</label>
                                         </Col>
                                         <Col span="6">
-                                            <Select v-model="formValidate.grades" style="width: 230px;">
+                                            <Select v-model="formValidate.grades" multiple style="width: 230px;">
                                                 <Option value="grade1">大一</Option>
                                                 <Option value="grade2">大二</Option>
                                                 <Option value="grade3">大三</Option>
                                                 <Option value="grade4">大四</Option>
-                                                <Option value="grade0">其他</Option>
                                             </Select>
                                         </Col>
                                     </FormItem>
@@ -209,10 +242,9 @@
                                             <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">性别</label>
                                         </Col>
                                         <Col span="6">
-                                            <Select v-model="formValidate.sexes" style="width: 230px;">
+                                            <Select v-model="formValidate.sexes" multiple style="width: 230px;">
                                                 <Option value="sex_type1">男</Option>
                                                 <Option value="sex_type2">女</Option>
-                                                <Option value="sex_type3">其他</Option>
                                             </Select>
                                         </Col>
                                     </FormItem>
@@ -222,7 +254,7 @@
                                             <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">学校</label>
                                         </Col>
                                         <Col span="6">
-                                            <Select v-model="formValidate.schools" style="width: 230px;">
+                                            <Select v-model="formValidate.schools" multiple style="width: 230px;">
                                                 <Option value="school_name1">中山大学</Option>
                                                 <Option value="school_name2">广东外语外贸大学</Option>
                                                 <Option value="school_name3">华南理工大学</Option>
@@ -233,7 +265,6 @@
                                                 <Option value="school_name8">广州工业大学</Option>
                                                 <Option value="school_name9">星海音乐学院</Option>
                                                 <Option value="school_name10">华南师范大学</Option>
-                                                <Option value="school_name0">其他</Option>
                                             </Select>
                                         </Col>
                                     </FormItem>
@@ -259,7 +290,7 @@
 
                 <Card :bordered="false" style="top: 20px;">
                     <p slot="title">查询结果 (点击任务所在行查看详细信息)</p>
-                    <Table :columns="taskInfoCol" :data="taskInfoData"></Table>
+                    <Table :columns="taskInfoCol" :data="taskInfoData" width="1314"></Table>
                 </Card>
 
             </Content>
@@ -274,7 +305,11 @@
   export default {
         data () {
             return {
+                ownerMessage: '',
+                isAcceptableTask: true,
+                showTaskInfo: false,
                 showdrawer: false,
+                displayData: {},
 				ageoptionsList:[],
                 formValidate: {
                     size: 100,
@@ -283,22 +318,21 @@
                     creator_organization_name: '',
                     status: '',
                     title: '',
-                    tags: '',
+                    tags: [],
                     reward_for_one_participant_lower: 0,
                     reward_for_one_participant_upper: 999,
                     receive_end_time: '',
                     finish_deadline_time: '',
                     age_upper: 30,
                     age_lower: 10,
-                    grades: '',
-                    sexes: '',
-                    schools: '',
+                    grades: [],
+                    sexes: [],
+                    schools: [],
                     steps_number_upper: 100,
                     steps_number_lower: 0
                 },
-
                 ruleValidate: {},
-                tasktags: [],
+                returnData: {},
 				tagList: [
                     {
                         value: '心理实验',
@@ -321,6 +355,8 @@
                 taskInfoCol: [
                     {
                         title: '任务名',
+                        width: 150,
+                        align: 'center',
                         key: 'name',
 
                         render: (h, params) => {
@@ -331,21 +367,18 @@
                                 // },
                                 style: {
                                     // marginRight: '5px'
+                                    // border: '1px solid red',
+                                    textAlign: 'center',
                                     padding: '15px 23px',
                                     marginLeft: '-18px',
-                                    width: '300px',
+                                    width: '150px',
                                     height: '47px',
                                     cursor: 'pointer'
                                 },
                                 on: {
                                     click: () => {
-                                        // window.open("https://www.baidu.com");
-                                        //this.$Message.error('' + params.index);
-                                        //console.log(params.index);
-                                        this.$router.push({
-                                            path: '/', 
-                                            name: 'taskinfoforcreate',
-                                        });	
+                                        this.showTaskAllInfo(this.$data.returnData.data[this.taskInfoData[params.index].num]);
+                                        // console.log(params.index);
                                     }
                                 }
                             }, this.taskInfoData[params.index].name)
@@ -354,25 +387,25 @@
                     },
                     {
                         title: 'tag',
+                        width: 200,
+                        align: 'center',
                         key: 'tag',
                         render: (h, params) => {
                             return h('div', {
                                 style: {
                                     // marginRight: '5px'
+                                    // border: '1px solid red',
+                                    textAlign: 'center',
                                     padding: '15px 23px',
                                     marginLeft: '-18px',
-                                    width: '300px',
+                                    width: '200px',
                                     height: '47px',
                                     cursor: 'pointer'
                                 },
                                 on: {
                                     click: () => {
-                                        //this.$Message.error('' + params.index);
-                                        //console.log(params.index);
-                                        this.$router.push({
-                                            path: '/', 
-                                            name: 'taskinfoforcreate',
-                                        });	                                        
+                                        // console.log(params.index);
+                                        this.showTaskAllInfo(this.$data.returnData.data[this.taskInfoData[params.index].num]);
                                     }
                                 }
                             }, this.taskInfoData[params.index].tag)
@@ -380,25 +413,25 @@
                     },
                     {
                         title: '发布方',
+                        width: 200,
+                        align: 'center',
                         key: 'boss',
                         render: (h, params) => {
                             return h('div', {
                                 style: {
                                     // marginRight: '5px'
+                                    // border: '1px solid red',
+                                    textAlign: 'center',
                                     padding: '15px 23px',
                                     marginLeft: '-18px',
-                                    width: '300px',
+                                    width: '200px',
                                     height: '47px',
                                     cursor: 'pointer'
                                 },
                                 on: {
                                     click: () => {
-                                        //this.$Message.error('' + params.index);
-                                        //console.log(params.index);
-                                        this.$router.push({
-                                            path: '/', 
-                                            name: 'taskinfoforcreate',
-                                        });	                                        
+                                        // console.log(params.index);
+                                        this.showTaskAllInfo(this.$data.returnData.data[this.taskInfoData[params.index].num]);
                                     }
                                 }
                             }, this.taskInfoData[params.index].boss)
@@ -406,25 +439,25 @@
                     },
                     {
                         title: '状态',
+                        width: 200,
+                        align: 'center',
                         key: 'status',
                         render: (h, params) => {
                             return h('div', {
                                 style: {
                                     // marginRight: '5px'
+                                    // border: '1px solid red',
+                                    textAlign: 'center',
                                     padding: '15px 23px',
                                     marginLeft: '-18px',
-                                    width: '300px',
+                                    width: '200px',
                                     height: '47px',
                                     cursor: 'pointer'
                                 },
                                 on: {
                                     click: () => {
-                                        //this.$Message.error('' + params.index);
-                                        //console.log(params.index);
-                                        this.$router.push({
-                                            path: '/', 
-                                            name: 'taskinfoforcreate',
-                                        });	                                        
+                                        // console.log(params.index);
+                                        this.showTaskAllInfo(this.$data.returnData.data[this.taskInfoData[params.index].num]);
                                     }
                                 }
                             }, this.taskInfoData[params.index].status)
@@ -432,25 +465,25 @@
                     },
                     {
                         title: '发布时间',
+                        width: 230,
+                        align: 'center',
                         key: 'reltime',
                         render: (h, params) => {
                             return h('div', {
                                 style: {
                                     // marginRight: '5px'
+                                    // border: '1px solid red',
+                                    textAlign: 'center',
                                     padding: '15px 23px',
                                     marginLeft: '-18px',
-                                    width: '300px',
+                                    width: '230px',
                                     height: '47px',
                                     cursor: 'pointer'
                                 },
                                 on: {
                                     click: () => {
-                                        //this.$Message.error('' + params.index);
-                                        //console.log(params.index);
-                                        this.$router.push({
-                                            path: '/', 
-                                            name: 'taskinfoforcreate',
-                                        });	                                        
+                                        // console.log(params.index);
+                                        this.showTaskAllInfo(this.$data.returnData.data[this.taskInfoData[params.index].num]);
                                     }
                                 }
                             }, this.taskInfoData[params.index].reltime)
@@ -458,25 +491,25 @@
                     },
                     {
                         title: '截止时间',
+                        width: 230,
+                        align: 'center',
                         key: 'ddltime',
                         render: (h, params) => {
                             return h('div', {
                                 style: {
                                     // marginRight: '5px'
+                                    // fontSize: '15px',
+                                    // border: '1px solid red',
                                     padding: '15px 23px',
                                     marginLeft: '-18px',
-                                    width: '300px',
+                                    width: '230px',
                                     height: '47px',
                                     cursor: 'pointer'
                                 },
                                 on: {
                                     click: () => {
-                                        //this.$Message.error('' + params.index);
-                                        //console.log(params.index);
-                                        this.$router.push({
-                                            path: '/', 
-                                            name: 'taskinfoforcreate',
-                                        });	                                        
+                                        // console.log(params.index);
+                                        this.showTaskAllInfo(this.$data.returnData.data[this.taskInfoData[params.index].num]);
                                     }
                                 }
                             }, this.taskInfoData[params.index].ddltime)
@@ -495,7 +528,7 @@
                                         size: 'small'
                                     },
                                     style: {
-                                        marginRight: '5px',
+                                        // marginRight: '5px',
                                         // display: (params.row.status == "1")?"inline-block":"none"
                                     },
                                     on: {
@@ -510,182 +543,168 @@
                     }
                 ],
                 taskInfoData: [
-                    {
-                        name: 'Coding1',
-                        tag: 'first',
-                        boss: 'Tencent',
-                        reltime: '2016-10-03',
-                        ddltime: '2016-11-03'
-                    },
-                    {
-                        name: 'Coding2',
-                        tag: 'second',
-                        boss: 'Huawei',
-                        reltime: '2016-11-02',
-                        ddltime: '2016-11-04'
-                    },
-                    {
-                        name: 'Coding3',
-                        tag: 'third',
-                        boss: 'Samsung',
-                        reltime: '2016-11-11',
-                        ddltime: '2016-11-13'
-                    },
-                    {
-                        name: 'Coding4',
-                        tag: 'forth',
-                        boss: 'Individual',
-                        reltime: '2016-10-29',
-                        ddltime: '2016-11-31'
-                    },
+                    // {
+                    //     name: 'Coding1',
+                    //     tag: [],
+                    //     boss: 'Tencent',
+                    //     status: 'ongoing',
+                    //     reltime: '2016-10-03',
+                    //     ddltime: '2016-11-03',
+                    //     status: 'ongong',
+                    //     num: 1
+                    // }
                 ]
 
             }
         },
         
 		created: function () { 
-			this.getEventData();
+            this.getEventData();
 		},
         methods: {
+            testAccept() {
+                alert("Waiting to be improved");
+            },
 
 
+            showTaskAllInfo(paraDisData) {
+                this.$data.showTaskInfo = true;
+                this.$data.displayData = paraDisData;
+                if(paraDisData.creator_organization_name == null)
+                    this.$data.displayData.creator_organization_name = paraDisData.creator_user_name;
+                var tempUID = window.localStorage.getItem('userID');
+                if(tempUID == paraDisData.user_id) {
+                    this.$data.isAcceptableTask = false;
+                    this.$data.ownerMessage = ' (由本用户创建)';
+                }
+                else {
+                    this.$data.isAcceptableTask = true;
+                    this.$data.ownerMessage = '';
+                }
+            },
 
 
+			showTaskCancel(){
+				 this.showTaskInfo = false;
+			},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			ToTaskInfo(taskID){
+                window.localStorage.setItem('taskID', taskID);
+                window.localStorage.removeItem('organID');
+                this.$router.push({
+                    path: '/', 
+                    name: 'taskinfoforcreate',
+                    params: { 
+                        taskID: taskID
+                    },
+                });
+			},
 
 
 			getEventData:function() {
-				// let routerParams = this.$route.params.organID;
-				// //console.log(routerParams);
-						
-				// if(routerParams != null)
-				// {
-				// 	this.isOrganCreate = true;
-				// 	this.organID = routerParams;
-				// }
-				// let task  =  this.$route.params.taskID;
-				// if(task != null)
-				// {
-				// 	this.isTaskChange = true;
-				// 	this.taskID = task;
-				// }
-				// /*
-				// let uID = window.localStorage.getItem('userID')
-				// if(uID == null || uID == ""){
-				// 	//跳转到主页
-				// 	this.$router.push({
-				// 		path: '/', 
-				// 		name: 'mainpage'
-				// 	});
-				// }
-				// */
-				
-				// if(this.isTaskChange){
-				// 	var _this = this;
-				// 	var url = "/users/" + uID;
-				// 	if(this.isCreateByOrgan){
-				// 		url += "/organizations/" + this.organID + "/my_tasks/" + this.taskID;
-				// 	}
-				// 	else{
-				// 		url += "/my_tasks/" + this.taskID;
-				// 	}
-				// 	var jwt = "JWT " + window.localStorage.getItem('token');	
-				// 	this.$axios({
-				// 		 method:"get",
-				// 		 url: url,
-				// 		 headers:{
-				// 			'Authorization': jwt,
-				// 		 }
-				// 	}).then(function (response){
-				// 		console.log(response.data);
-				// 		_this.formValidate.taskName = response.data.title;
-				// 		_this.formValidate.missionbrief = response.data.description;
-				// 		_this.formValidate.memnumber = response.data.participant_number_limit;
-				// 		_this.formValidate.reward = response.data.reward_for_one_participant;
-				// 		_this.formValidate.receive_end_time = response.data.receive_end_time;
-				// 		_this.formValidate.finish_deadline_time = response.data.finish_deadline_time;
-				// 		_this.haveUserLimit = true;
-				// 		_this.user_limit.age_upper = response.data.user_limit.age_upper;
-				// 		_this.user_limit.age_lower = response.data.user_limit.age_lower;
-				// 		_this.user_limit.grades = response.data.user_limit.grades;
-				// 		_this.user_limit.sexes = response.data.user_limit.sexes;
-				// 		_this.user_limit.schools = response.data.user_limit.schools;
-				// 		for(var i=0; i< response.data.steps.length;i++){
-				// 			 _this.citems.push({id: (_this.citemcount)++, number: _this.citemnum++,description:response.data.steps[i].description});
-				// 		}
-				// 	}).catch(function (error) {
-				// 		console.log(error);
-				// 	});	
-				// }
+                let uID = window.localStorage.getItem('userID');
+                if(uID == null || uID == ""){
+                    this.$router.push({
+                        path: '/', 
+                        name: 'mainpage'
+                    });
+                }
 
-
-
+                var url = "/users/" + uID + "/tasks";
+                this.$data.userID = uID;
+                var jwt = "JWT " + window.localStorage.getItem('token');
+                var _this = this;
+                this.$axios({
+                    method:"get",
+                    url:url,
+                    params: {},
+                    headers:{
+                        'Authorization': jwt,
+                    },
+                }).then(function (response){
+                    _this.$data.returnData = response;
+                    // console.log(_this.$data.returnData);
+                    for(var i = 0; i < response.data.length; ++i) {
+                        var temptags = "";
+                        var tempboss = response.data[i].creator_organization_name;
+                        if(tempboss == null)
+                            tempboss = response.data[i].creator_user_name;
+                        for(var j = 0; j < response.data[i].tags.length; ++j)
+                            temptags += response.data[i].tags[j] + " ";
+                        var tempdata = {
+                            name: response.data[i].title,
+                            boss: tempboss,
+                            reltime: response.data[i].post_time,
+                            ddltime: response.data[i].receive_end_time,
+                            status: response.data[i].status,
+                            tag:  temptags,
+                            num: i
+                        };
+                        _this.$data.taskInfoData.push(tempdata);
+                    }
+                }).catch(function (error) {
+                    _this.$Message.error('请先登录');
+                    console.log(error);
+                });
 			},
 
 
 
 
+            getConditions() {
+                var returnConditions = {
+                    user_limit: {}
+                };
+                if(this.$data.formValidate.status != '')
+                    returnConditions["status"] = this.$data.formValidate.status;
+                if(this.$data.formValidate.creator_user_email != "")
+                    returnConditions["creator_user_email"] = this.$data.formValidate.creator_user_email;
+                if(this.$data.formValidate.size != null)
+                    returnConditions["size"] = this.$data.formValidate.size;
+                if(this.$data.formValidate.creator_user_phone_number != "")
+                    returnConditions["creator_user_phone_number"] = this.$data.formValidate.creator_user_phone_number;
+                if(this.$data.formValidate.creator_organization_name != "")
+                    returnConditions["creator_organization_name"] = this.$data.formValidate.creator_organization_name;
+                if(this.$data.formValidate.title != "")
+                    returnConditions["title"] = this.$data.formValidate.title;
+                if(this.$data.formValidate.receive_end_time != "")
+                    returnConditions["receive_end_time"] = this.$data.formValidate.receive_end_time;
+                if(this.$data.formValidate.finish_deadline_time != "")
+                    returnConditions["finish_deadline_time"] = this.$data.formValidate.finish_deadline_time;
+                if(this.$data.formValidate.tags.length != 0)
+                    returnConditions["tags"] = this.$data.formValidate.tags;
+                if(this.$data.formValidate.reward_for_one_participant_upper != null)
+                    returnConditions["reward_for_one_participant_upper"] = this.$data.formValidate.reward_for_one_participant_upper;
+                if(this.$data.formValidate.reward_for_one_participant_lower != null)
+                    returnConditions["reward_for_one_participant_lower"] = this.$data.formValidate.reward_for_one_participant_lower;
+                if(this.$data.formValidate.age_upper != null)
+                    returnConditions["user_limit"]["age_upper"] = this.$data.formValidate.age_upper;
+                if(this.$data.formValidate.age_lower != null)
+                    returnConditions["user_limit"]["age_lower"] = this.$data.formValidate.age_lower;
+                if(this.$data.formValidate.steps_number_upper != null)
+                    returnConditions["steps_number_upper"] = this.$data.formValidate.steps_number_upper;
+                if(this.$data.formValidate.steps_number_lower != null)
+                    returnConditions["steps_number_lower"] = this.$data.formValidate.steps_number_lower;
+                if(this.$data.formValidate.age_upper != null)
+                    returnConditions["user_limit"]["age_upper"] = this.$data.formValidate.age_upper;
+                if(this.$data.formValidate.age_lower != null)
+                    returnConditions["user_limit"]["age_lower"] = this.$data.formValidate.age_lower;
+                if(this.$data.formValidate.grades.length != 0)
+                    returnConditions["user_limit"]["grades"] = this.$data.formValidate.grades;
+                if(this.$data.formValidate.sexes.length != 0)
+                    returnConditions["user_limit"]["sexes"] = this.$data.formValidate.sexes;
+                if(this.$data.formValidate.schools.length != 0)
+                    returnConditions["user_limit"]["schools"] = this.$data.formValidate.schools;
+
+
+                // console.log(returnConditions);
+                return returnConditions;
+            },
+
 
 
 			handleSubmit (name) {
+                 this.$data.taskInfoData = [];
 				 this.$refs[name].validate((valid) => {
 					 if (valid){
                         if(this.formValidate.age_upper < this.formValidate.age_lower){
@@ -700,59 +719,58 @@
                             this.$Message.error('个人最低报酬不能大于个人最高报酬');
                                 return;
                         }
-						/*
-						*   POST /users/:user_id/tasks HTTP/1.1
-							//or request: organization creating task 
-							POST /users/:user_id/organizations/:organization_id/tasks HTTP/1.1
-						*/
-                        var _this = this;
-						var jwt = "JWT " + window.localStorage.getItem('token');
-						var url = "/users/"+ this.$data.userID +"/tasks";
 
+                        let uID = window.localStorage.getItem('userID');
+                        if(uID == null || uID == ""){
+                            this.$router.push({
+                                path: '/', 
+                                name: 'mainpage'
+                            });
+                        }
+                        var url = "/users/" + uID + "/tasks";
+                        this.$data.userID = uID;
+                        var jwt = "JWT " + window.localStorage.getItem('token');
+                        var _this = this;
                         this.$axios({
-                            method:"post",
+                            method:"get",
                             url:url,
-                            data:{
-                                size: this.formValidate.size,
-                                creator_user_email: this.formValidate.creator_user_email,
-                                creator_user_phone_number: this.formValidate.creator_user_phone_number,
-                                creator_organization_name: this.formValidate.creator_organization_name,
-                                status: this.formValidate.status,
-                                tags: this.tasktags,
-                                title: this.formValidate.title,
-                                reward_for_one_participant_upper: this.formValidate.reward_for_one_participant_upper,
-                                reward_for_one_participant_lower: this.formValidate.reward_for_one_participant_lower,
-                                receive_end_time: this.formValidate.receive_end_time,
-                                finish_deadline_time: this.formValidate.finish_deadline_time,
-                                age_upper: this.formValidate.age_upper,
-                                age_lower: this.formValidate.age_lower,
-                                grades: this.formValidate.grades,
-                                sexes: this.formValidate.sexes,
-                                schools: this.formValidate.schools,
-                                steps_number_upper: this.formValidate.steps_number_upper,
-                                steps_number_lower: this.formValidate.steps_number_lower,
-                            },
+                            params: this.getConditions(),
                             headers:{
                                 'Authorization': jwt,
+                            },
+                        }).then(function (response){
+                            // _this.$Message.success('success');
+                            _this.$data.returnData = response;
+                            console.log(response);
+                            for(var i = 0; i < response.data.length; ++i) {
+                                var temptags = "";
+                                var tempboss = response.data[i].creator_organization_name;
+                                if(tempboss == null)
+                                    tempboss = response.data[i].creator_user_name;
+                                for(var j = 0; j < response.data[i].tags.length; ++j)
+                                    temptags += response.data[i].tags[j] + " ";
+                                var tempdata = {
+                                    name: response.data[i].title,
+                                    boss: tempboss,
+                                    reltime: response.data[i].post_time,
+                                    ddltime: response.data[i].receive_end_time,
+                                    status: response.data[i].status,
+                                    tag:  temptags,
+                                    num: i
+                                };
+                                _this.$data.taskInfoData.push(tempdata);
                             }
-                        }).then(function (response) {
-                                console.log(response);
-                                 _this.$Message.success('任务查询成功!');
                         }).catch(function (error) {
-                            _this.$Message.error('任务查询失败!');
-                            console.log(error);
+                            _this.$Message.error('failure');
+                            console.log(error)
                         });
-						console.log("提交成功");
 					 }
-				 })
+                })
 			},
-
-
-
 
             handleReset (name) {
                 this.$refs[name].resetFields();
-                this.tasktags = [];
+                this.formValidate.tags = [];
             },
 			handleReturnHomepage () {
 			    // 返回主页
@@ -764,9 +782,6 @@
         }
     }
 </script>
-
-
-
 
 
 <style scoped>
@@ -937,4 +952,8 @@ a:active {color: lightgray;}
 	text-align: center;
 	line-height: 50px;
 }
+
+.info {	
+    margin-bottom: 10px;
+}   
 </style>
