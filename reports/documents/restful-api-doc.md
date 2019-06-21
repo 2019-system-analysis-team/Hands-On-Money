@@ -20,11 +20,11 @@
 
 ## 目录
 
-- [RESTful API 设计文档](#restful-api-%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3)
+- [RESTful API 设计文档](#RESTful-API-%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3)
   - [标准](#%E6%A0%87%E5%87%86)
   - [参考](#%E5%8F%82%E8%80%83)
   - [目录](#%E7%9B%AE%E5%BD%95)
-  - [API](#api)
+  - [API](#API)
     - [用户与组织系统](#%E7%94%A8%E6%88%B7%E4%B8%8E%E7%BB%84%E7%BB%87%E7%B3%BB%E7%BB%9F)
       - [用户创建](#%E7%94%A8%E6%88%B7%E5%88%9B%E5%BB%BA)
       - [用户登陆](#%E7%94%A8%E6%88%B7%E7%99%BB%E9%99%86)
@@ -71,6 +71,7 @@
     - 对于键值不符合文档要求的 request，一律返回 400 Bad Request
     - 对于不在文档列表中的 request HTTP verb，一律返回 405 Method Not Allowed
     - 除部分注册、登陆可访问的 API 之外，未经正确验证 JWT 的 API 访问一律返回 401 Unauthorized
+    - 对于每个带 json 的 GET 查询API，请转成 param 再发过去，格式为 `resource?key1=value1&key2=value2`
 ```json
 //response: Bad Request. This post is SOMEHOW WRONG. 
 //e.g. key is not correct, or value contain not-allowed characters (just like attacker)
