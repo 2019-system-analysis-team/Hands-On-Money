@@ -117,9 +117,8 @@ def check_organization_tasks(current_user, user_id, organization_id):
 
     task_info = []
 
-    for task in current_user.tasks:
-        if task.organization is not None:
-            task_info.append(printTaskBrief(task))
+    for task in organization.tasks:
+        task_info.append(printTaskBrief(task))
 
     return jsonify({"task": task_info}), 200
 
@@ -187,7 +186,7 @@ def get_received_task(current_user, user_id):
     task_info = []
 
     for received_task_record in current_user.received_tasks:
-        task_info.append(printTaskBrief(received_task_record.task))
+        task_info.append(printTaskBriefReceive(received_task_record))
 
     return jsonify(task_info), 200
 

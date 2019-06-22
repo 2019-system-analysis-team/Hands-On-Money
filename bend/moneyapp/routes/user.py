@@ -17,6 +17,37 @@ from . import routes
 from .home import token_required , blacklist
 
 ##=========== Users ===============================
+
+# 修改密码
+@routes.route('/users/<user_id>/password', methods=['PUT'])
+@token_required
+def modifyPassword(current_user, user_id):
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+
+    try:
+        d = request.get_json()
+        old_password = d['old_password']
+        new_password = d['new_password']
+        user = queryUserById(user_id)
+
+    except Exception as e:
+        return jsonify({"error_code": "400", "error_msg": "fuck you asshole"}),400
+
+    if user:
+        bcrypt = Bcrypt(current_app)
+        if bcrypt.check_password_hash(user.password, old_password):
+            hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+            try:
+                changePassword(user_id, hashed_password)
+            except Exception as e:
+                return jsonify({"error_code": 500, "error_msg": str(e)}), 500
+            else:
+                return jsonify({"message": "Modify Successfully!"}), 200
+        else:
+            return jsonify({"error_code": "404", "error_msg": "account not found/password incorrect"}), 404
+    
+
 # RESTful 用户登录
 @routes.route('/sessions', methods=['POST'])
 def login():
@@ -85,6 +116,8 @@ def get_user_info(current_user, user_id):
                             })
         else:
             return jsonify({'user_id': user.id,
+                            'student_id': user.student_id,
+                            'phone_number': user.phone_number,
                             'profile_photo_path': user.profile_photo_path,
                             'name': user.name,
                             'age': user.age,

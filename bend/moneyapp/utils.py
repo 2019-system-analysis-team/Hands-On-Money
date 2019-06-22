@@ -116,6 +116,15 @@ def printTaskBrief(task):
     return {"task_id": task.id,
             "task_name": task.title,
             "task_status": task.status}
+
+# 打印任务简介（包括step）
+def printTaskBriefReceive(received_task_record):
+    task = received_task_record.task
+    return {"task_id": task.id,
+            "task_name": task.title,
+            "task_status": task.status,
+            "current_step": received_task_record.step}
+
 # 打印参与者信息
 def printUserInfoOfTask(task):
     participant_ids = []

@@ -7,6 +7,10 @@ from moneyapp.utils import *
 # ====================================================================
 # User
 # 访客基础信息
+def changePassword(_user_id, _hashed_password):
+    user = queryUserById(_user_id)
+    user.password = _hashed_password
+    db.session.commit()
 
 def addUser(_nickname, _email, _hashed_password, _phone_number, _profile_photo_path):
     user = User(nickname=_nickname, email=_email, password=_hashed_password, phone_number=_phone_number, profile_photo_path=_profile_photo_path)

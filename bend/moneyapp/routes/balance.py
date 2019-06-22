@@ -56,7 +56,7 @@ def chargeForOrganization(current_user, user_id, organization_id):
 
 
     record = queryRecord(current_user.id, organization_id)
-    if not record or record.status == 'member':
+    if not record:
         return jsonify({"error_code": "401",
                         "error_msg": "insufficient permission"}), 401
 
@@ -71,7 +71,10 @@ def chargeForOrganization(current_user, user_id, organization_id):
         if amount < 0:
             return jsonify({"error_code": 401,
                             "error_msg": "Can't withdraw the money of the organization"}), 401
-        balance = charge(user_id, organization_id, amount)
+        try:
+            balance = charge(user_id, organization_id, amount)
+        except Exception as e:
+            return jsonify({"error_code":500, "error_msg":str(e)}), 500
 
     return jsonify({"balance": balance}), 200
 

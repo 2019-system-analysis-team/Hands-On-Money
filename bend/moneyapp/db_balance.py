@@ -31,7 +31,22 @@ def charge(_user_id, _organization_id, _amount):
 	# 组织
 	else:
 		organization = queryOrganizationByID(_organization_id)
-		organization.balance += _amount
-		transaction = createTransaction(_user_id, _organization_id, _amount)
-		db.session.commit()
-		return organization.balance
+		balance_flag = checkBalance(_user_id, None, _amount)
+		if balance_flag:
+			user.balance -= _amount
+			organization.balance += _amount
+			transaction = createTransaction(_user_id, _organization_id, _amount)
+			db.session.commit()
+			return organization.balance
+		else:
+			raise ValueError("The balance is not enough!")
+	
+		
+
+
+
+
+
+
+
+

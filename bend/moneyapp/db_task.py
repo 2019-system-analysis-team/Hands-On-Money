@@ -44,10 +44,12 @@ def createTask(d):
 
     status = None
     steps_number = None
-    if task.post_time and task.receive_end_time and task.finish_deadline_time:
-        status = "ongoing" if (datetime.utcnow() > task.post_time and datetime.utcnow() < task.finish_deadline_time) else "pending"
-    else:
-        status = 'pending'
+    
+    # if task.post_time and task.receive_end_time and task.finish_deadline_time:
+    #     status = "ongoing" if (datetime.utcnow() > task.post_time and datetime.utcnow() < task.finish_deadline_time) else "pending"
+    # else:
+    #     status = 'pending'
+    status = 'ongoing'
 
     if 'steps' in d and d['steps'] is not None:
         steps_number = len(json.loads(d['steps']))
@@ -157,6 +159,8 @@ def searchTask(d):
 
     if 'status' in d:
         task_temp = task_temp.filter(Task.status == d['status'])
+
+
     # 时间筛选还要再思考一下!!!!
     if 'receive_end_time' in d:
         task_temp = task_temp.filter(Task.receive_end_time == d['receive_end_time'])
@@ -175,6 +179,10 @@ def searchTask(d):
     task_not_satisfy = set()
     
     for task in task_temp:
+        # pending 不能被搜索到
+        if task.status == 'pending':
+            task_not_satisfy.add(task)
+
         if task.steps:
             steps_number_of_task = len(json.loads(task.steps))
             if 'steps_number_lower' in d:
@@ -293,6 +301,15 @@ def userChangeReceiveTask(_user_id,_task_id,_step_id):
     task_steps = json.loads(task_steps_json_str)
     steps_num = len(task_steps)
     
+    # step_id 为0 -》 问卷
+    if _step_id == 0:
+        task_record.status = 'waiting examine'
+        
+        db.session.commit()
+
+        return task_record
+
+
     # step_id 超过规定的step_num 或者step_id已经标记过了
     if _step_id > steps_num or _step_id <= task_record.step or _step_id != (task_record.step + 1):
         raise ValueError('Step number incorrect')
@@ -345,6 +362,8 @@ def modifyTask(_task_id, _user_id, _organization_id, d):
 
     if task.status != 'pending':
         raise AssertionError("The task is not pended")
+
+    d['status'] = 'ongoing'
 
     items = {'title', 'description', 'tags', 'participant_number_limit',\
             'reward_for_one_participant', 'post_time', 'receive_end_time',\

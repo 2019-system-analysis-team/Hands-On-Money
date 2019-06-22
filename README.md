@@ -412,7 +412,72 @@ file
 { "message": "update successfully!" }
 ```
 
+##### 用户修改密码
 
+@app.route('/users/<user_id>/password', methods=['PUT'])
+
+###### test case 1: 尝试修改自己之外的账户的密码
+
+```
+PUT http://localhost:5000/users/1/password
+```
+
+```
+{
+	"old_password":"123",
+	"new_password":"231"
+}
+```
+
+```
+{
+    "error_code": "404",
+    "error_msg": "user Not Found"
+}
+```
+
+###### test case 2: 正常修改密码
+
+```
+PUT http://localhost:5000/users/2/password
+```
+
+```
+// Request
+{
+	"old_password":"test2",
+	"new_password":"test2-new"
+}
+```
+
+```
+// Response
+{
+    "message": "Modify Successfully!"
+}
+```
+
+###### test case 3: 输入错误的旧密码
+
+```
+PUT http://localhost:5000/users/2/password
+```
+
+```
+// Request
+{
+	"old_password":"test2",
+	"new_password":"test2-new"
+}
+```
+
+```
+// Response
+{
+    "error_code": "404",
+    "error_msg": "account not found/password incorrect"
+}
+```
 
 ##### 组织创建
 
@@ -1295,7 +1360,7 @@ GET http://localhost:5000/users/2/organizations/1/my_tasks/9
 @app.route('/users/<user_id>/received_tasks', methods=\['GET'\])
 
 ```
-GET http://localhost:5000/users/8/received_tasks
+GET http://localhost:5000/users/1/received_tasks
 ```
 
 ```
@@ -1308,109 +1373,15 @@ GET http://localhost:5000/users/8/received_tasks
 [
     {
         "task_id": 1,
-        "creator_user_id": 7,
-        "creator_organization_id": null,
-        "status": "on going",
-        "title": "task9",
-        "description": "task9",
-        "tags": [
-            "tag1",
-            "tag2",
-            "tag3"
-        ],
-        "participant_number_limit": 10,
-        "reward_for_one_participant": 0.1,
-        "post_time": "Wed, 05 Jun 2019 06:51:22 GMT",
-        "receive_end_time": "Wed, 05 Jun 2019 07:51:22 GMT",
-        "finish_deadline_time": "Thu, 06 Jun 2019 06:51:22 GMT",
-        "user_limit": {
-            "age_upper": 0,
-            "age_lower": 1,
-            "grades": [
-                "grade1",
-                "grade1"
-            ],
-            "sexes": [
-                "sex_type1",
-                "sex_type2",
-                "sex_type3"
-            ],
-            "schools": [
-                "school_name1",
-                "school_name2"
-            ]
-        },
-        "steps": [
-            {
-                "title": "step1",
-                "description": "string"
-            },
-            {
-                "title": "step2",
-                "description": "string"
-            }
-        ],
-        "participant_ids": [
-            8
-        ],
-        "ongoing_participant_ids": [
-            8
-        ],
-        "waiting_examine_participant_ids": [],
-        "finished_participant_ids": []
+        "task_name": "task9",
+        "task_status": "on going",
+        "current_step": 0
     },
     {
-        "task_id": 2,
-        "creator_user_id": 7,
-        "creator_organization_id": 1,
-        "status": "on going",
-        "title": "task1",
-        "description": "task1",
-        "tags": [
-            "tag1",
-            "tag2",
-            "tag3"
-        ],
-        "participant_number_limit": 10,
-        "reward_for_one_participant": 10,
-        "post_time": "Wed, 05 Jun 2019 06:54:03 GMT",
-        "receive_end_time": "Wed, 05 Jun 2019 07:54:03 GMT",
-        "finish_deadline_time": "Thu, 06 Jun 2019 06:54:03 GMT",
-        "user_limit": {
-            "age_upper": 0,
-            "age_lower": 1,
-            "grades": [
-                "grade1",
-                "grade1"
-            ],
-            "sexes": [
-                "sex_type1",
-                "sex_type2",
-                "sex_type3"
-            ],
-            "schools": [
-                "school_name1",
-                "school_name2"
-            ]
-        },
-        "steps": [
-            {
-                "title": "step1",
-                "description": "string"
-            },
-            {
-                "title": "step2",
-                "description": "string"
-            }
-        ],
-        "participant_ids": [
-            8
-        ],
-        "ongoing_participant_ids": [
-            8
-        ],
-        "waiting_examine_participant_ids": [],
-        "finished_participant_ids": []
+        "task_id": 5,
+        "task_name": "task5modify",
+        "task_status": "ongoing",
+        "current_step": 0
     }
 ]
 ```
@@ -2625,7 +2596,7 @@ PUT http://localhost:5000/users/2/balance
 
 ##### 用户给组织充值
 
-###### test case 1: 组织成员为组织充值
+###### test case 1: 组织成员为组织充值（正常）
 
 ```
 PUT http://localhost:5000/users/2/organizations/1/balance
@@ -2645,7 +2616,28 @@ PUT http://localhost:5000/users/2/organizations/1/balance
 }
 ```
 
-###### test case 2: 非组织成员为组织充值
+###### test case 2: 组织成员为组织充值（金额不足）
+
+```
+PUT http://localhost:5000/users/1/organizations/1/balance
+```
+
+```
+// Request
+{
+	"amount": 5
+}
+```
+
+```
+// Response
+{
+    "error_code": 500,
+    "error_msg": "The balance is not enough!"
+}
+```
+
+###### test case 3: 非组织成员为组织充值
 
 ```
 PUT http://localhost:5000/users/1/organizations/1/balance
