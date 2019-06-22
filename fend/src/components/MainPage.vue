@@ -64,13 +64,32 @@
 					</div>
                 </Menu>
             </Header>
-			<Content :style="{padding: '50px 50px'}" v-if="!isLogin">
-				<Card>
-                    <div style="min-height: 400px;">
-                        Content
-                    </div>
-                </Card>
-			</Content>			
+			<Content v-if="!isLogin">
+				<div class="mainDiv">
+                    <div class="logo"></div>
+                </div>
+                <div class="secondDiv">
+        			<div class="secondSubDiv"></div>
+        			<div class="secondTextDiv">
+        				<p class="introTitle">项目介绍</p>
+        				<p class="introPara">2019挣闲钱系统，致力于便利协调各个用户的生活。通过客户发布任务，其他用户以有偿做任务的方式解决客户日常实际问题，并使任务执行者获得相应报酬。主要实现功能如下：</p><br>
+        				<li class="funcPara">客户创建和删除任务</li>
+        				<li class="funcPara">用户接受和退出任务</li>
+        				<li class="funcPara">客户建立和解散组织</li>
+        				<li class="funcPara">任务的查询和修改</li>
+        				<li class="funcPara">任务完成度的记录</li>
+        			</div>
+                </div>
+                <div class="thirdDiv">
+                	<div class="thirdSubDiv"></div>
+                	<div class="thirdTextDiv">
+                		<p class="memTitle">组员信息</p>
+                		<li class="memPara">项目经理：席睿 吴宇祺</li>
+                		<li class="memPara">前端开发：杨芮 王友坤</li>
+                		<li class="memPara">后端开发：王雁玲 许倚安 孙肖冉</li>
+                	</div>
+                </div>
+			</Content>		
             <Content :style="{padding: '50px 50px'}" v-if="isLogin">
 				<Row v-if="haveTask" >
 					<Col span="11" style="margin-left: 30px;">
@@ -595,20 +614,6 @@
 .ivu-icon-md-notifications-outline{
 	margin-bottom: 30px;
 }
-.black_overlay {
-	display: none;
-	position: absolute;
-	top: 0%;
-	left: 0%;
-	width: 100%;
-	height: 100%;
-	/*background-color: black;*/
-	/*-moz-opacity: 0.8;*/
-	background: rgba(0,0,0,0.8);
-	z-index: 1001;
-	opacity: .80;
-	filter: alpha(opacity=80);
-}
 .white_content {
 	border-radius: 20px;
 	display: none;
@@ -753,5 +758,158 @@
 	.form-horizontal .btn{
 		padding: 10px 20px;
 	}
+}
+
+
+
+.black_overlay {
+	display: none;
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	/*background-color: black;*/
+	/*-moz-opacity: 0.8;*/
+	background: rgba(0,0,0,0.8);
+	z-index: 1001;
+	/*opacity: .80;*/
+	filter: alpha(opacity=80);
+}
+
+.mainDiv {
+	/* height: 90%; */
+	background-image: url("./../assets/bgimg.png");
+	/*background-repeat: no-repeat;*/
+	background-position: center;
+	/* border: 3px solid red; */
+	background-size: cover;
+	height: 770px;
+	z-index: 0;
+}
+
+.mainDiv-mask {
+	/*border: 3px solid green;*/
+	margin-right: 20px;
+	width: 100px;
+	height: 770px;
+	width: 100%;
+	/*background-color: #FDDFB2;*/
+	background-color: rgba(50,100,200,0.8);
+	/*opacity: 0.8;*/
+	z-index: 1;
+}
+
+.mainTitle {
+	text-align: center;
+	font-size: 70px;
+	color: white;
+	height: 20%;
+	padding-top: 15%;
+}
+
+.subTitle {
+	text-align: center;
+	font-size: 30px;
+	color: white;
+	padding-top: 8%;
+}
+
+.secondDiv {
+	/* border: 3px solid red; */
+	height: 830px;
+	position: relative;
+	/*background-color: #FDDFB2;*/
+	background-color: white;
+}
+
+.thirdDiv {
+	height: 830px;
+	position: relative;
+	/*background-color: #FDDFB2;*/
+	background-color: white;
+}
+
+.secondSubDiv {
+	position: absolute;
+	width: 40%;
+	height: 830px;
+	background-image: url("./../assets/secimg.png");
+	background-repeat: no-repeat;
+	/* border: 3px solid red; */
+}
+
+.thirdSubDiv {
+	position: absolute;
+	left: 60%;
+	width: 40%;
+	height: 830px;
+	background-image: url("./../assets/thiimg.png");
+	background-repeat: no-repeat;
+	/* border: 3px solid red; */
+}
+
+.secondTextDiv {
+	position: absolute;
+	padding: 50px;
+	left: 45%;
+	width: 50%;
+	height: 830px;
+	/* border: 3px solid green; */
+}
+
+.thirdTextDiv {
+	position: absolute;
+	padding: 50px;
+	left: 5%;
+	width: 50%;
+	height: 830px;
+	/* border: 3px solid green; */
+}
+
+.introTitle {
+	text-align: center;
+	font-size: 50px;
+	/*color: white;*/
+	margin-top: 10%;
+	margin-bottom: 5%;
+	/*padding-top: 15%;*/
+}
+
+.introPara {
+	font-size: 25px;
+	text-indent: 55px;
+	letter-spacing: 2px;
+}
+
+.funcPara {
+	font-size: 25px;
+	margin: 2%;
+	letter-spacing: 2px;
+}
+
+.memTitle {
+	text-align: center;
+	font-size: 50px;
+	/*color: white;*/
+	margin-top: 10%;
+	margin-bottom: 5%;
+}
+
+.memPara {
+	font-size: 25px;
+	margin: 2%;
+	letter-spacing: 2px;
+}
+
+.logo {
+	/* border: 3px solid red; */
+	top: 20%;
+	margin-left: 28%;
+	height: 700px;
+	width: 700px;
+	background-image: url("./../assets/logo2.png");
+	background-repeat: no-repeat;
+	background-size: cover;
 }
 </style>
