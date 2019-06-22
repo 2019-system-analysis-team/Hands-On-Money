@@ -305,7 +305,7 @@ def mark_task_step(current_user, user_id, task_id, step_id):
   
 
 # RESTful 任务审核
-@routes.route('/users/<user_id>/tasks/<task_id>/finisher/<finisher_id>', methods=['PUT'])
+@routes.route('/users/<user_id>/tasks/<task_id>/finishers/<finisher_id>', methods=['PUT'])
 @token_required
 def mark_task_finished(current_user, user_id, task_id, finisher_id):
     if current_user.id != int(user_id):
