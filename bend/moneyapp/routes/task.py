@@ -231,7 +231,7 @@ def delete_user_task(current_user, user_id, task_id):
     return jsonify({"task_id": task_id,
                     "task_name": task_name}), 200
 
-    
+
 # RESTful 删除组织任务
 @routes.route('/users/<user_id>/organizations/<organization_id>/tasks/<task_id>', methods=['DELETE'])
 @token_required
@@ -309,10 +309,14 @@ def mark_task_step(current_user, user_id, task_id, step_id):
 @token_required
 def mark_task_finished(current_user, user_id, task_id, finisher_id):
     if current_user.id != int(user_id):
+        print('current_user id', current_user.id)
+        print('user_id', user_id)
         return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
     
     task = queryTaskById(task_id)
     if not task or task.user.id != current_user.id:
+        print('task.user.id', task.user.id)
+        print('current_user.id', current_user.id)
         return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
     
     try:
