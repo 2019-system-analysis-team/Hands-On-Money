@@ -3,7 +3,6 @@
         <Layout>
             <Header>
                 <Menu mode="horizontal" theme="dark" active-name="1-1">
-                    <div class="layout-logo"></div>
                     <div class="layout-nav">
                         <Submenu name="1">
 							 <template slot="title">
@@ -159,7 +158,7 @@
 					<Button type="primary" @click="sendRate">确认评价</Button>
 				</div>
 			</Modal>
-            <Footer class="layout-footer-center">2019-2019 &copy; SYSU</Footer>
+            <Footer class="layout-footer-center">2019-2019 &copy; Hands-On-Money</Footer>
         </Layout>
 		<Drawer
 			title="钱包操作"

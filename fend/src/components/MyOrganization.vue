@@ -3,7 +3,6 @@
         <Layout>
             <Header>
                 <Menu active-name="organization" mode="horizontal" theme="dark" ref="menu">
-                    <div class="layout-logo"></div>
                     <div class="layout-nav">
                         <Submenu name="1">
 							 <template slot="title">
@@ -57,7 +56,7 @@
 							<Table border :columns="tableOrganization" :data="joinOrganizations" v-if="this.SelectType == 3"></Table>					
 				</Card>			
             </Content>
-            <Footer class="layout-footer-center">2019-2019 &copy; SYSU</Footer>
+            <Footer class="layout-footer-center">2019-2019 &copy; Hands-On-Money</Footer>
         </Layout>
 		<Drawer
 			title="钱包操作"

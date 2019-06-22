@@ -105,7 +105,7 @@
 					</Form>
 				</Card>
             </Content>
-            <Footer class="layout-footer-center">2019-2019 &copy; SYSU</Footer>
+            <Footer class="layout-footer-center">2019-2019 &copy; Hands-On-Money</Footer>
         </Layout>
     </div>
 </template>

@@ -3,7 +3,6 @@
         <Layout>
             <Header>
                 <Menu mode="horizontal" theme="dark">
-                    <div class="layout-logo"></div>
                     <div class="layout-nav" v-if="!isLogin">
 
                         <MenuItem name="2">
@@ -142,7 +141,7 @@
 					</Col>
 				</Row>
             </Content>
-            <Footer class="layout-footer-center">2019-2019 &copy; SYSU</Footer>
+            <Footer class="layout-footer-center">2019-2019 &copy; Hands-On-Money</Footer>
         </Layout>
 		<Modal v-model="showTaskInfo">
 			<p slot="header" style="text-align:center">
