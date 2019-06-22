@@ -1048,6 +1048,51 @@ POST http://localhost:5000/users/2/tasks
 }
 ```
 
+###### test case 3: 没有足够的余额创建任务
+
+```
+POST http://localhost:5000/users/2/tasks
+```
+
+```
+// Request
+{
+    "title": "task-testbalance",
+    "description": "task-testbalance",
+    "tags": ["tag1", "tag2", "tag3"],
+    "participant_number_limit": 10,
+    "reward_for_one_participant": 10,
+    "post_time": "2019-6-11 11:08:11", 
+    "receive_end_time": "2019-6-12 11:08:11", 
+    "finish_deadline_time": "2019-6-13 11:08:11",
+    "user_limit": {
+        "age_upper": 0,
+        "age_lower": 1,
+        "grades": ["grade1", "grade1"],
+        "sexes": ["sex_type1", "sex_type2", "sex_type3"],
+        "schools": ["school_name1", "school_name2"]
+    },
+    "steps": [
+        {
+            "title": "step1",
+            "description": "string"
+        },
+        {
+            "title": "step2",
+            "description": "string"
+        }
+    ]
+}
+```
+
+```
+// Response
+{
+    "error_code": 500,
+    "error_msg": "Not enough money"
+}
+```
+
 ##### 组织创建任务
 
 @app.route('/users/<user_id>/organization/<organization_id>/tasks',

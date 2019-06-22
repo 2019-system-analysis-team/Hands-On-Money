@@ -41,6 +41,27 @@ def charge(_user_id, _organization_id, _amount):
 		else:
 			raise ValueError("The balance is not enough!")
 	
+# 创建任务 扣钱函数
+def chargeForTask(_user_id, _organization_id, _amount):
+	if _organization_id:
+		organization = queryOrganizationByID(_organization_id)
+		organization.balance -= _amount
+	else:
+		user = queryUserById(_user_id)
+		user.balance -= _amount
+
+	db.session.commit()
+
+# 删除任务 退钱函数
+def refund(_user_id, _organization_id, _amount):
+	if _organization_id:
+		organization = queryOrganizationByID(_organization_id)
+		organization.balance += _amount
+	else:
+		user = queryUserById(_user_id)
+		user.balance += _amount
+
+	db.session.commit()
 		
 
 

@@ -79,14 +79,14 @@ def deleteTask(_user_id,_task_id, _organization_id):
     for rec in task.received_tasks:
         db.session.delete(rec)
 
-    money = task.reward_for_one_participant * task.participant_number_limit
+    #money = task.reward_for_one_participant * task.participant_number_limit
 
-    if _organization_id == None:
-        user = User.query.filter_by(id=_user_id).first()
-        user.balance += float(money) # 钱返还
-    else:
-        organization = queryOrganizationByID(_organization_id)
-        organization.balance += float(money)
+    # if _organization_id == None:
+    #     user = User.query.filter_by(id=_user_id).first()
+    #     user.balance += float(money) # 钱返还
+    # else:
+    #     organization = queryOrganizationByID(_organization_id)
+    #     organization.balance += float(money)
     
 
 

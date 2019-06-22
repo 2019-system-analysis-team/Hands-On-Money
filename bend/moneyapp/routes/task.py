@@ -1,11 +1,13 @@
 import uuid
 import jwt
+import sys
 from werkzeug.utils import secure_filename
 from flask import render_template, url_for, request, flash, jsonify
 from moneyapp.models import User, Organization, Task, Receiver_Task, Organization_Member, Transaction
 from moneyapp.db_user import *
 from moneyapp.db_organization import *
 from moneyapp.db_task import *
+from moneyapp.db_balance import *
 from flask_jwt import JWT, jwt_required, current_identity
 from functools import wraps
 from . import routes
@@ -23,6 +25,11 @@ def user_create_task(current_user, user_id):
     #if checkBalance(user_id, None, float(reward_for_one_participant) * float(participant_number_limit)):
     d = request.get_json()
 
+    amount = float(d['reward_for_one_participant']) * float(d['participant_number_limit'])
+    
+    if not checkBalance(user_id, None, amount):
+        return jsonify({"error_code":500, "error_msg": "Not enough money"}), 500
+
     d['user_id'] = int(user_id)
 
     # string -> datetime
@@ -34,6 +41,7 @@ def user_create_task(current_user, user_id):
         
     task = createTask(request.get_json())
 
+    chargeForTask(user_id, None, amount)
    
     return_msg = printSingleTask(task)
 
@@ -61,9 +69,16 @@ def organization_create_task(current_user, user_id, organization_id):
                         "error_msg": "insufficient permission"}), 401
 
     
+    
     d = request.get_json()
     d['user_id'] = int(user_id)
     d['organization_id'] = int(organization_id)
+
+    amount = float(d['reward_for_one_participant']) * float(d['participant_number_limit'])
+    
+    if not checkBalance(user_id, organization_id, amount):
+        return jsonify({"error_code":500, "error_msg": "Not enough money"}), 500
+
     
     # string -> datetime
     time_item = {'post_time', 'receive_end_time', 'finish_deadline_time'};
@@ -77,6 +92,8 @@ def organization_create_task(current_user, user_id, organization_id):
     task = createTask(d)
 
     return_msg = printSingleTask(task)
+
+    chargeForTask(user_id, organization_id, amount)
 
     return jsonify(return_msg), 200
 
@@ -198,6 +215,7 @@ def delete_user_task(current_user, user_id, task_id):
         return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
 
     task = queryTaskById(task_id)
+    amount = task.participant_number_limit * task.reward_for_one_participant
     if not task or task.organization != None:
         return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
 
@@ -207,6 +225,8 @@ def delete_user_task(current_user, user_id, task_id):
 
     task_name = task.title
     deleteTask(user_id, task_id, None)
+    
+    refund(user_id, None, amount)
     #return jsonify({"msg": "Delete " + str(task.title) + " successfully."}), 200
     return jsonify({"task_id": task_id,
                     "task_name": task_name}), 200
@@ -218,6 +238,8 @@ def delete_organization_task(current_user, user_id, task_id, organization_id):
         return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
 
     task = queryTaskById(task_id)
+    amount = task.participant_number_limit * task.reward_for_one_participant
+    print(amount)
     if not task or task.organization.id != int(organization_id):
         return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
 
@@ -227,6 +249,7 @@ def delete_organization_task(current_user, user_id, task_id, organization_id):
 
     task_name = task.title
     deleteTask(user_id, task_id, organization_id)
+    refund(user_id, organization_id, amount)
     #return jsonify({"msg": "Delete " + str(task.title) + " successfully."}), 200
     return jsonify({"task_id": task_id,
                     "task_name": task_name}), 200
@@ -545,23 +568,25 @@ def search_public_tasks(current_user, user_id, task_id):
 
 # RESTful 任务查询
 @routes.route('/users/<user_id>/tasks', methods=['GET'])
-@token_required
-def search_all_tasks(current_user, user_id):
+#@token_required
+#def search_all_tasks(current_user, user_id):
+def search_all_tasks(user_id):
 
-    if current_user.id != int(user_id):
-        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+    #if current_user.id != int(user_id):
+    #    return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
     try:
         print('hhh')
         #d = request.get_json()
         #暂时改成args
         #
-        d = request.args.to_dict()
+        d = request.args.to_dict()  
 
         if 'tags' in d:
-            d['tags'] = json.loads(d['tags'])
+            d['tags'] = json.loads(str(d['tags']))
 
         if 'user_limit' in d:
-            d['user_limit'] = json.loads(d['user_limit'])
+            print(d['user_limit'])
+            d['user_limit'] = json.loads(str(d['user_limit']))
         
 
         # string -> datetime
