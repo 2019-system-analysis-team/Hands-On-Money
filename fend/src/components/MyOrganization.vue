@@ -224,7 +224,7 @@
 							_this.joinOrganizations.push(_this.allOrganizations[i]);
 						}else if(_this.allOrganizations[i].status == "owner"){
 							_this.createOrganizations.push(_this.allOrganizations[i]);
-						}else if(_this.allOrganizations[i].status == "manager"){
+						}else if(_this.allOrganizations[i].status == "admin"){
 							_this.manageOrganizations.push(_this.allOrganizations[i]);
 						}
 					} 

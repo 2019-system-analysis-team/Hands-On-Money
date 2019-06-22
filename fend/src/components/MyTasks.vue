@@ -245,6 +245,7 @@
 					console.log(response);
 					_this.createdTasks = response.data.task;
 					for(var i=0; i<_this.createdTasks.length;i++){
+						_this.createdTasks[i].task_name += ' (创建的任务) ';
 						if(_this.createdTasks[i].task_status == "已完成"){
 							_this.finishedTasks.push(_this.createdTasks[i]);
 						}else if(_this.createdTasks[i].task_status == "ongoing"){
@@ -365,6 +366,7 @@
 
 			},
 			logout (){
+				var _this = this;
 				var url_all = "/users/" + this.$data.userID.toString() + "/session";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
@@ -378,7 +380,7 @@
 					window.localStorage.removeItem('userID');
 					window.localStorage.removeItem('organID');
 					window.localStorage.removeItem('taskID');
-					this.$router.push({
+					_this.$router.push({
 						path: '/', 
 						name: 'mainpage'
 					});	

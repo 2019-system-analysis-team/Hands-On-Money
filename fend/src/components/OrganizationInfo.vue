@@ -99,7 +99,7 @@
 								</div>
 							<div slot="footer">
 								<Button type="text" @click="showTaskCancel">确定</Button>
-								<Button type="primary" @click="ToTaskInfo(showTaskInfomation.task_id)" v-show="isManager || isCreater">编辑</Button>
+								<Button type="primary" @click="ToTaskInfo(showTaskInfomation.task_id)">编辑</Button>
 							</div>
 						</Modal>
 					</TabPane>
@@ -157,12 +157,12 @@
 								</Form>
 							</Modal>
 							<Col span="5" v-for="item in allMembers" :key="item.id" style="padding-left: 30px; padding-top: 30px;">
-								<Card>
+								<Card style="height: 180px;">
 									<p slot="title">成员信息</p>
 									<div slot="extra" v-show="(isManager || isCreater) && (item.status != 'owner')">
 										<Button type="error" ghost @click="deleteMember(item.userID)">删除</Button>
 									</div>	
-									<div style="width: 70%;float: left;">
+									<div style="width: 70%;float: left; ">
 										<p style="margin-bottom: 5px;">真实姓名 : {{item.name}}</p>
 										<p style="margin-bottom: 5px;">昵称 : {{item.nickname}}</p>
 										<p v-show="!(isManager || isCreater)">身份 : {{item.status}}</p>
@@ -453,7 +453,7 @@
 				this.organProfilePhotoUrl = "/users/"+uID+"/organizations/"+  this.organID +"/profile_photo";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$set(this.jwt,'Authorization',jwt);
-			
+		
 				this.$axios({
 						 method:"get",
 						 url:url,
@@ -467,7 +467,7 @@
 					_this.formValidate.desc = response.data.bio;
 					 _this.allMembersShortInfo = response.data.members;
 					 _this.organMoney = response.data.balance;
-					 _this.average_comment = response.data.average_comment;
+					 _this.average_comment = response.data.avg_comment;
 					for(var i=0; i < _this.allMembersShortInfo.length;i++){
 						var url = "/users/" + _this.allMembersShortInfo[i].user_id;
 						if(_this.allMembersShortInfo[i].user_id == _this.userID){
@@ -515,7 +515,7 @@
 					console.log(error);
 					_this.$Message.error('获取组织信息失败!');
 				});
-			
+							
 			    var url = "/users/" + uID + "/organizations/" + this.organID + "/my_tasks";
 				
 				this.$axios({
@@ -553,6 +553,7 @@
 					
 					
 				});
+
 				  this.money = window.localStorage.getItem('money');
 			    this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 				

@@ -533,7 +533,10 @@
 							steps.push(test);
 						}
 						
-						
+						if(this.citems.length == 0){
+							this.$Message.error('请至少添加一个步骤或问题!');
+							return;
+						}
 						
 						/*
 						*   POST /users/:user_id/tasks HTTP/1.1

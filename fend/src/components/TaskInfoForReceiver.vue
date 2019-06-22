@@ -396,6 +396,7 @@
 
 			},
 			logout (){
+				var _this = this;
 				var url_all = "/users/" + this.$data.userID + "/session";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
@@ -409,7 +410,7 @@
 					window.localStorage.removeItem('userID');
 					window.localStorage.removeItem('organID');
 					window.localStorage.removeItem('taskID');
-					this.$router.push({
+					_this.$router.push({
 						path: '/', 
 						name: 'mainpage'
 					});	
@@ -481,10 +482,7 @@
 					 this.appraise.isShow = true;
 					 return;
 				}
-                if (this.current == this.showTaskInfomation.steps.length - 1) {
-					this.appraise.isShow = true;
-                    this.$Message.info("成功完成任务,等待对方确认");
-                } else {
+
 					// PUT /users/:user_id/tasks/:task_id/steps/:step_id
 					var _this = this;
 					var url_all = "/users/" + this.$data.userID + "/tasks/" + this.taskID + "/steps/" + (this.current+1);
@@ -504,8 +502,9 @@
 					    _this.current += 1;
 					}).catch(function (error) {
 						console.log(error);
+						_this.$Message.error('已完成任务，请勿重复点击!');
 					});
-                }
+                
             },
 			createNewTask() {
 				window.localStorage.removeItem('organID');

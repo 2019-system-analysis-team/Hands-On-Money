@@ -137,17 +137,18 @@
                                             <Select v-model="formValidate.status" style="width: 230px;">
                                                 <!-- <Option value="all">全部</Option> -->
                                                 <Option value="ongoing">正在进行</Option>
-                                                <Option value="not ongoing">未进行</Option>
+                                                <Option value="finished">已完成</Option>
+												<Option value="pending">已撤回</Option>
                                             </Select>
                                         </Col>
                                     </FormItem>
 
                                     <FormItem prop="tags">
                                         <Col span="5">
-                                            <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">Tag</label>
+                                            <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">类型</label>
                                         </Col>
                                         <Col span="6">
-                                            <Select v-model="formValidate.tags" multiple :max-tag-count="2" style="width: 230px;">
+                                            <Select v-model="formValidate.tags" style="width: 230px;">
                                                 <Option v-for="item in tagList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                                             </Select>
                                         </Col>
@@ -176,7 +177,7 @@
                                             <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">任务接收截止时间</label>
                                         </Col>
                                         <Col span="6">
-                                            <DatePicker v-model="formValidate.receive_end_time" type="datetime" placeholder="任务接收截止时间" style="width: 230px"></DatePicker>
+                                            <DatePicker v-model="formValidate.receive_end_time" confirm   @on-change="receiveTimeChange" type="datetime" placeholder="任务接收截止时间" style="width: 230px"></DatePicker>
                                         </Col>
                                     </FormItem>
 
@@ -185,7 +186,7 @@
                                             <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">任务完成截止时间</label>
                                         </Col>
                                         <Col span="6">
-                                            <DatePicker v-model="formValidate.finish_deadline_time" type="datetime" placeholder="任务完成截止时间" style="width: 230px"></DatePicker>
+                                            <DatePicker v-model="formValidate.finish_deadline_time"  confirm  @on-change="finishTimeChange"  type="datetime" placeholder="任务完成截止时间" style="width: 230px"></DatePicker>
                                         </Col>
                                     </FormItem>
 
@@ -237,10 +238,12 @@
                                         </Col>
                                         <Col span="6">
                                             <Select v-model="formValidate.grades" multiple style="width: 230px;">
-                                                <Option value="grade1">大一</Option>
-                                                <Option value="grade2">大二</Option>
-                                                <Option value="grade3">大三</Option>
-                                                <Option value="grade4">大四</Option>
+                                                <Option value="大一">大一</Option>
+                                                <Option value="大二">大二</Option>
+                                                <Option value="大三">大三</Option>
+                                                <Option value="大四">大四</Option>
+                                                <Option value="研究生">研究生</Option>
+                                                <Option value="博士生">博士生</Option>
                                             </Select>
                                         </Col>
                                     </FormItem>
@@ -251,8 +254,8 @@
                                         </Col>
                                         <Col span="6">
                                             <Select v-model="formValidate.sexes" multiple style="width: 230px;">
-                                                <Option value="sex_type1">男</Option>
-                                                <Option value="sex_type2">女</Option>
+                                                <Option value="男">男</Option>
+                                                <Option value="女">女</Option>
                                             </Select>
                                         </Col>
                                     </FormItem>
@@ -352,7 +355,7 @@
                     creator_organization_name: '',
                     status: '',
                     title: '',
-                    tags: [],
+                    tags: '',
                     reward_for_one_participant_lower: 0,
                     reward_for_one_participant_upper: 999,
                     receive_end_time: '',
@@ -377,12 +380,8 @@
                         label: '问卷'
                     },
                     {
-                        value: '拿外卖',
-                        label: '拿外卖'
-                    },
-                    {
-                        value: '其他',
-                        label: '其他'
+                        value: '代跑腿',
+                        label: '代跑腿'
                     }
                 ],
 
@@ -802,7 +801,7 @@
                     returnConditions["receive_end_time"] = this.$data.formValidate.receive_end_time;
                 if(this.$data.formValidate.finish_deadline_time != "")
                     returnConditions["finish_deadline_time"] = this.$data.formValidate.finish_deadline_time;
-                if(this.$data.formValidate.tags.length != 0)
+                if(this.$data.formValidate.tags != '')
                     returnConditions["tags"] = this.$data.formValidate.tags;
                 if(this.$data.formValidate.reward_for_one_participant_upper != null)
                     returnConditions["reward_for_one_participant_upper"] = this.$data.formValidate.reward_for_one_participant_upper;
@@ -901,7 +900,7 @@
 
             handleReset (name) {
                 this.$refs[name].resetFields();
-                this.formValidate.tags = [];
+                this.formValidate.tags = '';
             },
 			handleReturnHomepage () {
 			    // 返回主页
@@ -909,6 +908,12 @@
 					path: '/', 
 					name: 'mainpage',
 				});		
+			},
+			receiveTimeChange(date){
+				this.formValidate.receive_end_time = date;
+			},
+			finishTimeChange(date){
+				this.formValidate.finish_deadline_time = date;
 			},
         }
     }

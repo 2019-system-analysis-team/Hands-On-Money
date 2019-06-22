@@ -218,7 +218,7 @@
 									</FormItem>
 							</Form>
 						</Card>
-					</TabPane>
+					</TabPane>				
 				</Tabs>
             </Content>
             <Footer class="layout-footer-center">2019-2019 &copy; SYSU</Footer>
@@ -455,7 +455,7 @@
 					_this.$data.schoolValidate.stunumber = response.data.student_id;
 					_this.$data.schoolValidate.grade = response.data.grade;
 					_this.$data.infoValidate.name = response.data.name;
-					_this.$data.infoValidate.age = response.data.age.toString();
+					_this.$data.infoValidate.age = response.data.age;
 					_this.$data.infoValidate.gender = response.data.sex;		
 					_this.$data.money = response.data.balance;
 					_this.$data.profilePhotoPath =  _this.$profilePath + response.data.profile_photo_path;
@@ -468,6 +468,7 @@
 					_this.$set(test,'url',_this.profilePhotoPath);
 					_this.uploadList.push(test);
 				}).catch(function (error) {
+					console.log(error);
 					_this.$Message.error('获取个人信息失败');
 					//跳转到主页
 					_this.$router.push({
@@ -712,6 +713,7 @@
 						'Authorization': jwt,
 					 }
 				}).then(function (response){
+					window.localStorage.removeItem('money');
 					window.localStorage.removeItem('token');
 					window.localStorage.removeItem('userID');
 					window.localStorage.removeItem('organID');

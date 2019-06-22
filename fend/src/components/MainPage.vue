@@ -5,29 +5,15 @@
                 <Menu mode="horizontal" theme="dark">
                     <div class="layout-logo"></div>
                     <div class="layout-nav" v-if="!isLogin">
-                        <MenuItem name="1">
-                            <Icon type="ios-navigate"></Icon>
-                            项目 1
-                        </MenuItem>
-                        <MenuItem name="2" to="/userinfomodify">
+
+                        <MenuItem name="2">
                             <Icon type="ios-keypad"></Icon>
-                            项目 2
+                            <a href="https://github.com/2019-system-analysis-team/Hands-On-Money" style="color: #BBBFC7">Github</a>
                         </MenuItem>
-						<Submenu name="3">
-							<template slot="title">
-								<Icon type="ios-stats" />
-								项目 3
-							</template>
-							<MenuGroup title="使用">
-								<MenuItem name="3-1">子项目1</MenuItem>
-								<MenuItem name="3-2">子项目2</MenuItem>
-								<MenuItem name="3-3">子项目3</MenuItem>
-							</MenuGroup>
-							<MenuGroup title="留存">
-								<MenuItem name="3-4">子项目4</MenuItem>
-								<MenuItem name="3-5">子项目5</MenuItem>
-							</MenuGroup>
-						</Submenu>
+						<MenuItem name="3">
+						   <Icon type="ios-navigate"></Icon>
+							<a href="https://2019-system-analysis-team.github.io/Hands-On-Money/" style="color: #BBBFC7">关于我们</a>
+						</MenuItem>
                     </div>
                     <div class="layout-nav" v-if="isLogin">
 						<Submenu name="1">
@@ -59,7 +45,7 @@
                     </div>
 					<div class="layout-button" v-if="!isLogin">
 						<Button type="default" ghost onclick="document.getElementById('loginFrame').style.display='block';
-			document.getElementById('bgColorDiv').style.display='block'">登录</Button>
+			document.getElementById('bgColorDiv').style.display='block'" style=" margin-right:15px;">登录</Button>
 						<Button type="primary" ghost v-on:click="register">注册</Button>
 					</div>
 					<div class="layout-button" v-if="isLogin">

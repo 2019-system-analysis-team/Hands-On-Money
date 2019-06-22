@@ -463,6 +463,97 @@
 							}
 						}
 					}
+					   if(_this.showTaskInfomation.participant_ids != null)
+					   {
+						   for(var i = 0 ;i < _this.showTaskInfomation.participant_ids.length;i++){					
+								var url = "/users/" + _this.showTaskInfomation.participant_ids[i];
+								var jwt = "JWT " + window.localStorage.getItem('token');
+								_this.$axios({
+									 method:"get",
+									 url:url,
+									 headers:{
+										'Authorization': jwt,
+									 }
+								}).then(function (response){
+									console.log("参与者信息");
+									console.log(response);
+									var test = {};
+									_this.$set(test,'id',response.data.user_id);
+									_this.$set(test,'school',response.data.school);
+									_this.$set(test,'grade',response.data.grade);
+									_this.$set(test,'name',response.data.name);
+									_this.participant_info.push(test);
+								}).catch(function (error) {
+									_this.$Message.error('获取任务参与者的信息失败!');
+								});
+						   }
+						   for(var i = 0 ;i < _this.showTaskInfomation.ongoing_participant_ids.length;i++){
+								var url = "/users/" + _this.showTaskInfomation.ongoing_participant_ids[i];
+								var jwt = "JWT " + window.localStorage.getItem('token');
+								_this.$axios({
+									 method:"get",
+									 url:url,
+									 headers:{
+										'Authorization': jwt,
+									 }
+								}).then(function (response){
+									console.log("正在参与任务信息");
+									console.log(response);
+									var test = {};
+									_this.$set(test,'id',response.data.user_id);
+									_this.$set(test,'school',response.data.school);
+									_this.$set(test,'grade',response.data.grade);
+									_this.$set(test,'name',response.data.name);
+									_this.ongoing_participant_info.push(test);
+								}).catch(function (error) {
+									_this.$Message.error('获取任务参与者的信息失败!');
+								});
+						   }
+						   for(var i = 0 ;i < _this.showTaskInfomation.waiting_examine_participant_ids.length;i++){
+								var url = "/users/" + _this.showTaskInfomation.waiting_examine_participant_ids[i];
+								var jwt = "JWT " + window.localStorage.getItem('token');
+								_this.$axios({
+									 method:"get",
+									 url:url,
+									 headers:{
+										'Authorization': jwt,
+									 }
+								}).then(function (response){
+									console.log("等待确认信息");
+									console.log(response);
+									var test = {};
+									_this.$set(test,'id',response.data.user_id);
+									_this.$set(test,'school',response.data.school);
+									_this.$set(test,'grade',response.data.grade);
+									_this.$set(test,'name',response.data.name);
+									_this.waiting_examine_participant_info.push(test);
+								}).catch(function (error) {
+									_this.$Message.error('获取任务参与者的信息失败!');
+								});
+						   }
+						   for(var i = 0 ;i < _this.showTaskInfomation.finished_participant_ids.length;i++){
+								var url = "/users/" + _this.showTaskInfomation.finished_participant_ids[i];
+								var jwt = "JWT " + window.localStorage.getItem('token');
+								_this.$axios({
+									 method:"get",
+									 url:url,
+									 headers:{
+										'Authorization': jwt,
+									 }
+								}).then(function (response){
+									console.log("完成实验");
+									console.log(response);
+									var test = {};
+									_this.$set(test,'id',response.data.user_id);
+									_this.$set(test,'school',response.data.school);
+									_this.$set(test,'grade',response.data.grade);
+									_this.$set(test,'name',response.data.name);
+									_this.finished_participant_info.push(test);
+								}).catch(function (error) {
+									_this.$Message.error('获取任务参与者的信息失败!');
+								});
+						   }				   
+					   }
 				}).catch(function (error) {
 					_this.$Message.error('获取任务信息失败!');
 						//跳转到主页
@@ -473,90 +564,7 @@
 					console.log(error);
 				});	
 
-			   var _this = this;
-			   if(this.showTaskInfomation.participant_ids != null)
-			   {
-				   for(var i = 0 ;i < this.showTaskInfomation.participant_ids.length;i++){					
-						var url = "/users/" + this.showTaskInfomation.participant_ids[i];
-						var jwt = "JWT " + window.localStorage.getItem('token');
-						this.$axios({
-							 method:"get",
-							 url:url,
-							 headers:{
-								'Authorization': jwt,
-							 }
-						}).then(function (response){
-							var test = {};
-							_this.$set(test,'id',response.data.id);
-							_this.$set(test,'school',response.data.school);
-							_this.$set(test,'grade',response.data.grade);
-							_this.$set(test,'name',response.data.name);
-							_this.participant_info.push(test);
-						}).catch(function (error) {
-							_this.$Message.error('获取任务参与者的信息失败!');
-						});
-				   }
-				   for(var i = 0 ;i < this.showTaskInfomation.ongoing_participant_ids.length;i++){
-						var url = "/users/" + this.showTaskInfomation.ongoing_participant_ids[i];
-						var jwt = "JWT " + window.localStorage.getItem('token');
-						this.$axios({
-							 method:"get",
-							 url:url,
-							 headers:{
-								'Authorization': jwt,
-							 }
-						}).then(function (response){
-							var test = {};
-							_this.$set(test,'id',response.data.id);
-							_this.$set(test,'school',response.data.school);
-							_this.$set(test,'grade',response.data.grade);
-							_this.$set(test,'name',response.data.name);
-							_this.ongoing_participant_info.push(test);
-						}).catch(function (error) {
-							_this.$Message.error('获取任务参与者的信息失败!');
-						});
-				   }
-				   for(var i = 0 ;i < this.showTaskInfomation.waiting_examine_participant_ids.length;i++){
-						var url = "/users/" + this.showTaskInfomation.waiting_examine_participant_ids[i];
-						var jwt = "JWT " + window.localStorage.getItem('token');
-						this.$axios({
-							 method:"get",
-							 url:url,
-							 headers:{
-								'Authorization': jwt,
-							 }
-						}).then(function (response){
-							var test = {};
-							_this.$set(test,'id',response.data.id);
-							_this.$set(test,'school',response.data.school);
-							_this.$set(test,'grade',response.data.grade);
-							_this.$set(test,'name',response.data.name);
-							_this.waiting_examine_participant_info.push(test);
-						}).catch(function (error) {
-							_this.$Message.error('获取任务参与者的信息失败!');
-						});
-				   }
-				   for(var i = 0 ;i < this.showTaskInfomation.finished_participant_ids.length;i++){
-						var url = "/users/" + this.showTaskInfomation.finished_participant_ids[i];
-						var jwt = "JWT " + window.localStorage.getItem('token');
-						this.$axios({
-							 method:"get",
-							 url:url,
-							 headers:{
-								'Authorization': jwt,
-							 }
-						}).then(function (response){
-							var test = {};
-							_this.$set(test,'id',response.data.id);
-							_this.$set(test,'school',response.data.school);
-							_this.$set(test,'grade',response.data.grade);
-							_this.$set(test,'name',response.data.name);
-							_this.finished_participant_info.push(test);
-						}).catch(function (error) {
-							_this.$Message.error('获取任务参与者的信息失败!');
-						});
-				   }				   
-			   }
+
 				this.money = window.localStorage.getItem('money');
 			    this.profilePhotoPath = window.localStorage.getItem('MyProfilePhotoPath');
 			},
@@ -657,6 +665,7 @@
 
 			},
 			logout (){
+				var _this = this;
 				var url_all = "/users/" + this.$data.userID.toString() + "/session";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
@@ -670,7 +679,7 @@
 					window.localStorage.removeItem('userID');
 					window.localStorage.removeItem('organID');
 					window.localStorage.removeItem('taskID');
-					this.$router.push({
+					_this.$router.push({
 						path: '/', 
 						name: 'mainpage'
 					});	
@@ -692,8 +701,9 @@
 			},
             show (index) {
 				var _this = this;
-				var url = "/users/:" + this.$data.userID + "/tasks/" + this.taskID+ "/finishers/" + this.ongoing_participant_info[index].id;
-				var deleteID = this.ongoing_participant_info[index].id;
+				console.log(this.waiting_examine_participant_info[index]);
+				var url = "/users/" + this.$data.userID + "/tasks/" + this.taskID+ "/finishers/" + this.waiting_examine_participant_info[index].id;
+				var deleteID = this.waiting_examine_participant_info[index].id;
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
 					 method:"put",
@@ -707,12 +717,12 @@
 					_this.appraise.appId = deleteID;
 					_this.showTaskInfomation.ongoing_participant_ids = response.data.ongoing_participant_ids;
 					_this.showTaskInfomation.participant_ids = response.data.participant_ids;
-					_this.ongoing_participant_info.splice(index,1);
+					_this.waiting_examine_participant_info.splice(index,1);
 					for(var i=0; i < _this.participant_info.length; i++)
 					{
 						if(_this.participant_info[i].id == deleteID)
 						{
-							_this.ongoing_participant_info.splice(i,1);
+							_this.waiting_examine_participant_info.splice(i,1);
 							break;
 						}
 					}
