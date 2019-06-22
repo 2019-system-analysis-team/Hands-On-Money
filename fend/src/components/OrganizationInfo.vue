@@ -517,7 +517,7 @@
 				});
 							
 			    var url = "/users/" + uID + "/organizations/" + this.organID + "/my_tasks";
-				
+
 				this.$axios({
 						 method:"get",
 						 url:url,
@@ -526,6 +526,7 @@
 						 }
 				}).then(function (response){
 					console.log("所有任务");	
+					console.log(url);
 					console.log(response);	
 					_this.allTasks = response.data.task;
 					for(var i=0; i < _this.allTasks.length;i++){

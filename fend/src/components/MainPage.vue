@@ -72,27 +72,39 @@
                 </Card>
 			</Content>			
             <Content :style="{padding: '50px 50px'}" v-if="isLogin">
-				<Row v-if="haveTask">
+				<Row v-if="haveTask" >
 					<Col span="11" style="margin-left: 30px;">
 						<Card>
-							<p slot="title">已发布的任务</p>
+							<p slot="title">正在进行中</p>
 							<p>							
-								<div style="min-height: 300px;">
-									<p>Content of card</p>
-									<p>Content of card</p>
-									<p>Content of card</p>
+								<div style="min-height: 420px;">
+									<Col span="11" v-for="item in inprogressTasks" :key="item.task_id" style="padding-left: 20px; padding-top: 10px;" v-show="!TasksIsEmpty">
+										<Card>
+											<p slot="title">{{item.task_name}}</p>
+											<div slot="extra">
+												<Button type="primary" ghost @click="LookTaskInfo(item.task_id)">详情</Button>
+											</div>	
+											<p>{{item.task_status}}</p>
+										</Card>
+									</Col>
 								</div>
 							</p>
 						</Card>
 					</Col>
 					<Col span="11" style="margin-left: 30px;">
 						<Card>
-							<p slot="title">已接取的任务</p>
+							<p slot="title">已完成的任务</p>
 							<p>							
-								<div style="min-height: 300px;">
-									<p>Content of card</p>
-									<p>Content of card</p>
-									<p>Content of card</p>
+								<div style="min-height: 420px;">
+									<Col span="11" v-for="item in finishedTasks" :key="item.task_id" style="padding-left: 20px; padding-top: 10px;" v-show="!TasksIsEmpty">
+										<Card>
+											<p slot="title">{{item.task_name}}</p>
+											<div slot="extra">
+												<Button type="primary" ghost @click="LookTaskInfo(item.task_id)">详情</Button>
+											</div>	
+											<p>{{item.task_status}}</p>
+										</Card>
+									</Col>
 								</div>
 							</p>
 						</Card>
@@ -103,22 +115,8 @@
 						<Card>
 							<p slot="title">开始创建一个新任务吧</p>
 							<p>							
-								<div style="min-height: 300px;text-align:center;">
+								<div style="min-height: 420px;text-align:center;">
 									<Button @click="createNewTask" type="primary" ghost shape="circle" icon="md-add" style="width: 30%;height: 63px;margin-top: 8%;">新建任务</Button>
-								</div>
-							</p>
-						</Card>
-					</Col>
-				</Row>
-				<Row style="margin-top: 30px; margin-left: 30px;">
-					<Col span="23">
-						<Card>
-							<p slot="title">任务推荐</p>
-							<p>							
-								<div style="min-height: 300px;">
-									<p>Content of card</p>
-									<p>Content of card</p>
-									<p>Content of card</p>
 								</div>
 							</p>
 						</Card>
@@ -127,6 +125,37 @@
             </Content>
             <Footer class="layout-footer-center">2019-2019 &copy; SYSU</Footer>
         </Layout>
+		<Modal v-model="showTaskInfo">
+			<p slot="header" style="text-align:center">
+				<Icon type="ios-information-circle"></Icon>
+				<span>任务详情</span>
+			</p>
+			<div>
+			<Card dis-hover>
+				<p slot="title" class="info">{{showTaskInfomation.title}}</p>
+				标签 : <Tag v-for="item in showTaskInfomation.tags" :key="item" :name="item" color="cyan">{{ item }}</Tag>
+				<p class="info">任务描述 : {{showTaskInfomation.description}}</p>
+				<p class="info">当前参与者人数 : {{showTaskInfomation.current_participant_number}}</p>
+				<p class="info">参与者人数上限 : {{showTaskInfomation.participant_number_limit}}</p>
+				<p class="info">完成奖励代币 : {{showTaskInfomation.reward_for_one_participant}}</p>
+				<p class="info">任务所属组织 : {{showTaskInfomation.creator_organization_name}}</p>
+				<p class="info">创建者邮箱 : {{showTaskInfomation.creator_user_email}}</p>
+				<p class="info">创建者电话 : {{showTaskInfomation.creator_user_phone_number}}</p>
+				<p class="info">任务发布时间 : {{showTaskInfomation.post_time}}</p>
+				<p class="info">截止接受任务时间 : {{showTaskInfomation.receive_end_time}}</p>
+				<p class="info">最迟完成任务时间 : {{showTaskInfomation.finish_deadline_time}}</p>
+				<p class="info" v-show="showTaskInfomation.tags !=  '问卷' ">步骤 : </p>
+				<Steps :current="showTaskInfomation.current" v-show="showTaskInfomation.tags !=  '问卷'">
+					<Step :title="item.title" v-for="item in showTaskInfomation.steps" :key="item.title">
+					</Step>
+				</Steps>
+			</Card>
+			</div>
+			<div slot="footer">
+				<Button type="text" @click="showTaskCancel">确定</Button>
+				<Button type="primary" @click="ToTaskInfo(showTaskInfomation.task_id)">编辑</Button>
+			</div>
+		</Modal>
 		<Drawer
 			title="钱包操作"
 			v-model="topup"
@@ -192,6 +221,9 @@
     export default {
 		data() {
 			return { 
+				showTaskInfo: false,
+				showTaskInfomation:{
+				},
 				userID: '',
 				isLogin: false,
 				profilePhotoPath: '',
@@ -212,6 +244,8 @@
 				inputName: '',
 				inputPassword: '',
 				isWithdraw:false,
+				inprogressTasks:[],
+				finishedTasks:[],
 			};
 		}, 
 		created: function () { 
@@ -244,6 +278,29 @@
 					_this.money = response.data.balance;
 					window.localStorage.setItem('money', _this.money);
 					window.localStorage.setItem('MyProfilePhotoPath', _this.profilePhotoPath);
+						var url = "/users/" + uID + "/received_tasks";
+						_this.$axios({
+							 method:"get",
+							 url:url,
+							 headers:{
+								'Authorization': jwt,
+							 }
+						}).then(function (response){
+							console.log("获取已接收任务");
+							console.log(response);
+							var receivedTasks = response.data;
+							for(var i=0; i< receivedTasks.length;i++){
+								if( receivedTasks[i].task_status == "pending"){
+									_this.inprogressTasks.push(receivedTasks[i]);
+								}else if(receivedTasks[i].task_status == "finished"){
+									_this.finishedTasks.push(receivedTasks[i]);
+								}
+								_this.haveTask = true;
+							}
+						}).catch(function (error) {
+							_this.$Message.error('获取已接收的任务失败!');
+						});
+						
 				}).catch(function (error) {
 					//console.log(error.response.status);
 					_this.isLogin = false;
@@ -417,7 +474,44 @@
 					path: '/', 
 					name: 'missioncreate'
 				});		
-			}
+			},
+			showTaskCancel(){
+				 this.showTaskInfo = false;
+			},
+			ToTaskInfo(taskID){
+					window.localStorage.setItem('taskID', taskID);
+					window.localStorage.removeItem('organID');
+					this.$router.push({
+						path: '/', 
+						name: 'taskinfoforreceiver',
+						params: { 
+								taskID: taskID
+						},
+					});					
+			},
+			LookTaskInfo(taskId){
+				this.showTaskInfo = true;				
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				var _this = this;
+				// 需要区分是自己创建的还是自己接收的任务
+			
+				var url = "/users/" + this.$data.userID + "/tasks/" + taskId;
+				this.$axios({
+						 method:"get",
+						 url:url,
+						 headers:{
+							'Authorization': jwt,
+						 }
+				}).then(function (response){
+					console.log("任务详情");
+					console.log(response);
+					_this.showTaskInfomation = response.data;
+					_this.$set(_this.showTaskInfomation,'current',-1);
+				}).catch(function (error) {
+					_this.$Message.error('获取任务详情失败!');
+				});	
+			
+			},
 		}
     }
 </script>

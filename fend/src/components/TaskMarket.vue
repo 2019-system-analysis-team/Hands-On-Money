@@ -40,7 +40,7 @@
                     <div slot="footer">
                         <Button type="primary" ghost @click="showTaskCancel">确定</Button>
                         <Button type="primary" @click="ToTaskInfo(displayData.task_id)" v-if="!isAcceptableTask">编辑</Button>
-                        <Button type="success" @click="confirmAccept = true;" v-if="isAcceptableTask">接受</Button>
+                        <Button type="success" @click="confirmAccept = true;" v-if="isAcceptableTask && !isFullPeople">接受</Button>
                     </div>
                 </Modal>
 
@@ -307,7 +307,7 @@
  
                             <!-- <Col span="4" offset="3"> -->
                                 <FormItem style="margin-top: 30px;">
-                                    <Button type="primary" @click="showdrawer = false;" style="margin-left: 70px;">确定</Button>
+                                    <Button type="primary" @click="handleSubmit('formValidate')" style="margin-left: 70px;">确定</Button>
                                     <Button @click="handleReset('formValidate')" style="margin-left: 15px;">重置</Button>
                                 </FormItem>
                             <!-- </Col> -->
@@ -340,6 +340,7 @@
   export default {
         data () {
             return {
+				isFullPeople: false,
                 chosenTaskId: 0,
                 confirmAccept: false,
                 ownerMessage: '',
@@ -644,9 +645,20 @@
                     }
                 }).then(function (response){
                     _this.$Message.success('接受任务成功!');
+					_this.confirmAccept = false;
+					_this.showTaskInfo = false;
+					for(var i=0; i<_this.taskInfoData.length; i++){
+						if(_this.$data.returnData.data[_this.taskInfoData[i].num].task_id == _this.$data.chosenTaskId){
+							_this.taskInfoData.splice(i, 1);
+							return;
+						}
+					}
+
                 }).catch(function (error) {
-                    _this.$Message.error('接受任务失败!');
+                    _this.$Message.error('请勿重复接收任务!');
                     console.log(error);
+					_this.confirmAccept = false;
+					_this.showTaskInfo = false;
                 });
             },
 
@@ -702,6 +714,7 @@
                 if(paraDisData.creator_organization_name == null)
                     this.$data.displayData.creator_organization_name = paraDisData.creator_user_name;
                 var tempUID = window.localStorage.getItem('userID');
+				
                 if(tempUID == paraDisData.user_id) {
                     this.$data.isAcceptableTask = false;
                     this.$data.ownerMessage = ' (由本用户创建)';
@@ -710,6 +723,13 @@
                     this.$data.isAcceptableTask = true;
                     this.$data.ownerMessage = '';
                 }
+				
+				if(this.displayData.current_participant_number == this.displayData.participant_number_limit){
+					this.isFullPeople = true;
+				}
+				else{
+					this.isFullPeople = false;
+				}
             },
 
 
@@ -834,6 +854,7 @@
 
 
 			handleSubmit (name) {
+				 this.showdrawer = false;
                  this.$data.taskInfoData = [];
 				 this.$refs[name].validate((valid) => {
 					 if (valid){
