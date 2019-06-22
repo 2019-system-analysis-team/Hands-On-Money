@@ -78,7 +78,7 @@
 							<p slot="title">正在进行中</p>
 							<p>							
 								<div style="min-height: 420px;">
-									<Col span="11" v-for="item in inprogressTasks" :key="item.task_id" style="padding-left: 20px; padding-top: 10px;" v-show="!TasksIsEmpty">
+									<Col span="11" v-for="item in inprogressTasks" :key="item.task_id" style="padding-left: 20px; padding-top: 10px;">
 										<Card>
 											<p slot="title">{{item.task_name}}</p>
 											<div slot="extra">
@@ -96,7 +96,7 @@
 							<p slot="title">已完成的任务</p>
 							<p>							
 								<div style="min-height: 420px;">
-									<Col span="11" v-for="item in finishedTasks" :key="item.task_id" style="padding-left: 20px; padding-top: 10px;" v-show="!TasksIsEmpty">
+									<Col span="11" v-for="item in finishedTasks" :key="item.task_id" style="padding-left: 20px; padding-top: 10px;">
 										<Card>
 											<p slot="title">{{item.task_name}}</p>
 											<div slot="extra">
@@ -113,10 +113,10 @@
 				<Row v-if="!haveTask" style="margin-left: 30px;">
 					<Col span="23">
 						<Card>
-							<p slot="title">开始创建一个新任务吧</p>
+							<p slot="title">还没有任务 快去新建一个任务或接受一个任务吧</p>
 							<p>							
 								<div style="min-height: 420px;text-align:center;">
-									<Button @click="createNewTask" type="primary" ghost shape="circle" icon="md-add" style="width: 30%;height: 63px;margin-top: 8%;">新建任务</Button>
+									<Button @click="toTaskMarket" type="primary" ghost shape="circle" icon="md-add" style="width: 30%;height: 63px;margin-top: 8%;">任务市场</Button>
 								</div>
 							</p>
 						</Card>
@@ -290,7 +290,7 @@
 							console.log(response);
 							var receivedTasks = response.data;
 							for(var i=0; i< receivedTasks.length;i++){
-								if( receivedTasks[i].task_status == "pending"){
+								if( receivedTasks[i].task_status == "ongoing"){
 									_this.inprogressTasks.push(receivedTasks[i]);
 								}else if(receivedTasks[i].task_status == "finished"){
 									_this.finishedTasks.push(receivedTasks[i]);
@@ -339,6 +339,11 @@
 						console.log(error);
 					});
 				}
+			},
+			toTaskMarket(){
+				this.$router.push({
+						path: '/taskmarket'
+				});						
 			},
 			GotoTopup (){
 				this.topup = true;
@@ -479,13 +484,31 @@
 				 this.showTaskInfo = false;
 			},
 			ToTaskInfo(taskID){
+					var current_step = 0;
+					for(var i = 0;i < this.inprogressTasks.length;i++){
+						if(this.inprogressTasks[i].task_id == taskID){
+							console.log("当前任务:");
+							console.log(this.inprogressTasks[i]);
+							current_step = this.inprogressTasks[i].current_step;
+							break;
+						}
+					}
+					for(var i = 0;i < this.finishedTasks.length;i++){
+						if(this.finishedTasks[i].task_id == taskID){
+							console.log("当前任务:");
+							console.log(this.finishedTasks[i]);
+							current_step = this.finishedTasks[i].current_step;
+							break;
+						}
+					}
 					window.localStorage.setItem('taskID', taskID);
 					window.localStorage.removeItem('organID');
 					this.$router.push({
 						path: '/', 
 						name: 'taskinfoforreceiver',
 						params: { 
-								taskID: taskID
+								taskID: taskID,
+								current_step: current_step
 						},
 					});					
 			},

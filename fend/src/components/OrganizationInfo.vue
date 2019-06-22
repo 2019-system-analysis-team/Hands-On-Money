@@ -60,7 +60,7 @@
 							<div slot="extra" v-show="isManager || isCreater">
 								<Button type="primary" icon="ios-add" shape="circle" @click="createOrganTask">新建组织任务</Button>
 							</div>	
-							<Col  v-show="!TasksIsEmpty" span="8" v-for="item in selectTasks" :key="item.task_id" style="padding-left: 30px; padding-top: 50px;">
+							<Col  v-show="!TasksIsEmpty" span="5" v-for="item in selectTasks" :key="item.task_id" style="padding-left: 30px; padding-top: 50px;">
 								<Card>
 									<p slot="title">{{item.task_name}}</p>
 									<div slot="extra">
@@ -125,7 +125,7 @@
 						</Card>					
 					</TabPane>
 					<TabPane label="管理成员" name="管理成员">
-						<Card dis-hover style="height: 500px">
+						<Card dis-hover>
 							<p slot="title" style="height: 38px;">
 								全部成员
 							</p>
@@ -156,15 +156,16 @@
 									</FormItem>
 								</Form>
 							</Modal>
-							<Col span="5" v-for="item in allMembers" :key="item.id" style="padding-left: 30px; padding-top: 30px;">
-								<Card style="height: 180px;">
+							<Col span="6" v-for="item in allMembers" :key="item.id" style="padding-left: 20px; padding-top: 30px;">
+								<Card style="height: 185px;">
 									<p slot="title">成员信息</p>
 									<div slot="extra" v-show="(isManager || isCreater) && (item.status != 'owner')">
 										<Button type="error" ghost @click="deleteMember(item.userID)">删除</Button>
 									</div>	
-									<div style="width: 70%;float: left; ">
+									<div style="width: 83%;float: left;">
 										<p style="margin-bottom: 5px;">真实姓名 : {{item.name}}</p>
 										<p style="margin-bottom: 5px;">昵称 : {{item.nickname}}</p>
+										<p style="margin-bottom: 5px;">学号 : {{item.student_id}}</p>
 										<p v-show="!(isManager || isCreater)">身份 : {{item.status}}</p>
 										<div v-show="isManager || isCreater">
 											身份 : 
@@ -486,6 +487,7 @@
 									'Authorization': jwt,
 								 }
 						}).then(function (response){
+							console.log("获取成员的信息");
 							console.log(response);
 							var nickname = response.data.nickname;
 							var name = response.data.name;
@@ -504,6 +506,8 @@
 							//_this.$set(test,'status',_this.allMembersShortInfo[i].status);
 							_this.$set(test,'statusChanged',statusChanged);
 							_this.$set(test,'headPhotoPath',_this.$profilePath + response.data.profile_photo_path);
+							_this.$set(test,'student_id',response.data.student_id);
+							
 							console.log("新成员:");
 							console.log(test);
 							_this.allMembers.push(test);
@@ -638,9 +642,12 @@
 				}).then(function (response){
 				_this.$Message.success('为组织充值成功!');
 				_this.organMoney = _this.organtopupData.value + _this.organMoney;
+
+				_this.money = _this.money - _this.organtopupData.value;
+				window.localStorage.setItem('money', _this.money);
 				}).catch(function (error) {
 					console.log(error);
-					_this.$Message.error('为组织充值失败');
+					_this.$Message.error('为组织充值失败,请检查自己的余额是否充足');
 				});
 			},
 			logout (){

@@ -53,7 +53,7 @@
 							</RadioGroup>
 						</FormItem>
 						<FormItem label="学院" prop="school">
-							<Select v-model="formValidate.school">
+							<Select v-model="formValidate.school" filterable>
 								<Option value="中国语言文学系">中国语言文学系</Option>
 								<Option value="历史学系">历史学系</Option>
 								<Option value="哲学系">哲学系</Option>

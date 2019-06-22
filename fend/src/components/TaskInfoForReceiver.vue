@@ -257,7 +257,9 @@
             },
 			getEventData:function() {
 				let routerParams = window.localStorage.getItem('taskID');
-				let organID = window.localStorage.getItem('organID');;
+				let organID = window.localStorage.getItem('organID');
+				this.current = this.$route.params.current_step;
+				console.log("现在步骤:" + this.current);
 				if(organID != null){
 					this.isCreateByOrgan = true;
 					this.organID = organID;
@@ -474,7 +476,28 @@
 					}
 					console.log(this.showTaskInfomation.steps[i].description );
 				}
-				 this.$Message.info("填写问卷成功,等待对方确认");
+					// PUT /users/:user_id/tasks/:task_id/steps/:step_id
+					var _this = this;
+					var url_all = "/users/" + this.$data.userID + "/tasks/" + this.taskID + "/steps/" + 0;
+					var jwt = "JWT " + window.localStorage.getItem('token');
+					this.$axios({
+						 method:"put",
+						 url: url_all,
+						 data:{
+							task_id:  this.taskID,
+							task_finished_steps: 0
+						 },
+						 headers:{
+							'Authorization': jwt,
+						 }
+					}).then(function (response){
+						_this.$Message.success('填写问卷成功!');
+					    //_this.current += 1;
+						 _this.appraise.isShow = true;
+					}).catch(function (error) {
+						console.log(error);
+						_this.$Message.error('已问卷，请勿重复点击!');
+					});		
 			},
 			next () {
 				if(this.isNullStep){
@@ -482,7 +505,33 @@
 					 this.appraise.isShow = true;
 					 return;
 				}
-
+				if(this.showTaskInfomation.tags == '问卷')
+				{
+					// PUT /users/:user_id/tasks/:task_id/steps/:step_id
+					var _this = this;
+					var url_all = "/users/" + this.$data.userID + "/tasks/" + this.taskID + "/steps/" + 0;
+					var jwt = "JWT " + window.localStorage.getItem('token');
+					this.$axios({
+						 method:"put",
+						 url: url_all,
+						 data:{
+							task_id:  this.taskID,
+							task_finished_steps: 0
+						 },
+						 headers:{
+							'Authorization': jwt,
+						 }
+					}).then(function (response){
+						_this.$Message.success('填写问卷成功!');
+					    //_this.current += 1;
+						 _this.appraise.isShow = true;
+					}).catch(function (error) {
+						console.log(error);
+						_this.$Message.error('已问卷，请勿重复点击!');
+					});					
+				}
+				else
+				{
 					// PUT /users/:user_id/tasks/:task_id/steps/:step_id
 					var _this = this;
 					var url_all = "/users/" + this.$data.userID + "/tasks/" + this.taskID + "/steps/" + (this.current+1);
@@ -499,11 +548,17 @@
 						 }
 					}).then(function (response){
 						_this.$Message.success('完成一个步骤成功!');
+						if(_this.showTaskInfomation.steps.length == _this.current+1)
+						{
+							_this.appraise.isShow = true;
+						}
 					    _this.current += 1;
 					}).catch(function (error) {
 						console.log(error);
 						_this.$Message.error('已完成任务，请勿重复点击!');
-					});
+					});					
+				}
+
                 
             },
 			createNewTask() {

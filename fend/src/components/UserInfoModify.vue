@@ -72,7 +72,7 @@
 							<p slot="title">您的学校信息如下</p>
 							<Form ref="schoolValidate" :model="schoolValidate" :rules="schoolRuleValidate" :label-width="80" class="form">
 								<FormItem label="学院" prop="school">
-									<Select v-model="schoolValidate.school" :disabled="disabledSchool">
+									<Select v-model="schoolValidate.school" :disabled="disabledSchool" filterable>
 										<Option value="中国语言文学系">中国语言文学系</Option>
 										<Option value="历史学系">历史学系</Option>
 										<Option value="哲学系">哲学系</Option>
@@ -378,7 +378,7 @@
 				},				
 				infoValidate:{
 					name: '',
-					age: '',
+					age: '18',
 					gender: ''	
 				},
                 infoRuleValidate: {
@@ -455,7 +455,7 @@
 					_this.$data.schoolValidate.stunumber = response.data.student_id;
 					_this.$data.schoolValidate.grade = response.data.grade;
 					_this.$data.infoValidate.name = response.data.name;
-					_this.$data.infoValidate.age = response.data.age;
+					_this.$data.infoValidate.age = response.data.age.toString();
 					_this.$data.infoValidate.gender = response.data.sex;		
 					_this.$data.money = response.data.balance;
 					_this.$data.profilePhotoPath =  _this.$profilePath + response.data.profile_photo_path;
@@ -556,8 +556,24 @@
 								console.log(error);
 							});
 						}else if(this.tabs == "密码修改"){
-							_this.$Message.success('修改成功!');
-							_this.disabledPwd = true;
+							var url_info = url_all + "/password";
+							this.$axios({
+								 method:"put",
+								 url: url_info,
+								 data:{
+									old_password: this.$data.pwdValidate.oldpasswd,
+									new_password: this.$data.pwdValidate.passwd,
+								 },
+								 headers:{
+									'Authorization': jwt,
+								 }
+							}).then(function (response){
+								_this.$Message.success('修改成功!');
+								_this.disabledPwd = true;
+							}).catch(function (error) {
+								_this.$Message.error('修改失败，请确认旧密码是否正确');
+								console.log(error);
+							});
 						}
                     } else {
                         _this.$Message.error('信息填写有误!');

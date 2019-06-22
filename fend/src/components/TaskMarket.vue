@@ -30,11 +30,23 @@
                         <p class="info">任务发布时间 : {{displayData.post_time}}</p>
                         <p class="info">截止接受任务时间 : {{displayData.receive_end_time}}</p>
                         <p class="info">最迟完成任务时间 : {{displayData.finish_deadline_time}}</p>
-                        <p class="info">步骤 : </p>
-                        <Steps :current="displayData.current">
-                            <Step :title="item.title" v-for="item in displayData.steps" :key="item.title">
-                            </Step>
-                        </Steps>
+						<Collapse simple>
+							<Panel name="1">
+								用户限制
+								<p slot="content">
+									年龄下限 : {{displayData.user_limit.age_upper}} 年龄上限 : {{displayData.user_limit.age_lower}}</br>
+									年级 : <tag v-for="item in displayData.user_limit.grades" :key="item.grades">{{item}}</tag></br>
+									性别 : <tag v-for="item in displayData.user_limit.sexes" :key="item.sexes">{{item}}</tag></br>
+									学校 : <tag v-for="item in displayData.user_limit.schools" :key="item.schools">{{item}}</tag>
+								</p>
+							</Panel>
+						</Collapse>
+						<p class="info" v-show="displayData.tags !=  '问卷' ">步骤 : </p>
+						<Steps :current="displayData.current" v-show="displayData.tags !=  '问卷'">
+							<Step :title="item.title" v-for="item in displayData.steps" :key="item.title">
+							</Step>
+						</Steps>
+
                     </Card>
                     </div>
                     <div slot="footer">
@@ -347,7 +359,15 @@
                 isAcceptableTask: true,
                 showTaskInfo: false,
                 showdrawer: false,
-                displayData: {},
+                displayData: {
+					user_limit: {
+						age_upper: null,
+						age_lower: null,
+						grades:null,
+						sexes: null,
+						schools: null
+					},
+				},
 				ageoptionsList:[],
                 formValidate: {
                     size: 100,
@@ -655,7 +675,7 @@
 					}
 
                 }).catch(function (error) {
-                    _this.$Message.error('请勿重复接收任务!');
+                    _this.$Message.error('不符合任务条件或重复接受任务!');
                     console.log(error);
 					_this.confirmAccept = false;
 					_this.showTaskInfo = false;
@@ -711,6 +731,8 @@
                 // console.log(this.$data.chosenTaskId);
                 this.$data.showTaskInfo = true;
                 this.$data.displayData = paraDisData;
+				console.log("展示的data");
+				console.log(this.displayData);
                 if(paraDisData.creator_organization_name == null)
                     this.$data.displayData.creator_organization_name = paraDisData.creator_user_name;
                 var tempUID = window.localStorage.getItem('userID');
@@ -821,16 +843,16 @@
                     returnConditions["receive_end_time"] = this.$data.formValidate.receive_end_time;
                 if(this.$data.formValidate.finish_deadline_time != "")
                     returnConditions["finish_deadline_time"] = this.$data.formValidate.finish_deadline_time;
+				
                 if(this.$data.formValidate.tags != '')
-                    returnConditions["tags"] = this.$data.formValidate.tags;
+				{
+					returnConditions["tags"] = "[\""+ this.$data.formValidate.tags + "\"]";
+				}
+
                 if(this.$data.formValidate.reward_for_one_participant_upper != null)
                     returnConditions["reward_for_one_participant_upper"] = this.$data.formValidate.reward_for_one_participant_upper;
                 if(this.$data.formValidate.reward_for_one_participant_lower != null)
                     returnConditions["reward_for_one_participant_lower"] = this.$data.formValidate.reward_for_one_participant_lower;
-                if(this.$data.formValidate.age_upper != null)
-                    returnConditions["user_limit"]["age_upper"] = this.$data.formValidate.age_upper;
-                if(this.$data.formValidate.age_lower != null)
-                    returnConditions["user_limit"]["age_lower"] = this.$data.formValidate.age_lower;
                 if(this.$data.formValidate.steps_number_upper != null)
                     returnConditions["steps_number_upper"] = this.$data.formValidate.steps_number_upper;
                 if(this.$data.formValidate.steps_number_lower != null)

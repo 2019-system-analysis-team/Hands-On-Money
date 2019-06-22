@@ -49,9 +49,9 @@
 					<TabPane label="基本信息" name="基本信息">
 						<Card dis-hover>
 							<div slot="extra">
-								<Button type="error" shape="circle"  @click="deleteTask()" v-show="!isOngoing">删除任务</Button>
-								<Button type="warning" shape="circle"  @click="toshowWithdrawInfo()" v-show="isOngoing">撤回任务</Button>
-								<Button type="primary" icon="ios-hammer-outline" shape="circle" v-show="!isOngoing" @click="modifyTask()">修改任务</Button>
+								<Button type="error" shape="circle"  @click="deleteTask()" v-show="!isOngoing && isManager">删除任务</Button>
+								<Button type="warning" shape="circle"  @click="toshowWithdrawInfo()" v-show="isOngoing && isManager">撤回任务</Button>
+								<Button type="primary" icon="ios-hammer-outline" shape="circle" v-show="!isOngoing && isManager" @click="modifyTask()">修改任务</Button>
 							</div>	
 							<Modal v-model="showWithdrawInfo">
 								<div>
@@ -134,7 +134,7 @@
 							<Table border :columns="allParticipant" :data="participant_info" v-if="this.participantSelectType == 0"></Table>
 							<Table border :columns="ongoingParticipant" :data="ongoing_participant_info" v-if="this.participantSelectType == 1"></Table>
 							<Table border :columns="waitingExamineParticipant" :data="waiting_examine_participant_info" v-if="this.participantSelectType == 2"></Table>
-							<Table border :columns="allParticipant" :data="finished_participant_info" v-if="this.participantSelectType == 3"></Table>
+							<Table border :columns="finishedParticipant" :data="finished_participant_info" v-if="this.participantSelectType == 3"></Table>
 						</Card>		
 					</TabPane>
 				</Tabs>
@@ -230,13 +230,21 @@
                         }
                     },
                     {
-                        title: '学校',
-                        key: 'school'
+                        title: '电话',
+                        key: 'phone_number'
                     },
                     {
-                        title: '年级',
-                        key: 'grade'
-                    }
+                        title: '学号',
+                        key: 'student_id'
+                    },
+					{
+					    title: '年级',
+					    key: 'grade'
+					},
+					{
+					    title: '学院',
+					    key: 'school'
+					}
                 ],
                 ongoingParticipant: [
                     {
@@ -254,13 +262,21 @@
                         }
                     },
                     {
-                        title: '学校',
-                        key: 'school'
+                        title: '电话',
+                        key: 'phone_number'
                     },
                     {
-                        title: '年级',
-                        key: 'grade'
+                        title: '学号',
+                        key: 'student_id'
                     },
+					{
+					    title: '年级',
+					    key: 'grade'
+					},
+					{
+					    title: '学院',
+					    key: 'school'
+					}
                 ],
 				waitingExamineParticipant: [
                     {
@@ -278,13 +294,21 @@
                         }
                     },
                     {
-                        title: '学校',
-                        key: 'school'
+                        title: '电话',
+                        key: 'phone_number'
                     },
                     {
-                        title: '年级',
-                        key: 'grade'
+                        title: '学号',
+                        key: 'student_id'
                     },
+					{
+					    title: '年级',
+					    key: 'grade'
+					},
+					{
+					    title: '学院',
+					    key: 'school'
+					},
                     {
                         title: '设置',
                         key: 'action',
@@ -326,13 +350,21 @@
                         }
                     },
                     {
-                        title: '学校',
-                        key: 'school'
+                        title: '电话',
+                        key: 'phone_number'
                     },
                     {
-                        title: '年级',
-                        key: 'grade'
-                    }
+                        title: '学号',
+                        key: 'student_id'
+                    },
+					{
+					    title: '年级',
+					    key: 'grade'
+					},
+					{
+					    title: '学院',
+					    key: 'school'
+					}
                 ],
 				profilePhotoPath: '',
 				taskID: '',
@@ -380,6 +412,7 @@
 				isCreateByOrgan:false,
 				organID:null,
 				isOngoing:false,
+				isManager:false,
             }
         },
 		created: function () { 
@@ -421,17 +454,40 @@
 				}
 				
 				this.$data.userID = uID;
-				
+				var jwt = "JWT " + window.localStorage.getItem('token');
 				var _this = this;
 				var url = "/users/" + this.$data.userID;
 				if(this.isCreateByOrgan){
 					url += "/organizations/" + this.organID + "/my_tasks/" + this.taskID;
+					
+					var _this = this;
+					var url_info = "/users/" + uID + "/organizations/" + this.organID;
+
+					this.$axios({
+							 method:"get",
+							 url:url_info,
+							 headers:{
+								'Authorization': jwt,
+							 }
+					}).then(function (response){
+						var allMembersShortInfo = response.data.members;
+
+						for(var i=0; i < allMembersShortInfo.length;i++){
+
+							if(allMembersShortInfo[i].user_id == _this.userID){
+								if(allMembersShortInfo[i].status == 'admin'){
+									_this.isManager = true;
+								}else if(allMembersShortInfo[i].status == 'owner'){
+									_this.isManager = true;
+								}
+							}
+						}
+					})
 				}
 				else{
 					url += "/my_tasks/" + this.taskID;
-				}
-				var jwt = "JWT " + window.localStorage.getItem('token');
-								
+					this.isManager = true;
+				}						
 				this.$axios({
 					 method:"get",
 					 url: url,
@@ -479,9 +535,11 @@
 									console.log(response);
 									var test = {};
 									_this.$set(test,'id',response.data.user_id);
-									_this.$set(test,'school',response.data.school);
-									_this.$set(test,'grade',response.data.grade);
+									_this.$set(test,'phone_number',response.data.phone_number);
+									_this.$set(test,'student_id',response.data.student_id);
 									_this.$set(test,'name',response.data.name);
+									_this.$set(test,'grade',response.data.grade);
+									_this.$set(test,'school',response.data.school);
 									_this.participant_info.push(test);
 								}).catch(function (error) {
 									_this.$Message.error('获取任务参与者的信息失败!');
@@ -501,9 +559,11 @@
 									console.log(response);
 									var test = {};
 									_this.$set(test,'id',response.data.user_id);
-									_this.$set(test,'school',response.data.school);
-									_this.$set(test,'grade',response.data.grade);
+									_this.$set(test,'phone_number',response.data.phone_number);
+									_this.$set(test,'student_id',response.data.student_id);
 									_this.$set(test,'name',response.data.name);
+									_this.$set(test,'grade',response.data.grade);
+									_this.$set(test,'school',response.data.school);
 									_this.ongoing_participant_info.push(test);
 								}).catch(function (error) {
 									_this.$Message.error('获取任务参与者的信息失败!');
@@ -523,9 +583,11 @@
 									console.log(response);
 									var test = {};
 									_this.$set(test,'id',response.data.user_id);
-									_this.$set(test,'school',response.data.school);
-									_this.$set(test,'grade',response.data.grade);
+									_this.$set(test,'phone_number',response.data.phone_number);
+									_this.$set(test,'student_id',response.data.student_id);
 									_this.$set(test,'name',response.data.name);
+									_this.$set(test,'grade',response.data.grade);
+									_this.$set(test,'school',response.data.school);
 									_this.waiting_examine_participant_info.push(test);
 								}).catch(function (error) {
 									_this.$Message.error('获取任务参与者的信息失败!');
@@ -545,9 +607,11 @@
 									console.log(response);
 									var test = {};
 									_this.$set(test,'id',response.data.user_id);
-									_this.$set(test,'school',response.data.school);
-									_this.$set(test,'grade',response.data.grade);
+									_this.$set(test,'phone_number',response.data.phone_number);
+									_this.$set(test,'student_id',response.data.student_id);
 									_this.$set(test,'name',response.data.name);
+									_this.$set(test,'grade',response.data.grade);
+									_this.$set(test,'school',response.data.school);
 									_this.finished_participant_info.push(test);
 								}).catch(function (error) {
 									_this.$Message.error('获取任务参与者的信息失败!');

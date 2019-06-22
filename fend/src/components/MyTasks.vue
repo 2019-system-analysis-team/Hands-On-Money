@@ -246,7 +246,7 @@
 					_this.createdTasks = response.data.task;
 					for(var i=0; i<_this.createdTasks.length;i++){
 						_this.createdTasks[i].task_name += ' (创建的任务) ';
-						if(_this.createdTasks[i].task_status == "已完成"){
+						if(_this.createdTasks[i].task_status == "finished"){
 							_this.finishedTasks.push(_this.createdTasks[i]);
 						}else if(_this.createdTasks[i].task_status == "ongoing"){
 							_this.inprogressTasks.push(_this.createdTasks[i]);
@@ -280,7 +280,7 @@
 					console.log(response);
 					_this.receivedTasks = response.data;
 					for(var i=0; i<_this.receivedTasks.length;i++){
-						if(_this.receivedTasks[i].task_status == "已完成"){
+						if(_this.receivedTasks[i].task_status == "finished"){
 							_this.finishedTasks.push(_this.receivedTasks[i]);
 						}else if(_this.receivedTasks[i].task_status == "ongoing"){
 							_this.inprogressTasks.push(_this.receivedTasks[i]);
@@ -505,9 +505,18 @@
 			},
 			ToTaskInfo(taskID){
 				var isCreate = false;
+				var current_step = 0;
 				for(var i = 0;i < this.createdTasks.length;i++){
 					if(this.createdTasks[i].task_id == taskID){
 						isCreate = true;
+						break;
+					}
+				}
+				for(var i = 0;i < this.receivedTasks.length;i++){
+					if(this.receivedTasks[i].task_id == taskID){
+						console.log("当前任务:");
+						console.log(this.receivedTasks[i]);
+						current_step = this.receivedTasks[i].current_step;
 						break;
 					}
 				}
@@ -529,7 +538,8 @@
 						path: '/', 
 						name: 'taskinfoforreceiver',
 						params: { 
-								taskID: taskID
+								taskID: taskID,
+								current_step: current_step
 						},
 					});					
 				}
