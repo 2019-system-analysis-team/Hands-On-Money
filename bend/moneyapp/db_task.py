@@ -109,10 +109,12 @@ def deleteTaskOrganization(_organization_id,_task_id):
     db.session.delete(task)
     db.session.commit()
 
+
 # ======================================================
 # Receiver_Task
 def receiveTask(_user_id, _task_id):
     task = queryTaskById(_task_id)
+    user = queryUserById(_user_id)
     user_number = Receiver_Task.query.filter_by(task_id=_task_id).count()
     
     user_number_limitation = task.participant_number_limit
@@ -120,6 +122,30 @@ def receiveTask(_user_id, _task_id):
     print("user num",user_number)
     if user_number_limitation <= user_number:
         raise ValueError("The user number has reached the limitation")
+    
+    user_age = user.age
+    user_grade = user.grade
+    user_sex = user.sex
+    user_school = user.school
+
+    user_limit = json.loads(task.user_limit)
+
+    if 'age_upper' in user_limit and (user_age is None or user_age > user_limit['age_upper']):
+        raise ValueError("The age not satisfy the user limitations")
+
+    if 'age_lower' in user_limit and (user_age is None or user_age < user_limit['age_lower']):
+        raise ValueError("The age is beyond age_lower")
+
+    if 'grades' in user_limit and (user_grade not in user_limit['grades'] or user_grade is None):
+        raise ValueError("The grade doesn't satisfy the user limitations")
+    
+    if 'sexes' in user_limit and (user_sex not in user_limit['sexes'] or user_sex is None):
+        raise ValueError("The sex doesn't satisfy the user limitations")
+
+    if 'schools' in user_limit and (user_school not in user_limit['schools'] or user_school is None):
+        raise ValueError("The school doesn't satisfy the user limitations")
+
+
     receiver_task = Receiver_Task(user_id=_user_id, task_id=_task_id)
     db.session.add(receiver_task)
     db.session.commit()

@@ -230,6 +230,8 @@ def delete_user_task(current_user, user_id, task_id):
     #return jsonify({"msg": "Delete " + str(task.title) + " successfully."}), 200
     return jsonify({"task_id": task_id,
                     "task_name": task_name}), 200
+
+    
 # RESTful 删除组织任务
 @routes.route('/users/<user_id>/organizations/<organization_id>/tasks/<task_id>', methods=['DELETE'])
 @token_required
