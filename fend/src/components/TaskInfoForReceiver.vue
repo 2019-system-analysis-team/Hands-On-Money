@@ -498,6 +498,7 @@
 							'Authorization': jwt,
 						 }
 					}).then(function (response){
+						console.log(response);
 						_this.$Message.success('填写问卷成功!');
 					    //_this.current += 1;
 						 _this.appraise.isShow = true;
@@ -556,6 +557,7 @@
 							'Authorization': jwt,
 						 }
 					}).then(function (response){
+						console.log(response);
 						_this.$Message.success('完成一个步骤成功!');
 						if(_this.showTaskInfomation.steps.length == _this.current+1)
 						{

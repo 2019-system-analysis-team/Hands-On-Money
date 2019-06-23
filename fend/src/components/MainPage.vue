@@ -85,9 +85,9 @@
                 	<div class="thirdSubDiv"></div>
                 	<div class="thirdTextDiv">
                 		<p class="memTitle">组员信息</p>
-                		<li class="memPara">项目经理：席睿 吴宇祺</li>
-                		<li class="memPara">前端开发：杨芮 王友坤</li>
-                		<li class="memPara">后端开发：王雁玲 许倚安 孙肖冉</li>
+                		<li class="memPara">项目经理：Siri Yuki</li>
+                		<li class="memPara">前端开发：Cyulei Sapphire</li>
+                		<li class="memPara">后端开发：Popiko 465924212 enao_sun</li>
                 	</div>
                 </div>
 			</Content>		
@@ -905,7 +905,7 @@
 .logo {
 	/* border: 3px solid red; */
 	top: 20%;
-	margin-left: 28%;
+	margin: 0 auto;
 	height: 700px;
 	width: 700px;
 	background-image: url("./../assets/logo2.png");

@@ -913,7 +913,7 @@
                         }).then(function (response){
                             // _this.$Message.success('success');
                             _this.$data.returnData = response;
-                            // console.log(response);
+                             console.log(response);
                             for(var i = 0; i < response.data.length; ++i) {
                                 var temptags = "";
                                 var tempboss = response.data[i].creator_organization_name;
@@ -935,6 +935,7 @@
                         }).catch(function (error) {
                             _this.$Message.error('failure');
                             console.log(error)
+							console.log(error.response);
                         });
 					 }
                 })

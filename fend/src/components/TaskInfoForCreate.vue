@@ -664,6 +664,7 @@
 					_this.$Message.success('评价成功!');
 				}).catch(function (error) {
 					console.log(error);
+					console.log(error.response);
 				});			
 				this.appraise.appId = 0;
 				this.appraise.title = '';
@@ -802,6 +803,7 @@
 					}
 				}).catch(function (error) {
 					console.log(error);
+					console.log(error.response);
 				});
 				
             },
