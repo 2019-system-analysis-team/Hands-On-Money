@@ -65,5 +65,5 @@
 
 ## 物理视图
 
-![](/pics/07-04-architecture-design-log.png)
+![](/pics/07-04-architecture-design-phy.png)
 

@@ -8,7 +8,7 @@ layout: default
 
 
 
-* 1、 [About](01-about)  项目概况
+* 1、[About](01-about)  项目概况
 * 2、[Team profile](02-team-profile)  团队组建与分工
 * 3、[Investigation](03-investigation) 项目前期调研/竞品分析
 * 4、[Vision](04-vision) 项目愿景
@@ -24,7 +24,7 @@ layout: default
   - 7.1 UI design（界面设计）
   - 7.2 Database design（数据库设计）
   - 7.3 [Interface API design](07-03-interface-api-design)  接口 API 设计  
-  - 7.4 Architecture design（架构设计）
+  - 7.4 [Architecture design](07-04-architecture-design)（架构设计）
   - 7.5 Usecase design（用例设计）
 * 8、生产规范与指南
   - 8.1 XX 代码规范
