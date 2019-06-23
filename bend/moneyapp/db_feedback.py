@@ -8,7 +8,7 @@ from moneyapp.utils import *
 def  createFeedbackReview(d):
     feedback_review = Feedback_Review(**d)
     db.session.add(feedback_review)
-    db.commit()
+    db.session.commit()
     return feedback_review
 
 #这里组织是意味着？

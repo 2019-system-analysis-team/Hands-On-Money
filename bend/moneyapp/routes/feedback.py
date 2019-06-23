@@ -24,14 +24,14 @@ def  create_User_Feedback_Review(current_user,user_id,task_id,receiver_id):
     #检查是否已有评论
     
     if checkCommentCreated(receiver_id,task_id) :
-        return jsonify({"error_code": "500", "error_msg": "The user have not created a comment"}), 500
+        return jsonify({"error_code": "500", "error_msg": "The receiver have not created a comment"}), 500
     
 
     #检查是否已有回评
-    if checkFeedbackCreated(user_id,task_id,receiver_id):
+    if not checkFeedbackCreated(user_id,task_id,receiver_id):
             
 
-        task = Task.query.filter_by(organization_id = organization_id , user_id = user_id)
+        task = Task.query.filter_by(id = task_id, user_id = user_id)
 
         #检查是否是创建task的人
         if task:
@@ -51,7 +51,7 @@ def  create_User_Feedback_Review(current_user,user_id,task_id,receiver_id):
                                 "task_id": feedback_review.task.id,
                                 "feedback_title": feedback_review.title,
                                 "feedback_content": feedback_review.content,
-                                "feedback_rate": feedback_review.rate}), 200
+                                "feedback_rate": feedback_review.rate}), 201
         else:
             return jsonify({"error_code":500,"error_msg":"It is not your task"}),500
 
