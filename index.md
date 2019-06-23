@@ -9,7 +9,7 @@ layout: default
 * 4、[Vision](04-vision) 项目愿景
 * 5、[Product Backlog](05-product-backlog)产品特性库
 * 6、Requirement specification 需求规格说明书
-  - 6.1 [Usecase Diagram](06-01-usecase-diagram)  用例图，业务过程/多泳道图
+  - 6.1 [Usecase Diagram](06-01-usecase-diagram)  用例图，业务过程
     - [Case 1 User Admin](06-02-01-user-admin)
     - [Case 2 Origanization Admin](06-02-02-organization-admin)
     - [Case 3 Task Admin](06-02-03-task-admin)
