@@ -65,6 +65,8 @@
             </Header>
 			<Content v-if="!isLogin">
 				<div class="mainDiv">
+					<!-- <div class="leftpart"></div> -->
+					<!-- <div class="rightpart"></div> -->
                     <div class="logo"></div>
                 </div>
                 <div class="secondDiv">
@@ -778,7 +780,7 @@
 
 .mainDiv {
 	/* height: 90%; */
-	background-image: url("./../assets/bgimg.png");
+	/* background-image: url("./../assets/bgimg.png"); */
 	/*background-repeat: no-repeat;*/
 	background-position: center;
 	/* border: 3px solid red; */
@@ -819,21 +821,23 @@
 	height: 830px;
 	position: relative;
 	/*background-color: #FDDFB2;*/
-	background-color: white;
+	/* background-color: white; */
 }
 
 .thirdDiv {
 	height: 830px;
 	position: relative;
 	/*background-color: #FDDFB2;*/
-	background-color: white;
+	/* background-color: white; */
 }
 
 .secondSubDiv {
 	position: absolute;
 	width: 40%;
 	height: 830px;
-	background-image: url("./../assets/secimg.png");
+	top: 100px;
+	left: 150px;
+	background-image: url("./../assets/3.png");
 	background-repeat: no-repeat;
 	/* border: 3px solid red; */
 }
@@ -843,7 +847,7 @@
 	left: 60%;
 	width: 40%;
 	height: 830px;
-	background-image: url("./../assets/thiimg.png");
+	background-image: url("./../assets/5.png");
 	background-repeat: no-repeat;
 	/* border: 3px solid red; */
 }
@@ -910,5 +914,25 @@
 	background-image: url("./../assets/logo2.png");
 	background-repeat: no-repeat;
 	background-size: cover;
+}
+.leftpart {
+	position: absolute;
+	left: -30px;
+	width: 40%;
+	height: 830px;
+	top: 100px;
+	background-image: url("./../assets/2.png");
+	background-repeat: no-repeat;
+	/* border: 3px solid red; */
+}
+
+.rightpart {
+	position: absolute;
+	left: 70%;
+	width: 40%;
+	height: 830px;
+	background-image: url("./../assets/1.png");
+	background-repeat: no-repeat;
+	/* border: 3px solid red; */
 }
 </style>
