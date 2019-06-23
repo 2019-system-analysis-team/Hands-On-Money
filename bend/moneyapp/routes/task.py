@@ -273,6 +273,7 @@ def receive_task(current_user, user_id, task_id):
     try:
         receiveTask(user_id, task_id)
     except Exception as e:
+        print(e)
         return jsonify({"error_code": "500", "error_msg": str(e)}), 500
     else:   
         return jsonify({"msg": "Receive task successfully."}), 201
