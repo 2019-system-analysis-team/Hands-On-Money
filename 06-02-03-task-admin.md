@@ -75,7 +75,7 @@
 
 ### 创建任务活动图
 
-![ZCLfRx.png](C:\dashboard\assets\ZCLfRx.png)
+![ZCLfRx.png](https://s2.ax1x.com/2019/06/23/ZCLfRx.png)
 
 ### 接受任务活动图
 
