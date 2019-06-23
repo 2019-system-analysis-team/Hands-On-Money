@@ -140,18 +140,27 @@ def receiveTask(_user_id, _task_id):
         if user_limit['age_lower'] != '':
             raise ValueError("The age is beyond age_lower")
 
-    if 'grades' in user_limit and (user_grade not in user_limit['grades'] or user_grade is None):
+    if 'grades' in user_limit:
         print(user_limit['grades'])
-        if len(user_limit['grades']) != 0:
+        print(user_grade)
+        if (len(user_limit['grades']) != 0 and (user_grade is not None and user_grade != '') and user_grade not in user_limit['grades']):
             raise ValueError("The grade doesn't satisfy the user limitations")
     
-    if 'sexes' in user_limit and (user_sex not in user_limit['sexes'] or user_sex is None):
-        if len(user_limit['sexes']) != 0:
+    if 'sexes' in user_limit:
+        print(user_limit['sexes'])
+        if (len(user_limit['sexes']) != 0 and (user_sex is not None and user_sex != '') and user_sex not in user_limit['sexes']):
             raise ValueError("The sex doesn't satisfy the user limitations")
+    
+        # if len(user_limit['sexes']) != 0:
+        #     raise ValueError("The sex doesn't satisfy the user limitations")
 
-    if 'schools' in user_limit and (user_school not in user_limit['schools'] or user_school is None):
-        if len(user_limit['schools']) != 0:
+    if 'schools' in user_limit:
+        print(user_limit['schools'])
+        if (len(user_limit['schools']) != 0 and (user_school is not None and user_school != '') and user_school not in user_limit['schools']):
             raise ValueError("The school doesn't satisfy the user limitations")
+    
+        # if len(user_limit['schools']) != 0:
+        #     raise ValueError("The school doesn't satisfy the user limitations")
 
 
     receiver_task = Receiver_Task(user_id=_user_id, task_id=_task_id)

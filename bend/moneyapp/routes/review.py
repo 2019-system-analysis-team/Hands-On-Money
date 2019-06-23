@@ -15,7 +15,7 @@ from .home import token_required
 
 
 # RESTful 接受任务者写评论
-@routes.route('/users/<user_id>/tasks/<task_id>/review', methods=['POST'])
+@routes.route('/users/<user_id>/tasks/<task_id>/comment', methods=['POST'])
 @token_required
 def create_Customer_Review(current_user, user_id, task_id):
     if current_user.id != int(user_id):
@@ -57,7 +57,7 @@ def create_Customer_Review(current_user, user_id, task_id):
                         "task_id": customer_review.task.id,
                         "review_title": customer_review.title,
                         "review_content": customer_review.content,
-                        "review_rate": customer_review.rate}), 200
+                        "review_rate": customer_review.rate}), 201
  
 
 # RESTful 接受任务者修改评论
