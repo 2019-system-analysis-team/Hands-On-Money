@@ -20,6 +20,7 @@ layout: default
   - 6.4 [State Models](06-04-state-models)  状态模型
   - 6.5 [System Sequence Diagrams](06-05-system-sequence-diagrams)  功能模型
   - 6.6 [Supplementary Requirements](06-06-supplementary-requirements)  补充需求
+<<<<<<< HEAD
 * 7、Design 设计说明书
   - 7.1 [UI design]()
   - 7.2 Database design
@@ -28,6 +29,14 @@ layout: default
   - 7.3 [Interface API design](07-03-interface-api-design)  
   - 7.4 [Architecture design](07-04-architecture-design)
   - 7.5 Usecase design
+=======
+* 7、Design（设计说明书）
+  - 7.1 UI design（界面设计）
+  - 7.2 Database design（数据库设计）
+  - 7.3 [Interface API design](07-03-interface-api-design)  接口 API 设计  
+  - 7.4 [Architecture design](07-04-architecture-design)（架构设计）
+  - 7.5 [Usecase design](07-05-usercase-design)（用例设计）
+>>>>>>> d0f0e43c15e25933dea1c230893513e36b3b7ec8
 * 8、生产规范与指南
   - 8.1 代码规范
     - 8.1.1 [Python 规范](https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/contents/#)
@@ -42,5 +51,7 @@ layout: default
   - [第六周例会记录]() (19/04/04)
   - [第七周例会记录](X1-03-week7-meeting-record) (19/04/12)
   - [第八周例会记录](X1-04-week8-meeting-record) (19/04/19)
-* X2 KANBAN
+* X2 [KANBAN GitHub Project](https://github.com/2019-system-analysis-team/Hands-On-Money/projects)
+* X5 Final Report
+  - [16340247-SiriusSee](X5-01)
 
