@@ -575,12 +575,12 @@ def search_public_tasks(current_user, user_id, task_id):
 
 # RESTful 任务查询
 @routes.route('/users/<user_id>/tasks', methods=['GET'])
-#@token_required
-#def search_all_tasks(current_user, user_id):
-def search_all_tasks(user_id):
+@token_required
+def search_all_tasks(current_user, user_id):
+#def search_all_tasks(user_id):
 
-    #if current_user.id != int(user_id):
-    #    return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+    if current_user.id != int(user_id):
+       return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
     try:
         print('hhh')
         #d = request.get_json()

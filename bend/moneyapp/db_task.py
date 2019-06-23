@@ -132,19 +132,25 @@ def receiveTask(_user_id, _task_id):
 
     # 魔改 
     if 'age_upper' in user_limit and (user_age is None or user_age < user_limit['age_upper']):
-        raise ValueError("The age not satisfy the user limitations")
+        if user_limit['age_upper'] != '':
+            raise ValueError("The age not satisfy the user limitations")
 
     if 'age_lower' in user_limit and (user_age is None or user_age > user_limit['age_lower']):
-        raise ValueError("The age is beyond age_lower")
+        if user_limit['age_lower'] != '':
+            raise ValueError("The age is beyond age_lower")
 
     if 'grades' in user_limit and (user_grade not in user_limit['grades'] or user_grade is None):
-        raise ValueError("The grade doesn't satisfy the user limitations")
+        print(user_limit['grades'])
+        if len(user_limit['grades']) != 0:
+            raise ValueError("The grade doesn't satisfy the user limitations")
     
-    if 'sexes' in user_limit and (user_sex not in user_limit['sexes'] or user_sex is None):
-        raise ValueError("The sex doesn't satisfy the user limitations")
+    if 'sexes' in user_limit and (user_sex not in user_limit['sexes'] or user_limit['sexes'] != '' or user_sex is None):
+        if len(user_limit['sexes']) != 0:
+            raise ValueError("The sex doesn't satisfy the user limitations")
 
-    if 'schools' in user_limit and (user_school not in user_limit['schools'] or user_school is None):
-        raise ValueError("The school doesn't satisfy the user limitations")
+    if 'schools' in user_limit and (user_school not in user_limit['schools'] or user_limit['schools'] != '' or user_school is None):
+        if len(user_limit['schools']) != 0:
+            raise ValueError("The school doesn't satisfy the user limitations")
 
 
     receiver_task = Receiver_Task(user_id=_user_id, task_id=_task_id)
@@ -254,19 +260,26 @@ def searchTask(d):
                     break
                 else:
                     if arg == 'age_upper':
-                        if not limit_temp <= d['user_limit'][arg]:
-                            task_not_satisfy.add(task)
-                            break
+                        # 魔改
+                        if d['user_limit']['age_upper'] != '':
+                            
+                            if not limit_temp >= d['user_limit'][arg]:
+                                task_not_satisfy.add(task)
+                                break
                     elif arg == 'age_lower':
-                        if not limit_temp >= d['user_limit'][arg]:
-                            task_not_satisfy.add(task)
-                            break
+                        if d['user_limit']['age_lower'] != '':
+                            
+                            if not limit_temp <= d['user_limit'][arg]:
+                                task_not_satisfy.add(task)
+                                break
                     elif arg == 'grades' or arg == 'sexes' or arg == 'schools':
-                        set_task = set(limit_temp)
-                        set_search = set(d['user_limit'][arg])
-                        if not set_search.issubset(set_task):
-                            task_not_satisfy.add(task)
-                            break
+                        if len(d['user_limit'][arg]) != 0:
+                            
+                            set_task = set(limit_temp)
+                            set_search = set(d['user_limit'][arg])
+                            if not set_search.issubset(set_task):
+                                task_not_satisfy.add(task)
+                                break
             continue
 
     task_temp_difference_set = task_temp - task_not_satisfy
@@ -383,6 +396,7 @@ def modifyTask(_task_id, _user_id, _organization_id, d):
         if task.organization.id != _organization_id:
             raise AssertionError("Insufficient permission")
         else:
+
             record = queryRecord(_user_id, _organization_id)
             if record.status == 'member':
                 raise AssertionError("Insufficient permission")
