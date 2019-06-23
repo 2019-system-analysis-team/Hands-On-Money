@@ -310,10 +310,10 @@
 							console.log(response);
 							var receivedTasks = response.data;
 							for(var i=0; i< receivedTasks.length;i++){
-								if( receivedTasks[i].task_status == "ongoing"){
-									_this.inprogressTasks.push(receivedTasks[i]);
-								}else if(receivedTasks[i].task_status == "finished"){
+								if(receivedTasks[i].task_status == "finished" || receivedTasks[i].task_receiver_status == "waiting examine"){
 									_this.finishedTasks.push(receivedTasks[i]);
+								}else if( receivedTasks[i].task_status == "ongoing"){
+									_this.inprogressTasks.push(receivedTasks[i]);
 								}
 								_this.haveTask = true;
 							}

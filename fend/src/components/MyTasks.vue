@@ -279,7 +279,7 @@
 					console.log(response);
 					_this.receivedTasks = response.data;
 					for(var i=0; i<_this.receivedTasks.length;i++){
-						if(_this.receivedTasks[i].task_status == "finished"){
+						if(_this.receivedTasks[i].task_status == "finished"  || _this.receivedTasks[i].task_receiver_status == "waiting examine"){
 							_this.finishedTasks.push(_this.receivedTasks[i]);
 						}else if(_this.receivedTasks[i].task_status == "ongoing"){
 							_this.inprogressTasks.push(_this.receivedTasks[i]);

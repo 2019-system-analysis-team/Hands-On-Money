@@ -49,7 +49,6 @@
 						<Card dis-hover>
 							<div slot="extra">
 								<Button type="error" shape="circle"  @click="deleteTask()" v-show="!isOngoing && isManager && !isFinish">删除任务</Button>
-								<Button type="error" shape="circle"  @click="finishTask()" v-show="isOngoing && isManager">结束任务</Button>
 								<Button type="warning" shape="circle"  @click="toshowWithdrawInfo()" v-show="isOngoing && isManager">撤回任务</Button>
 								<Button type="primary" icon="ios-hammer-outline" shape="circle" v-show="!isOngoing && isManager && !isFinish" @click="modifyTask()">修改任务</Button>
 							</div>	
@@ -800,6 +799,10 @@
 							//_this.participant_info.splice(i,1);
 							break;
 						}
+					}
+					if(_this.showTaskInfomation.participant_number_limit == _this.finished_participant_info.length){
+						console.log("自动结束任务");
+						_this.finishTask();
 					}
 				}).catch(function (error) {
 					console.log(error);
