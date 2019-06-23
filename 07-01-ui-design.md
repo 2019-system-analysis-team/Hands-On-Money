@@ -30,4 +30,4 @@
 
 ### 内页设计
 
-![Zix68H.png](C:\dashboard\assets\Zix68H.png)
+![Zix68H.png](https://s2.ax1x.com/2019/06/23/Zix68H.png)
