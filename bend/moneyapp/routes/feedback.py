@@ -15,7 +15,7 @@ from . import routes
 from .home import token_required
 
 
-@routes.route('/users/<user_id>/tasks/<task_id>/feedback/feedback/<receiver_id>',methods = ['POST'])
+@routes.route('/users/<user_id>/tasks/<task_id>/feedback/<receiver_id>',methods = ['POST'])
 @token_required
 def  create_User_Feedback_Review(current_user,user_id,task_id,receiver_id):
     if current_user.id != int(user_id):

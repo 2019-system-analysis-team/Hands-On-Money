@@ -277,13 +277,13 @@ def searchTask(d):
                         # 魔改
                         if d['user_limit']['age_upper'] != '':
                             
-                            if limit_temp >= d['user_limit'][arg]:
+                            if not limit_temp >= d['user_limit'][arg]:
                                 task_not_satisfy.add(task)
                                 break
                     elif arg == 'age_lower':
                         if d['user_limit']['age_lower'] != '':
                             
-                            if limit_temp <= d['user_limit'][arg]:
+                            if not limit_temp <= d['user_limit'][arg]:
                                 task_not_satisfy.add(task)
                                 break
                     elif arg == 'grades' or arg == 'sexes' or arg == 'schools':
@@ -363,7 +363,7 @@ def userChangeReceiveTask(_user_id,_task_id,_step_id):
     steps_num = len(task_steps)
     
     # step_id 为0 -》 问卷
-    if _step_id == 0:
+    if _step_id == 0 and task_record.status != 'waiting examine':
         task_record.status = 'waiting examine'
         
         db.session.commit()

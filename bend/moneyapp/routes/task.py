@@ -203,7 +203,7 @@ def get_received_task(current_user, user_id):
     task_info = []
 
     for received_task_record in current_user.received_tasks:
-        task_info.append(printTaskBriefReceive(received_task_record))
+        task_info.append(printTaskBriefReceiveStatus(received_task_record))
 
     return jsonify(task_info), 200
 
@@ -315,7 +315,7 @@ def mark_task_finished(current_user, user_id, task_id, finisher_id):
         return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
     
     task = queryTaskById(task_id)
-    if not task or task.user.id != current_user.id:
+    if not task:
         print('task.user.id', task.user.id)
         print('current_user.id', current_user.id)
         return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
