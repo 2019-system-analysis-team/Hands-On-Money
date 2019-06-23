@@ -148,6 +148,7 @@ def receiveTask(_user_id, _task_id):
     
     if 'sexes' in user_limit:
         print(user_limit['sexes'])
+        print(user_sex)
         if (len(user_limit['sexes']) != 0 and (user_sex is not None and user_sex != '') and user_sex not in user_limit['sexes']):
             raise ValueError("The sex doesn't satisfy the user limitations")
     
@@ -218,6 +219,7 @@ def searchTask(d):
     if 'reward_for_one_participant_lower' in d:
         task_temp = task_temp.filter(Task.reward_for_one_participant >= d['reward_for_one_participant_lower'])
 
+
     task_temp = set(task_temp)
     task_temp_difference_set = set()
     task_not_satisfy = set()
@@ -275,13 +277,13 @@ def searchTask(d):
                         # 魔改
                         if d['user_limit']['age_upper'] != '':
                             
-                            if not limit_temp >= d['user_limit'][arg]:
+                            if limit_temp >= d['user_limit'][arg]:
                                 task_not_satisfy.add(task)
                                 break
                     elif arg == 'age_lower':
                         if d['user_limit']['age_lower'] != '':
                             
-                            if not limit_temp <= d['user_limit'][arg]:
+                            if limit_temp <= d['user_limit'][arg]:
                                 task_not_satisfy.add(task)
                                 break
                     elif arg == 'grades' or arg == 'sexes' or arg == 'schools':
