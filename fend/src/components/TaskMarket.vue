@@ -150,7 +150,6 @@
                                                 <!-- <Option value="all">全部</Option> -->
                                                 <Option value="ongoing">正在进行</Option>
                                                 <Option value="finished">已完成</Option>
-												<Option value="pending">已撤回</Option>
                                             </Select>
                                         </Col>
                                     </FormItem>
@@ -228,7 +227,7 @@
                                 
                                     <FormItem prop="age_lower">
                                         <Col span="5">
-                                            <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">参与者最小年龄</label>
+                                            <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">参与者最大年龄</label>
                                         </Col>
                                         <Col span="6">
                                             <InputNumber v-model="formValidate.age_lower" :min="0"></InputNumber>
@@ -237,7 +236,7 @@
 
                                     <FormItem prop="age_upper">
                                         <Col span="5">
-                                            <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">参与者最大年龄</label>
+                                            <label style="width: 100px; margin-left: -100px; padding-right: 50px; font-size: 14px;">参与者最小年龄</label>
                                         </Col>
                                         <Col span="6">
                                             <InputNumber v-model="formValidate.age_upper" :min="0"></InputNumber>
@@ -381,8 +380,8 @@
                     reward_for_one_participant_upper: 999,
                     receive_end_time: '',
                     finish_deadline_time: '',
-                    age_upper: 30,
-                    age_lower: 10,
+                    age_upper: 10,
+                    age_lower: 30,
                     grades: [],
                     sexes: [],
                     schools: [],
@@ -880,7 +879,7 @@
                  this.$data.taskInfoData = [];
 				 this.$refs[name].validate((valid) => {
 					 if (valid){
-                        if(this.formValidate.age_upper < this.formValidate.age_lower){
+                        if(this.formValidate.age_upper > this.formValidate.age_lower){
                             this.$Message.error('年龄下限不能大于等于年龄上限');
                                 return;
                         }

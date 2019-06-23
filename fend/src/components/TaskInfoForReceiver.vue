@@ -48,8 +48,8 @@
 					<TabPane label="基本信息" name="基本信息">
 						<Card dis-hover>
 							<div slot="extra">
-								<Button type="success" shape="circle"  @click="show()" v-show="this.showTaskInfomation.tags != '问卷'">完成任务</Button>
-								<Button type="success" shape="circle"  @click="show()" v-show="this.showTaskInfomation.tags == '问卷'">填写问卷</Button>
+								<Button type="success" shape="circle"  @click="show()" v-show="this.showTaskInfomation.tags != '问卷' && isOngoing">完成任务</Button>
+								<Button type="success" shape="circle"  @click="show()" v-show="this.showTaskInfomation.tags == '问卷' && isOngoing">填写问卷</Button>
 							</div>	
 							<p slot="title" class="info">{{showTaskInfomation.title}}</p>
 							标签 : <Tag v-for="item in showTaskInfomation.tags" :key="item" :name="item" color="cyan">{{ item }}</Tag>
@@ -241,6 +241,7 @@
 				organID:null,
 				isNullStep:false,
 				choiceList:[],
+				isOngoing : false,
             }
         },
 		created: function () { 
@@ -259,6 +260,10 @@
 				let organID = window.localStorage.getItem('organID');
 				this.current = this.$route.params.current_step;
 				console.log("现在步骤:" + this.current);
+				if(this.current == null)
+				{
+					this.current = 0;
+				}
 				if(organID != null){
 					this.isCreateByOrgan = true;
 					this.organID = organID;
@@ -304,6 +309,9 @@
 					console.log("任务信息");
 					console.log(response);
 					_this.showTaskInfomation = response.data;
+					if(_this.showTaskInfomation.status == "ongoing"){
+						_this.isOngoing = true;
+					}
 					if(_this.showTaskInfomation.steps.length == 0)
 					{
 						_this.isNullStep = true;
@@ -493,6 +501,7 @@
 						_this.$Message.success('填写问卷成功!');
 					    //_this.current += 1;
 						 _this.appraise.isShow = true;
+						 _this.isOngoing = false;
 					}).catch(function (error) {
 						console.log(error);
 						_this.$Message.error('已问卷，请勿重复点击!');
@@ -522,6 +531,7 @@
 						 }
 					}).then(function (response){
 						_this.$Message.success('填写问卷成功!');
+						 _this.isOngoing = false;
 					    //_this.current += 1;
 						 _this.appraise.isShow = true;
 					}).catch(function (error) {
@@ -550,6 +560,7 @@
 						if(_this.showTaskInfomation.steps.length == _this.current+1)
 						{
 							_this.appraise.isShow = true;
+							 _this.isOngoing = false;
 						}
 					    _this.current += 1;
 					}).catch(function (error) {

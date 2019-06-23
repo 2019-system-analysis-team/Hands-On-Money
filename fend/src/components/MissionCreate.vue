@@ -312,6 +312,7 @@
 				taskID:0,
 				isQuestionnaire: false,
 				isfirstEnter: true,
+				userID:0,
             }
         },
 		created: function () { 
@@ -345,7 +346,7 @@
 						name: 'mainpage'
 					});
 				}
-				
+				this.userID = uID;
 				
 				if(this.isTaskChange){
 					var _this = this;
@@ -377,7 +378,7 @@
 						_this.user_limit.grades = response.data.user_limit.grades;
 						_this.user_limit.sexes = response.data.user_limit.sexes;
 						_this.user_limit.schools = response.data.user_limit.schools;
-						_this.teskTag = response.data.tags;
+						_this.teskTag = response.data.tags[0];
 						// 需要根据任务类型来区分 TODO
 						if(_this.teskTag != '问卷'){
 							for(var i=0; i< response.data.steps.length;i++){
@@ -585,6 +586,20 @@
 							}).then(function (response){
 									//console.log(response);
 									var task_id = response.data.task_id;
+									var url = "/users/" + _this.userID;
+									var jwt = "JWT " + window.localStorage.getItem('token');
+									_this.$axios({
+											 method:"get",
+											 url:url,
+											 headers:{
+												'Authorization': jwt,
+											 }
+									}).then(function (response){
+										console.log("修改金额");
+										console.log(response);
+										window.localStorage.setItem('money',response.data.balance);
+									}).catch(function (error) {
+									});
 									if(_this.isOrganCreate){
 										window.localStorage.setItem('taskID', task_id);
 										window.localStorage.setItem('organID', _this.organID);
@@ -608,10 +623,12 @@
 									}
 									 _this.$Message.success('创建任务成功!');
 							}).catch(function (error) {
-								_this.$Message.error('创建任务失败!');
+								_this.$Message.error('创建任务失败,请检查余额是否充足!');
 							
 							});
 						}else{
+							console.log(this.tasktags);
+
 							this.tasktags[0] = this.teskTag; 
 							this.$axios({
 									 method:"put",
@@ -634,6 +651,20 @@
 							}).then(function (response){
 									//console.log(response);
 									var task_id = response.data.task_id;
+									var url = "/users/" + _this.userID;
+									var jwt = "JWT " + window.localStorage.getItem('token');
+									_this.$axios({
+											 method:"get",
+											 url:url,
+											 headers:{
+												'Authorization': jwt,
+											 }
+									}).then(function (response){
+										console.log("修改金额");
+										console.log(response);
+										window.localStorage.setItem('money',response.data.balance);
+									}).catch(function (error) {
+									});
 									if(_this.isOrganCreate){
 										window.localStorage.setItem('taskID', task_id);
 										window.localStorage.setItem('organID', _this.organID);
@@ -657,7 +688,7 @@
 									}
 									 _this.$Message.success('修改任务成功!');
 							}).catch(function (error) {
-								_this.$Message.error('修改任务失败!');
+								_this.$Message.error('修改任务失败,请检查余额是否充足!');
 							
 							});							
 						}

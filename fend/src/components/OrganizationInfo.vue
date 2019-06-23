@@ -59,7 +59,7 @@
 							<div slot="extra" v-show="isManager || isCreater">
 								<Button type="primary" icon="ios-add" shape="circle" @click="createOrganTask">新建组织任务</Button>
 							</div>	
-							<Col  v-show="!TasksIsEmpty" span="5" v-for="item in selectTasks" :key="item.task_id" style="padding-left: 30px; padding-top: 50px;">
+							<Col  v-show="!TasksIsEmpty" span="6" v-for="item in selectTasks" :key="item.task_id" style="padding-left: 30px; padding-top: 50px;">
 								<Card>
 									<p slot="title">{{item.task_name}}</p>
 									<div slot="extra">

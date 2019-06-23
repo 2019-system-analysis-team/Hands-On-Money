@@ -48,9 +48,10 @@
 					<TabPane label="基本信息" name="基本信息">
 						<Card dis-hover>
 							<div slot="extra">
-								<Button type="error" shape="circle"  @click="deleteTask()" v-show="!isOngoing && isManager">删除任务</Button>
+								<Button type="error" shape="circle"  @click="deleteTask()" v-show="!isOngoing && isManager && !isFinish">删除任务</Button>
+								<Button type="error" shape="circle"  @click="finishTask()" v-show="isOngoing && isManager">结束任务</Button>
 								<Button type="warning" shape="circle"  @click="toshowWithdrawInfo()" v-show="isOngoing && isManager">撤回任务</Button>
-								<Button type="primary" icon="ios-hammer-outline" shape="circle" v-show="!isOngoing && isManager" @click="modifyTask()">修改任务</Button>
+								<Button type="primary" icon="ios-hammer-outline" shape="circle" v-show="!isOngoing && isManager && !isFinish" @click="modifyTask()">修改任务</Button>
 							</div>	
 							<Modal v-model="showWithdrawInfo">
 								<div>
@@ -412,6 +413,7 @@
 				organID:null,
 				isOngoing:false,
 				isManager:false,
+				isFinish:false,
             }
         },
 		created: function () { 
@@ -499,7 +501,10 @@
 					_this.showTaskInfomation = response.data;
 					if(_this.showTaskInfomation.status == "pending"){
 						_this.isOngoing = false;
-					}else{
+					}else if(_this.showTaskInfomation.status == "finished"){
+						_this.isFinish = true;
+					}
+					else{
 						_this.isOngoing = true;
 					}
 					if(_this.showTaskInfomation.tags == '问卷'){
@@ -763,6 +768,10 @@
 			
 			},
             show (index) {
+				if(this.isFinish == true){
+					_this.$Message.info('该任务已经结束!');
+					return;
+				}
 				var _this = this;
 				console.log(this.waiting_examine_participant_info[index]);
 				var url = "/users/" + this.$data.userID + "/tasks/" + this.taskID+ "/finishers/" + this.waiting_examine_participant_info[index].id;
@@ -780,12 +789,14 @@
 					_this.appraise.appId = deleteID;
 					_this.showTaskInfomation.ongoing_participant_ids = response.data.ongoing_participant_ids;
 					_this.showTaskInfomation.participant_ids = response.data.participant_ids;
+					_this.showTaskInfomation.finished_participant_ids = response.data.finished_participant_ids;
 					_this.waiting_examine_participant_info.splice(index,1);
 					for(var i=0; i < _this.participant_info.length; i++)
 					{
 						if(_this.participant_info[i].id == deleteID)
 						{
-							_this.waiting_examine_participant_info.splice(i,1);
+							_this.finished_participant_info.push(_this.participant_info[i]);
+							//_this.participant_info.splice(i,1);
 							break;
 						}
 					}
@@ -805,6 +816,35 @@
 			},
 			showdeleteTaskInfoCancel(){
 				this.showdeleteTaskInfo = false;
+			},
+			finishTask(){
+				var _this = this;
+				var url = "/users/" + this.$data.userID;
+				if(this.isCreateByOrgan){
+					url += "/organizations/" + this.organID + "/tasks/" + this.taskID + "/finish";
+				}
+				else{
+					url += "/tasks/" + this.taskID + "/finish";
+				}
+				var jwt = "JWT " + window.localStorage.getItem('token');
+				
+				this.$axios({
+					 method:"put",
+					 url: url,
+					 data:{
+						task_id: this.taskID,
+					 },
+					 headers:{
+						'Authorization': jwt,
+					 }
+				}).then(function (response){
+					_this.$Message.info('任务已结束');
+					_this.isFinish = true;
+					_this.isOngoing = false;
+
+				}).catch(function (error) {
+					console.log(error);
+				});						
 			},
 			deleteTaskTrue(){
 				var _this = this;
@@ -830,6 +870,21 @@
 				}).then(function (response){
 					_this.$Message.info('删除任务成功');
 				    window.localStorage.removeItem('taskID');
+
+					var url = "/users/" + _this.userID;
+					var jwt = "JWT " + window.localStorage.getItem('token');
+					_this.$axios({
+							 method:"get",
+							 url:url,
+							 headers:{
+								'Authorization': jwt,
+							 }
+					}).then(function (response){
+						console.log("修改金额");
+						console.log(response);
+						window.localStorage.setItem('money',response.data.balance);
+					}).catch(function (error) {
+					});
 					_this.$router.back();  
 				}).catch(function (error) {
 					console.log(error);

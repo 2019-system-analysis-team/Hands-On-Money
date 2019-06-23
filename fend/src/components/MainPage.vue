@@ -617,7 +617,7 @@
 	border-radius: 20px;
 	display: none;
 	position: absolute;
-	top: 20%;
+	top: 10%;
 	left: 30%;
 	width: 40%;
 	height: 370px;
