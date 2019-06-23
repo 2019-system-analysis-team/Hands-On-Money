@@ -3,6 +3,7 @@ import json
 from flask import jsonify
 from datetime import datetime
 from moneyapp.db_user import checkBalance, queryUserById
+from moneyapp.db_organization import *
 from moneyapp.utils import *
 # ====================================================================
 # Task
@@ -144,11 +145,11 @@ def receiveTask(_user_id, _task_id):
         if len(user_limit['grades']) != 0:
             raise ValueError("The grade doesn't satisfy the user limitations")
     
-    if 'sexes' in user_limit and (user_sex not in user_limit['sexes'] or user_limit['sexes'] != '' or user_sex is None):
+    if 'sexes' in user_limit and (user_sex not in user_limit['sexes'] or user_sex is None):
         if len(user_limit['sexes']) != 0:
             raise ValueError("The sex doesn't satisfy the user limitations")
 
-    if 'schools' in user_limit and (user_school not in user_limit['schools'] or user_limit['schools'] != '' or user_school is None):
+    if 'schools' in user_limit and (user_school not in user_limit['schools'] or user_school is None):
         if len(user_limit['schools']) != 0:
             raise ValueError("The school doesn't satisfy the user limitations")
 
@@ -174,6 +175,7 @@ def queryTaskByTag(_tag):
 def searchTask(d):
     # 先用status title finish_deadline_time 找一波
     #if d['']
+    print('hhhkkkk')
     for arg in d:
         print(arg)
     # task_2 = queryTaskById(2)
@@ -251,6 +253,7 @@ def searchTask(d):
                 continue
 
         if 'user_limit' in d:
+            print('hhhhh')
             user_limit_task = json.loads(task.user_limit)
             for arg in d['user_limit']:
                 try:
@@ -273,14 +276,21 @@ def searchTask(d):
                                 task_not_satisfy.add(task)
                                 break
                     elif arg == 'grades' or arg == 'sexes' or arg == 'schools':
+                        print("args: ", arg)
+                        print(len(d['user_limit'][arg]))
                         if len(d['user_limit'][arg]) != 0:
                             
                             set_task = set(limit_temp)
                             set_search = set(d['user_limit'][arg])
-                            if not set_search.issubset(set_task):
+                            # 查看是否有交集
+                            set_intersection = set_task & set_search
+                            if len(set_intersection) == 0 and len(set_task) != 0 and len(set_search) != 0:
                                 task_not_satisfy.add(task)
                                 break
-            continue
+                            # if not set_task.issubset(set_search):
+                            #     task_not_satisfy.add(task)
+                            #     break
+                continue
 
     task_temp_difference_set = task_temp - task_not_satisfy
     # for task in task_temp_difference_set:
