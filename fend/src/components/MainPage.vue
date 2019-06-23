@@ -94,7 +94,7 @@
             <Content :style="{padding: '50px 50px'}" v-if="isLogin">
 				<Row v-if="haveTask" >
 					<Col span="11" style="margin-left: 30px;">
-						<Card>
+						<Card style="height: 550px; overflow: auto;">
 							<p slot="title">正在进行中</p>
 							<p>							
 								<div style="min-height: 420px;">
@@ -112,7 +112,7 @@
 						</Card>
 					</Col>
 					<Col span="11" style="margin-left: 30px;">
-						<Card>
+						<Card style="height: 550px; overflow: auto;">
 							<p slot="title">已完成的任务</p>
 							<p>							
 								<div style="min-height: 420px;">
@@ -245,7 +245,7 @@
 				showTaskInfomation:{
 				},
 				userID: '',
-				isLogin: false,
+				isLogin: true,
 				profilePhotoPath: '',
 				money: 0,
 				topupData: {
@@ -588,9 +588,6 @@
 }
 .layout-footer-center{
     text-align: center;
-}
-.ivu-layout-header{
-    padding-right: 25px;
 }
 .demo-drawer-footer{
 	width: 100%;

@@ -265,8 +265,8 @@
                                         </Col>
                                         <Col span="6">
                                             <Select v-model="formValidate.sexes" multiple style="width: 230px;">
-                                                <Option value="男">男</Option>
-                                                <Option value="女">女</Option>
+                                                <Option value="男生">男生</Option>
+                                                <Option value="女生">女生</Option>
                                             </Select>
                                         </Col>
                                     </FormItem>

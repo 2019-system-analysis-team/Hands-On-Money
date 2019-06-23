@@ -253,8 +253,8 @@
 					}	
 				],
 				sexesList:[
-                    { value: '男', label: '男'},
-					{ value: '女', label: '女'}					
+                    { value: '男生', label: '男生'},
+					{ value: '女生', label: '女生'}					
 				],
 				schoolsList:[
 					{ value: '中国语言文学系', label: '中国语言文学系'},

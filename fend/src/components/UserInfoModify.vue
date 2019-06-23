@@ -832,8 +832,5 @@
 	background-color: #FFFFFF;
 	margin-top: 5px;
 }
-.ivu-layout-header{
-    padding-right: 25px;
-}
 
 </style>

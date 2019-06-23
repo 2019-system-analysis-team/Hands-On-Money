@@ -420,7 +420,4 @@
 .layout-footer-center{
     text-align: center;
 }
-.ivu-layout-header{
-    padding-right: 25px;
-}
 </style>

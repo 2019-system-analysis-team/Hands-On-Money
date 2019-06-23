@@ -635,9 +635,6 @@
 	background-color: #FFFFFF;
 	margin-top: 5px;
 }
-.ivu-layout-header{
-    padding-right: 25px;
-}
 .content-head{
 	margin: 0 auto;
 	width: 100%;
