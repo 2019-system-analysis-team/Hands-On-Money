@@ -9,18 +9,23 @@ layout: default
 * 4、[Vision](04-vision) 项目愿景
 * 5、[Product Backlog](05-product-backlog)产品特性库
 * 6、Requirement specification 需求规格说明书
-  - 6.1 [Usecase Diagram](06-01-usecase-diagram)  用例图，业务过程/多泳道图
+  - 6.1 [Usecase Diagram](06-01-usecase-diagram)  用例图，业务过程
+    - [Case 1 User Admin](06-02-01-user-admin)
+    - [Case 2 Origanization Admin](06-02-02-organization-admin)
+    - [Case 3 Task Admin](06-02-03-task-admin)
+    - [Case 4 Comment](06-02-04-comment)
+    - [Case 5 Token Payment](06-02-05-token-payment)
   - 6.2 [Use Cases and Activity Diagram](06-02-use-case-and-uml-activity-diagram) 用例+活动图
   - 6.3 [Domian Models](06-03-domian-models)  领域模型
   - 6.4 [State Models](06-04-state-models)  状态模型
   - 6.5 [System Sequence Diagrams](06-05-system-sequence-diagrams)  功能模型
   - 6.6 [Supplementary Requirements](06-06-supplementary-requirements)  补充需求
 * 7、Design（设计说明书）
-  - 7.1 [UI design](07-01-ui-design)（界面设计）
-  - 7.2 [Database design](07-02-database-design)（数据库设计）
+  - 7.1 [UI design](07-01-ui-design) 界面设计
+  - 7.2 [Database design](07-02-database-design) 数据库设计
   - 7.3 [Interface API design](07-03-interface-api-design)  接口 API 设计  
-  - 7.4 [Architecture design](07-04-architecture-design)（架构设计）
-  - 7.5 [Usecase design](07-05-usercase-design)（用例设计）
+  - 7.4 [Architecture design](07-04-architecture-design) 架构设计 
+  - 7.5 [Usecase design](07-05-usercase-design)用例设计
 * 8、生产规范与指南
   - 8.1 代码规范
     - 8.1.1 [Python 规范](https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/contents/#)
@@ -38,4 +43,5 @@ layout: default
 * X2 [KANBAN GitHub Project](https://github.com/2019-system-analysis-team/Hands-On-Money/projects)
 * X5 Final Report
   - [16340247-SiriusSee](X5-01)
+  - [16340273-cyuhei](X5-02)
 
