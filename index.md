@@ -20,23 +20,14 @@ layout: default
   - 6.4 [State Models](06-04-state-models)  状态模型
   - 6.5 [System Sequence Diagrams](06-05-system-sequence-diagrams)  功能模型
   - 6.6 [Supplementary Requirements](06-06-supplementary-requirements)  补充需求
-<<<<<<< HEAD
-* 7、Design 设计说明书
-  - 7.1 [UI design]()
-  - 7.2 Database design
-    - [用户及组织系统数据库设计]()
-    - [任务系统数据库设计]()
-  - 7.3 [Interface API design](07-03-interface-api-design)  
-  - 7.4 [Architecture design](07-04-architecture-design)
-  - 7.5 Usecase design
-=======
+    
+
 * 7、Design（设计说明书）
-  - 7.1 UI design（界面设计）
+  - 7.1 [UI design]()（界面设计）
   - 7.2 Database design（数据库设计）
   - 7.3 [Interface API design](07-03-interface-api-design)  接口 API 设计  
   - 7.4 [Architecture design](07-04-architecture-design)（架构设计）
   - 7.5 [Usecase design](07-05-usercase-design)（用例设计）
->>>>>>> d0f0e43c15e25933dea1c230893513e36b3b7ec8
 * 8、生产规范与指南
   - 8.1 代码规范
     - 8.1.1 [Python 规范](https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/contents/#)
