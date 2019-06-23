@@ -130,10 +130,11 @@ def receiveTask(_user_id, _task_id):
 
     user_limit = json.loads(task.user_limit)
 
-    if 'age_upper' in user_limit and (user_age is None or user_age > user_limit['age_upper']):
+    # 魔改 
+    if 'age_upper' in user_limit and (user_age is None or user_age < user_limit['age_upper']):
         raise ValueError("The age not satisfy the user limitations")
 
-    if 'age_lower' in user_limit and (user_age is None or user_age < user_limit['age_lower']):
+    if 'age_lower' in user_limit and (user_age is None or user_age > user_limit['age_lower']):
         raise ValueError("The age is beyond age_lower")
 
     if 'grades' in user_limit and (user_grade not in user_limit['grades'] or user_grade is None):
