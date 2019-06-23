@@ -39,4 +39,5 @@ layout: default
 * X2 [KANBAN GitHub Project](https://github.com/2019-system-analysis-team/Hands-On-Money/projects)
 * X5 Final Report
   - [16340247-SiriusSee](X5-01)
+  - [16340273-cyuhei](X5-02)
 
