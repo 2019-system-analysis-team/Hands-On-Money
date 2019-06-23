@@ -24,7 +24,7 @@ layout: default
 
 * 7、Design（设计说明书）
   - 7.1 [UI design]()（界面设计）
-  - 7.2 Database design（数据库设计）
+  - 7.2 [Database design](07-02-database-design)（数据库设计）
   - 7.3 [Interface API design](07-03-interface-api-design)  接口 API 设计  
   - 7.4 [Architecture design](07-04-architecture-design)（架构设计）
   - 7.5 [Usecase design](07-05-usercase-design)（用例设计）
