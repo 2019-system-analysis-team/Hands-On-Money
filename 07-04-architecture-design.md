@@ -61,9 +61,9 @@
 - 数据库适当建立索引
 
 ## 逻辑视图
-![](/pics/07-04-architecture-design-log.png)
+![log.png](https://s2.ax1x.com/2019/06/23/ZPkoaq.png)
 
 ## 物理视图
 
-![](/pics/07-04-architecture-design-phy.png)
+![phy.png](https://s2.ax1x.com/2019/06/23/ZPkHiV.png)
 
