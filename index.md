@@ -4,7 +4,7 @@ layout: default
 
 # 目录
 * 1、[About](01-about)  项目概况
-  - [Demo](01-01-demo-pre) 项目功能展示
+  - 1.1 [Demo](01-01-demo-pre) 项目功能展示
 * 2、[Team profile](02-team-profile)  团队组建与分工
 * 3、[Investigation](03-investigation) 项目前期调研/竞品分析
 * 4、[Vision](04-vision) 项目愿景
