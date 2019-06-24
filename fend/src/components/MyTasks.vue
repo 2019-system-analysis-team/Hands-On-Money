@@ -61,7 +61,8 @@
 									<div slot="extra">
 										<Button type="primary" ghost @click="LookTaskInfo(item.task_id)">详情</Button>
 									</div>	
-									<p>{{item.task_status}}</p>
+									<p v-show="item.task_receiver_status == null">{{item.task_status}}</p>
+									<p v-show="item.task_receiver_status != null">{{item.task_receiver_status}}</p>
 								</Card>
 							</Col>
 							<Modal v-model="showTaskInfo">
@@ -279,7 +280,8 @@
 					console.log(response);
 					_this.receivedTasks = response.data;
 					for(var i=0; i<_this.receivedTasks.length;i++){
-						if(_this.receivedTasks[i].task_status == "finished"  || _this.receivedTasks[i].task_receiver_status == "waiting examine"){
+						if(_this.receivedTasks[i].task_status == "finished"  || _this.receivedTasks[i].task_receiver_status == "waiting examine"||
+						_this.receivedTasks[i].task_receiver_status == "finished"){
 							_this.finishedTasks.push(_this.receivedTasks[i]);
 						}else if(_this.receivedTasks[i].task_status == "ongoing"){
 							_this.inprogressTasks.push(_this.receivedTasks[i]);

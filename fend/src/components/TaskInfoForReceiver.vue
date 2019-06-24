@@ -505,7 +505,7 @@
 						 _this.isOngoing = false;
 					}).catch(function (error) {
 						console.log(error);
-						_this.$Message.error('已问卷，请勿重复点击!');
+						_this.$Message.error('已完成问卷，请勿重复点击!');
 					});		
 			},
 			next () {

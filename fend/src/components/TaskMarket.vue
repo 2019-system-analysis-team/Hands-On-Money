@@ -385,8 +385,8 @@
                     grades: [],
                     sexes: [],
                     schools: [],
-                    steps_number_upper: 100,
-                    steps_number_lower: 0
+                    steps_number_upper: null,
+                    steps_number_lower: null
                 },
                 ruleValidate: {},
                 returnData: {},

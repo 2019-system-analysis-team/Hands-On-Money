@@ -104,7 +104,7 @@
 											<div slot="extra">
 												<Button type="primary" ghost @click="LookTaskInfo(item.task_id)">详情</Button>
 											</div>	
-											<p>{{item.task_status}}</p>
+											<p>{{item.task_receiver_status}}</p>
 										</Card>
 									</Col>
 								</div>
@@ -122,7 +122,7 @@
 											<div slot="extra">
 												<Button type="primary" ghost @click="LookTaskInfo(item.task_id)">详情</Button>
 											</div>	
-											<p>{{item.task_status}}</p>
+											<p>{{item.task_receiver_status}}</p>
 										</Card>
 									</Col>
 								</div>
@@ -310,7 +310,8 @@
 							console.log(response);
 							var receivedTasks = response.data;
 							for(var i=0; i< receivedTasks.length;i++){
-								if(receivedTasks[i].task_status == "finished" || receivedTasks[i].task_receiver_status == "waiting examine"){
+								if(receivedTasks[i].task_status == "finished" || receivedTasks[i].task_receiver_status == "waiting examine" ||
+								    receivedTasks[i].task_receiver_status == "finished"){
 									_this.finishedTasks.push(receivedTasks[i]);
 								}else if( receivedTasks[i].task_status == "ongoing"){
 									_this.inprogressTasks.push(receivedTasks[i]);
