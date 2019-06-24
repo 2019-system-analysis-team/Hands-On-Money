@@ -25,6 +25,10 @@ from moneyapp.utils import *
 #     db.session.commit()
 
 #     return task
+def markFinishTask(task_id):
+    task = queryTaskById(task_id)
+    task.status = 'finished'
+    db.session.commit()
 
 def createTask(d):
     items = {'user_id', 'organization_id', 'title', 'description', 'tags', 'participant_number_limit',\

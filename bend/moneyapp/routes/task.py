@@ -15,6 +15,41 @@ from .home import token_required
 
 
 ##=========== Task =================================
+# 完成任务api
+@routes.route('/users/<user_id>/tasks/<task_id>/finish', methods=['PUT'])
+@token_required
+def finishTask(current_user, user_id, task_id):
+    if current_user.id != int(user_id):
+        return jsonify({"error_code": "404", "error_msg": "user Not Found"}), 404
+
+    task = queryTaskById(task_id)
+    if task is None:
+        return jsonify({"error_code": 500, "error_msg": "No such task"}), 500
+
+    # 个人任务
+    if task.organization_id is None or task.organization_id == '':
+        if task.user_id != int(user_id):
+            return jsonify({"error_code": 401, "error_msg": "Insufficient permission"}), 401
+
+    # 组织任务
+    if task.organization_id and task.organization_id != '':
+        record = queryRecord(current_user.id, task.organization_id)
+        if not record:
+            return jsonify({"error_code": 401,
+                           "error_msg": "insufficient permission"}), 401
+
+    # 重复finish
+    if task.status == 'finished':
+        return jsonify({"error_code": 500, "error_msg": "The task has been finished"}), 500
+    try:    
+        markFinishTask(task_id)
+    except Exception as e:
+        return jsonify({"error_code": 500,
+                           "error_msg": str(e)}), 500
+    else:
+        return jsonify(printTaskBrief(task)), 200
+
+
 # RESTful 用户创建任务
 @routes.route('/users/<user_id>/tasks', methods=['POST'])
 @token_required

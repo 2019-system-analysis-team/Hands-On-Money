@@ -28,11 +28,13 @@ def create_Customer_Review(current_user, user_id, task_id):
         return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
     
 
-    # 检查该用户是否完成了任务
-    finish_flag = checkFinishTask(received_task_record)
-    # 没有完成任务
-    if not finish_flag:
-        return jsonify({"error_code": "500", "error_msg": "You can't comment before you finish the task"}), 500
+    # # 检查该用户是否完成了任务
+    # finish_flag = checkFinishTask(received_task_record)
+
+    
+    # # 没有完成任务
+    # if not finish_flag:
+    #     return jsonify({"error_code": "500", "error_msg": "You can't comment before you finish the task"}), 500
 
     # 检查该用户是否已经写了评论
     if checkCommentCreated(user_id, task_id):
