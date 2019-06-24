@@ -1,19 +1,10 @@
 # DEMO 展示
 
 在这一部分，我们将展示我们实现的所有用例。主要分为如下几个部分：
-
-- [DEMO 展示](#DEMO-%E5%B1%95%E7%A4%BA)
-  - [首页](#%E9%A6%96%E9%A1%B5)
-  - [用户系统](#%E7%94%A8%E6%88%B7%E7%B3%BB%E7%BB%9F)
-    - [注册](#%E6%B3%A8%E5%86%8C)
-    - [界面](#%E7%95%8C%E9%9D%A2)
-    - [个人信息](#%E4%B8%AA%E4%BA%BA%E4%BF%A1%E6%81%AF)
-  - [组织管理系统](#%E7%BB%84%E7%BB%87%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F)
-    - [新建](#%E6%96%B0%E5%BB%BA)
-    - [详情](#%E8%AF%A6%E6%83%85)
-    - [删除](#%E5%88%A0%E9%99%A4)
-    - [成员管理](#%E6%88%90%E5%91%98%E7%AE%A1%E7%90%86)
-    - [权限管理](#%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86)
+- 用户管理
+- 组织管理
+- 任务系统
+- 支付系统
 
 ## 首页
 
@@ -100,25 +91,57 @@
 
 <img src="https://s2.ax1x.com/2019/06/24/ZkjEdK.png" alt="ZkjEdK.png" border="0">
 
+## 任务系统
 
+任务系统提供了任务的浏览、查询、创建、接收、完成、审核等一系列流程。
+
+### 我的任务
+
+当用户接受或者创建了任务后，该用户所有的任务都会显示在主界面上。用户可以根据一系列条件进行筛选。
 
 <img src="https://s2.ax1x.com/2019/06/24/Zkj3eP.png" alt="Zkj3eP.png" border="0">
+
+### 任务市场
+
+任务市场是一个浏览与筛选任务的地方：用户可以根据任务名和其他条件对任务进行详细的查询。
+
 <img src="https://s2.ax1x.com/2019/06/24/Zkjwyn.png" alt="Zkjwyn.png" border="0">
+
+可选的查询条件如下图所示：
+
 <img src="https://s2.ax1x.com/2019/06/24/ZkjtJg.png" alt="ZkjtJg.png" border="0">
 <img src="https://s2.ax1x.com/2019/06/24/ZkjNWQ.png" alt="ZkjNWQ.png" border="0">
+
+点击任意一个任务，可以看到任务的详情页面。如果你是任务的发起者，你可以修改任务。
+
+<img src="https://s2.ax1x.com/2019/06/24/ZkjQsI.png" alt="ZkjQsI.png" border="0">
+
+### 修改任务
+
+撤回任务
+
 <img src="https://s2.ax1x.com/2019/06/24/ZkjDe0.png" alt="ZkjDe0.png" border="0">
+
+修改任务，重新发布
+
 <img src="https://s2.ax1x.com/2019/06/24/ZkjrwV.png" alt="ZkjrwV.png" border="0">
 <img src="https://s2.ax1x.com/2019/06/24/ZkjhO1.png" alt="ZkjhO1.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/Zkj0Lq.png" alt="Zkj0Lq.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/Zkj6FU.png" alt="Zkj6FU.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjsoT.png" alt="ZkjsoT.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjRSJ.png" alt="ZkjRSJ.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjgW4.png" alt="ZkjgW4.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjcYF.png" alt="ZkjcYF.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjfyR.png" alt="ZkjfyR.png" border="0">
+
+### 创建任务
+
 
 <img src="https://s2.ax1x.com/2019/06/24/ZkjYFS.png" alt="ZkjYFS.png" border="0">
 <img src="https://s2.ax1x.com/2019/06/24/ZkjGo8.png" alt="ZkjGo8.png" border="0">
 <img src="https://s2.ax1x.com/2019/06/24/Zkj8df.png" alt="Zkj8df.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjQsI.png" alt="ZkjQsI.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjWl9.png" alt="ZkjWl9.png" border="0">
+
+## 支付系统
+
+在本项目中，充值提现、创建任务、完成任务都存在代币的变化。下面以一个例子来展示代币的变化情况。
+1. 用户账户中原有 9900 代币
+2. 用户往账户充值 66 代币
+3. 账户现有 10056代币
+4. 用户从账户内取现 1000 代币，现有 9056 代币
+5. 用户创建一个奖励为 1000 代币的任务
+6. 账户现有 8056代币
+
+<img src="https://s2.ax1x.com/2019/06/24/ZAM0XR.png" alt="ZAM0XR.png" border="0" />
