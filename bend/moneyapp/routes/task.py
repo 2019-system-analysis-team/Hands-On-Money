@@ -111,7 +111,7 @@ def check_user_tasks(current_user, user_id):
 
     for task in current_user.tasks:
         if task.organization is None:
-            task_info.append(printTaskBrief(task))
+            task_info.append(printTaskWithLists(task))
 
     return jsonify({"task": task_info}), 200
 
@@ -135,7 +135,7 @@ def check_organization_tasks(current_user, user_id, organization_id):
     task_info = []
 
     for task in organization.tasks:
-        task_info.append(printTaskBrief(task))
+        task_info.append(printTaskWithLists(task))
 
     return jsonify({"task": task_info}), 200
 
@@ -320,6 +320,14 @@ def mark_task_finished(current_user, user_id, task_id, finisher_id):
         print('current_user.id', current_user.id)
         return jsonify({"error_code": "404", "error_msg": "task Not Found"}), 404
     
+    
+    # 组织任务
+    if task.organization_id:
+        record = queryRecord(current_user.id, task.organization_id)
+        if not record:
+            return jsonify({"error_code": "401",
+                            "error_msg": "insufficient permission"}), 401
+
     try:
         task = finishUserTask(task_id, finisher_id)
 
@@ -330,6 +338,8 @@ def mark_task_finished(current_user, user_id, task_id, finisher_id):
         #result_msg = printSingleTask(task)
         result_msg = printUserInfoOfTask(task)
         return jsonify(result_msg), 200
+   
+
 
         # status = "on going" if (datetime.datetime.utcnow() > task.post_time and datetime.datetime.utcnow() < task.finish_deadline_time) else "not ongoing"
     

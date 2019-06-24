@@ -117,6 +117,41 @@ def printTaskBrief(task):
             "task_name": task.title,
             "task_status": task.status}
 
+# 打印任务简介（包括三个list）
+def printTaskWithLists(task):
+    participant_ids = []
+    ongoing_participant_ids = []
+    waiting_examine_participant_ids = []
+    finished_participant_ids = []
+
+    # 获取creator
+    creator = queryUserById(task.user_id)
+    org_name = None
+    
+    if task.organization:
+        org_name = task.organization.name
+
+    count = 0
+
+    for par in task.received_tasks:
+        count += 1
+        par_user_id = par.user_id
+        participant_ids.append(par_user_id)
+        if par.status == 'on going':
+            ongoing_participant_ids.append(par_user_id)
+        elif par.status == 'waiting examine':
+            waiting_examine_participant_ids.append(par_user_id)
+        elif par.status == 'finished':
+            finished_participant_ids.append(par_user_id)
+
+    return {"task_id": task.id,
+            "task_name": task.title,
+            "task_status": task.status,
+            "participant_ids": participant_ids,
+            "ongoing_participant_ids": ongoing_participant_ids,
+            "waiting_examine_participant_ids": waiting_examine_participant_ids,
+            "finished_participant_ids": finished_participant_ids}
+
 # 打印任务简介（包括step）
 def printTaskBriefReceive(received_task_record):
     task = received_task_record.task

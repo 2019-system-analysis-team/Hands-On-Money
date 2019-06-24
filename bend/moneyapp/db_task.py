@@ -132,13 +132,22 @@ def receiveTask(_user_id, _task_id):
     user_limit = json.loads(task.user_limit)
 
     # 魔改 
-    if 'age_upper' in user_limit and (user_age is None or user_age < user_limit['age_upper']):
-        if user_limit['age_upper'] != '':
+    if not ((user_age is None or user_age == '') or (user_limit['age_upper'] == '')):
+        if user_age < user_limit['age_upper']:
+            print(user_limit['age_upper'])
+            print(user_age)
             raise ValueError("The age not satisfy the user limitations")
 
-    if 'age_lower' in user_limit and (user_age is None or user_age > user_limit['age_lower']):
-        if user_limit['age_lower'] != '':
+    # if 'age_lower' in user_limit and (user_age is None or user_age > user_limit['age_lower']):
+    #     if user_limit['age_lower'] != '':
+    #         raise ValueError("The age is beyond age_lower")
+    #         
+    if not ((user_age is None or user_age == '') or (user_limit['age_lower'] == '')):
+        if user_age > user_limit['age_lower']:
+            print(user_limit['age_lower'])
+            print(user_age)
             raise ValueError("The age is beyond age_lower")
+
 
     if 'grades' in user_limit:
         print(user_limit['grades'])
@@ -452,7 +461,7 @@ def modifyTask(_task_id, _user_id, _organization_id, d):
             user = queryUserById(_user_id)
             user.balance -= delta
         else:
-            print("hhhhh")
+            print("org")
             organization = queryOrganizationByID(_organization_id)
             organization.balance -= delta
     else:
