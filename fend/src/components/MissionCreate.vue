@@ -623,7 +623,7 @@
 									}
 									 _this.$Message.success('创建任务成功!');
 							}).catch(function (error) {
-								_this.$Message.error('创建任务失败,请检查余额是否充足!');
+								_this.$Message.error('创建任务失败,请检查组织/个人余额是否充足!');
 							
 							});
 						}else{
@@ -688,7 +688,7 @@
 									}
 									 _this.$Message.success('修改任务成功!');
 							}).catch(function (error) {
-								_this.$Message.error('修改任务失败,请检查余额是否充足!');
+								_this.$Message.error('修改任务失败,请检查组织/个人余额是否充足!');
 							
 							});							
 						}

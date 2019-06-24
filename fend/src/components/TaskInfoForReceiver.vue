@@ -434,6 +434,7 @@
 				//POST /users/:user_id/tasks/:task_id/comment
 				var _this = this;
 				var url_all = "/users/" + this.$data.userID + "/tasks/" + this.taskID + "/comment";
+				console.log(url_all);
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				this.$axios({
 					 method:"post",

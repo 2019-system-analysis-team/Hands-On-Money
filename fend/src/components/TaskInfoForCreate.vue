@@ -641,7 +641,7 @@
 				var _this = this;
 				var url_all = "/users/" + this.$data.userID ;
 				if(this.isCreateByOrgan){
-					url_all += "/organizations/" + this.organID + "/tasks/" + this.taskID;
+					url_all += "/organization/" + this.organID + "/tasks/" + this.taskID;
 				}
 				else{
 					url_all += "/tasks/" + this.taskID;
@@ -825,12 +825,7 @@
 			finishTask(){
 				var _this = this;
 				var url = "/users/" + this.$data.userID;
-				if(this.isCreateByOrgan){
-					url += "/organizations/" + this.organID + "/tasks/" + this.taskID + "/finish";
-				}
-				else{
-					url += "/tasks/" + this.taskID + "/finish";
-				}
+				url += "/tasks/" + this.taskID + "/finish";
 				var jwt = "JWT " + window.localStorage.getItem('token');
 				
 				this.$axios({
@@ -843,7 +838,7 @@
 						'Authorization': jwt,
 					 }
 				}).then(function (response){
-					_this.$Message.info('任务已结束');
+					//_this.$Message.info('任务已结束');
 					_this.isFinish = true;
 					_this.isOngoing = false;
 
