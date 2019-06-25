@@ -26,7 +26,8 @@ layout: default
   - 7.2 [Database design](07-02-database-design) 数据库设计
   - 7.3 [Interface API design](07-03-interface-api-design)  接口 API 设计  
   - 7.4 [Architecture design](07-04-architecture-design) 架构设计 
-  - 7.5 [Usecase design](07-05-usercase-design)用例设计
+  - 7.5 Usecase design
+    - [接受任务用例设计](07-05-01-usercase-design)
 * 8、生产规范与指南
   - 8.1 代码规范
     - 8.1.1 [Python 规范](https://zh-google-styleguide.readthedocs.io/en/latest/google-python-styleguide/contents/#)
