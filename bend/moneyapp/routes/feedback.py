@@ -23,7 +23,7 @@ def  create_User_Feedback_Review(current_user,user_id,task_id,receiver_id):
 
     #检查是否已有评论
     
-    if checkCommentCreated(receiver_id,task_id) :
+    if not checkCommentCreated(receiver_id,task_id) :
         return jsonify({"error_code": "500", "error_msg": "The receiver have not created a comment"}), 500
     
 
