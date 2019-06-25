@@ -2,18 +2,11 @@
 
 在这一部分，我们将展示我们实现的所有用例。主要分为如下几个部分：
 
-- [DEMO 展示](#DEMO-%E5%B1%95%E7%A4%BA)
-  - [首页](#%E9%A6%96%E9%A1%B5)
-  - [用户系统](#%E7%94%A8%E6%88%B7%E7%B3%BB%E7%BB%9F)
-    - [注册](#%E6%B3%A8%E5%86%8C)
-    - [界面](#%E7%95%8C%E9%9D%A2)
-    - [个人信息](#%E4%B8%AA%E4%BA%BA%E4%BF%A1%E6%81%AF)
-  - [组织管理系统](#%E7%BB%84%E7%BB%87%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F)
-    - [新建](#%E6%96%B0%E5%BB%BA)
-    - [详情](#%E8%AF%A6%E6%83%85)
-    - [删除](#%E5%88%A0%E9%99%A4)
-    - [成员管理](#%E6%88%90%E5%91%98%E7%AE%A1%E7%90%86)
-    - [权限管理](#%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86)
+- 用户管理
+- 组织管理
+- 任务系统
+- 支付系统
+- 评价系统
 
 ## 首页
 
@@ -21,7 +14,7 @@
 
 <img src="https://s2.ax1x.com/2019/06/24/ZkX7xs.png" alt="ZkX7xs.png" border="0">
 
-## 用户系统
+## 用户管理
 
 本系统提供用户信息管理功能。用户可以通过本系统查看其他用户的信息，并管理自己的信息。
 
@@ -41,7 +34,7 @@
 
 ### 界面
 
-系统的主页面如下图所示。主界面将会显示你当前的全部任务（建立的/接受的）。由于刚注册的用户没有任务，因此存在一个导航到任务市场的连接。这一部分会在 [任务](##任务) 部分详细描述。
+系统的主页面如下图所示。主界面将会显示你当前的全部任务（建立的/接受的）。由于刚注册的用户没有任务，因此存在一个导航到任务市场的连接。这一部分会在 [任务](##任务系统) 部分详细描述。
 
 <img src="https://s2.ax1x.com/2019/06/24/ZkjpRJ.png" alt="ZkjpRJ.png" border="0">
 
@@ -66,7 +59,7 @@
 <img src="https://s2.ax1x.com/2019/06/24/ZkXXZV.png" alt="ZkXXZV.png" border="0">
 <img src="https://s2.ax1x.com/2019/06/24/ZkXziF.png" alt="ZkXziF.png" border="0" />
 
-## 组织管理系统
+## 组织管理
 
 ### 新建
 
@@ -100,26 +93,107 @@
 
 <img src="https://s2.ax1x.com/2019/06/24/ZkjEdK.png" alt="ZkjEdK.png" border="0">
 
+## 任务系统
 
+任务系统提供了任务的浏览、查询、创建、接收、完成、审核等一系列流程。
+
+### 我的任务
+
+当用户接受或者创建了任务后，该用户所有的任务都会显示在主界面上。用户可以根据一系列条件进行筛选。
 
 <img src="https://s2.ax1x.com/2019/06/24/Zkj3eP.png" alt="Zkj3eP.png" border="0">
+
+### 任务市场
+
+任务市场是一个浏览与筛选任务的地方：用户可以根据任务名和其他条件对任务进行详细的查询。
+
 <img src="https://s2.ax1x.com/2019/06/24/Zkjwyn.png" alt="Zkjwyn.png" border="0">
+
+可选的查询条件如下图所示：
+
 <img src="https://s2.ax1x.com/2019/06/24/ZkjtJg.png" alt="ZkjtJg.png" border="0">
 <img src="https://s2.ax1x.com/2019/06/24/ZkjNWQ.png" alt="ZkjNWQ.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjDe0.png" alt="ZkjDe0.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjrwV.png" alt="ZkjrwV.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjhO1.png" alt="ZkjhO1.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/Zkj0Lq.png" alt="Zkj0Lq.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/Zkj6FU.png" alt="Zkj6FU.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjsoT.png" alt="ZkjsoT.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjRSJ.png" alt="ZkjRSJ.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjgW4.png" alt="ZkjgW4.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjcYF.png" alt="ZkjcYF.png" border="0">
-<img src="https://s2.ax1x.com/2019/06/24/ZkjfyR.png" alt="ZkjfyR.png" border="0">
+
+点击任意一个任务，可以看到任务的详情页面。如果你是任务的发起者，你可以编辑任务。
+
+<img src="https://s2.ax1x.com/2019/06/24/ZkjQsI.png" alt="ZkjQsI.png" border="0">
+
+### 创建任务
+
+想要创建一个属于自己的任务，你需要先单击导航栏-任务下的创建任务选项卡。在创建任务页面中，你可以对任务的各个类型进行定制。比如，你可以增加对任务参与者限制，限制完成时间，以及修改任务步骤等等。
 
 <img src="https://s2.ax1x.com/2019/06/24/ZkjYFS.png" alt="ZkjYFS.png" border="0">
 <img src="https://s2.ax1x.com/2019/06/24/ZkjGo8.png" alt="ZkjGo8.png" border="0">
+
+任务创建完成后，点击发布。如果你的账户余额足够，则任务将会发布。你将会跳转到如下的任务详情页面。在这个页面，你会看到任务的详情。
+
 <img src="https://s2.ax1x.com/2019/06/24/Zkj8df.png" alt="Zkj8df.png" border="0">
+<<<<<<< HEAD
 <img src="https://s2.ax1x.com/2019/06/24/ZkjQsI.png" alt="ZkjQsI.png" border="0">
 <img src="https://s2.ax1x.com/2019/06/24/ZkjWl9.png" alt="ZkjWl9.png" border="0">
 
+=======
+
+在任务审核界面，你可以实时追踪任务接收者的完成动向。
+
+### 修改任务
+
+已发出的任务可以修改。在编辑任务之前，你需要先撤回任务。点击撤回任务把任务撤回，并确认。
+
+<img src="https://s2.ax1x.com/2019/06/24/ZkjDe0.png" alt="ZkjDe0.png" border="0">
+
+已撤回的任务可以被修改并重新发布。或者，你也可以将其直接删除。
+
+<img src="https://s2.ax1x.com/2019/06/24/ZkjrwV.png" alt="ZkjrwV.png" border="0">
+<img src="https://s2.ax1x.com/2019/06/24/ZkjhO1.png" alt="ZkjhO1.png" border="0">
+
+### 完成任务
+
+用户可以接受并完成任务。在任务市场中选择你心仪的任务，点击接受。
+
+<img src="https://s2.ax1x.com/2019/06/24/ZABkG9.png" alt="ZABkG9.png" border="0" />
+
+在完成任务步骤之后，进入任务详情，点击完成任务，完成该步骤。
+
+<img src="https://s2.ax1x.com/2019/06/24/ZABFPJ.png" alt="ZABFPJ.png" border="0" />
+<img src="https://s2.ax1x.com/2019/06/24/ZABCaF.png" alt="ZABCaF.png" border="0" />
+
+当任务完成之后，用户可以对任务的质量进行[评价](##评价系统)。
+
+<img src="https://s2.ax1x.com/2019/06/24/ZAB9VU.png" alt="ZAB9VU.png" border="0" />
+
+### 审核任务
+
+当任务被完成之后，任务的发布者需要审核任务的完成情况。点击审核通过确认此任务已被完成。
+
+<img src="https://s2.ax1x.com/2019/06/24/ZABA2R.md.png" alt="ZABA2R.png" border="0" />
+
+当任务完成之后，用户可以对任务完成的质量进行[评价](##评价系统)。
+
+<img src="https://s2.ax1x.com/2019/06/24/ZABP54.png" alt="ZABP54.png" border="0" />
+
+## 支付系统
+
+在本项目中，充值提现、创建任务、完成任务都存在代币的变化。下面以一个例子来展示代币的变化情况。
+
+1. 用户账户中原有 9900 代币
+2. 用户往账户充值 66 代币
+3. 账户现有 10056代币
+4. 用户从账户内取现 1000 代币，现有 9056 代币
+5. 用户创建一个奖励为 1000 代币的任务
+6. 账户现有 8056代币
+
+<img src="https://s2.ax1x.com/2019/06/24/ZAM0XR.png" alt="ZAM0XR.png" border="0" />
+
+## 评价系统
+
+除了任务完成后的双方互评之外，用户和组织还可以看到自己的平均评价。
+
+<img src="https://s2.ax1x.com/2019/06/24/ZAB9VU.png" alt="ZAB9VU.png" border="0" />
+
+<img src="https://s2.ax1x.com/2019/06/24/ZABP54.png" alt="ZABP54.png" border="0" />
+
+<img src="https://s2.ax1x.com/2019/06/24/ZkjSG4.png" alt="ZkjSG4.png" border="0">
+
+<img src="https://s2.ax1x.com/2019/06/24/ZkjMQA.png" alt="ZkjMQA.png" border="0">
+>>>>>>> e2018f0ad84695325887a98be3c5866981f69d85
