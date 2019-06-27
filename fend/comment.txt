@@ -1,1 +1,0 @@
-This dir is for front-end dev. Please orginaze your file structure in this dir.
