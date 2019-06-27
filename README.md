@@ -2,12 +2,19 @@
 
 ## 项目博客
 
-![传送门](https://2019-system-analysis-team.github.io/Hands-On-Money/)，其中包括全部文档和报告
+[传送门](https://2019-system-analysis-team.github.io/Hands-On-Money/)，其中包括全部文档和报告
 
 ## 项目成果展示
 
-![传送门](https://2019-system-analysis-team.github.io/Hands-On-Money/01-01-demo-pre)
+[传送门](https://2019-system-analysis-team.github.io/Hands-On-Money/01-01-demo-pre)
 
+## 一键部署
+
+```
+git clone https://github.com/2019-system-analysis-team/Hands-On-Money.git
+cd Hands-On-Money
+bash deploy.sh
+```
 
 ## 组队，分工与绩效
 
