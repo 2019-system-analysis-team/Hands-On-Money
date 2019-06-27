@@ -42,8 +42,9 @@ layout: default
   - [第六周例会记录]() (19/04/04)
   - [第七周例会记录](X1-03-week7-meeting-record) (19/04/12)
   - [第八周例会记录](X1-04-week8-meeting-record) (19/04/19)
+  - [第十二周例会记录](X1-06-week12-meeting-record)(19/05/14)
 * X2 [KANBAN GitHub Project](https://github.com/2019-system-analysis-team/Hands-On-Money/projects)
-* X5 Final Report
+* X3 Final Report
   - [16340247-SiriusSee](X5-01)
   - [16340273-cyuhei](X5-02)
   - [16340225-Popiko](X5-03)
