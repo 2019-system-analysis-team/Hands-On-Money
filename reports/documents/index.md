@@ -9,7 +9,7 @@ layout: default
 * 3、[Investigation](03-investigation) 项目前期调研/竞品分析
 * 4、[Vision](04-vision) 项目愿景
 * 5、[Product Backlog](05-product-backlog)产品特性库
-* 6、Requirement specification 需求规格说明书
+* 6、[Requirement specification](06-requirement-specification) 需求规格说明书
   - 6.1 [Usecase Diagram](06-01-usecase-diagram)  用例图，业务过程
     - [Case 1 User Admin](06-02-01-user-admin)
     - [Case 2 Origanization Admin](06-02-02-organization-admin)
@@ -21,7 +21,7 @@ layout: default
   - 6.4 [State Models](06-04-state-models)  状态模型
   - 6.5 [System Sequence Diagrams](06-05-system-sequence-diagrams)  功能模型
   - 6.6 [Supplementary Requirements](06-06-supplementary-requirements)  补充需求
-* 7、Design（设计说明书）
+* 7、[Design](07-design-document)（设计说明书）
   - 7.1 [UI design](07-01-ui-design) 界面设计
   - 7.2 [Database design](07-02-database-design) 数据库设计
   - 7.3 [Interface API design](07-03-interface-api-design)  接口 API 设计  
