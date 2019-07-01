@@ -13,7 +13,8 @@
 ```
 git clone https://github.com/2019-system-analysis-team/Hands-On-Money.git
 cd Hands-On-Money
-bash deploy.sh
+bash deploy_fend.sh
+bash deploy_bend.sh
 ```
 
 ## 组队，分工与绩效

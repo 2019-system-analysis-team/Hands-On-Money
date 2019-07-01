@@ -20,11 +20,11 @@
 
 ## 目录
 
-- [RESTful API 设计文档](#RESTful-API-%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3)
+- [RESTful API 设计文档](#restful-api-%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3)
   - [标准](#%E6%A0%87%E5%87%86)
   - [参考](#%E5%8F%82%E8%80%83)
   - [目录](#%E7%9B%AE%E5%BD%95)
-  - [API](#API)
+  - [API](#api)
     - [用户与组织系统](#%E7%94%A8%E6%88%B7%E4%B8%8E%E7%BB%84%E7%BB%87%E7%B3%BB%E7%BB%9F)
       - [用户创建](#%E7%94%A8%E6%88%B7%E5%88%9B%E5%BB%BA)
       - [用户登陆](#%E7%94%A8%E6%88%B7%E7%99%BB%E9%99%86)
@@ -43,7 +43,6 @@
       - [用户/组织创建任务](#%E7%94%A8%E6%88%B7%E7%BB%84%E7%BB%87%E5%88%9B%E5%BB%BA%E4%BB%BB%E5%8A%A1)
       - [用户/组织查询自己创建的任务列表](#%E7%94%A8%E6%88%B7%E7%BB%84%E7%BB%87%E6%9F%A5%E8%AF%A2%E8%87%AA%E5%B7%B1%E5%88%9B%E5%BB%BA%E7%9A%84%E4%BB%BB%E5%8A%A1%E5%88%97%E8%A1%A8)
       - [查询自己的任务详情](#%E6%9F%A5%E8%AF%A2%E8%87%AA%E5%B7%B1%E7%9A%84%E4%BB%BB%E5%8A%A1%E8%AF%A6%E6%83%85)
-      - [查询自己已接收的任务](#%E6%9F%A5%E8%AF%A2%E8%87%AA%E5%B7%B1%E5%B7%B2%E6%8E%A5%E6%94%B6%E7%9A%84%E4%BB%BB%E5%8A%A1)
       - [任务查询](#%E4%BB%BB%E5%8A%A1%E6%9F%A5%E8%AF%A2)
       - [任务详情](#%E4%BB%BB%E5%8A%A1%E8%AF%A6%E6%83%85)
       - [任务接受](#%E4%BB%BB%E5%8A%A1%E6%8E%A5%E5%8F%97)
@@ -52,12 +51,6 @@
       - [撤回任务](#%E6%92%A4%E5%9B%9E%E4%BB%BB%E5%8A%A1)
       - [修改未发布任务](#%E4%BF%AE%E6%94%B9%E6%9C%AA%E5%8F%91%E5%B8%83%E4%BB%BB%E5%8A%A1)
       - [组织/个人删除任务](#%E7%BB%84%E7%BB%87%E4%B8%AA%E4%BA%BA%E5%88%A0%E9%99%A4%E4%BB%BB%E5%8A%A1)
-    - [评论系统](#%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F)
-      - [用户新增评论](#%E7%94%A8%E6%88%B7%E6%96%B0%E5%A2%9E%E8%AF%84%E8%AE%BA)
-      - [组织/用户回评](#%E7%BB%84%E7%BB%87%E7%94%A8%E6%88%B7%E5%9B%9E%E8%AF%84)
-    - [支付系统](#%E6%94%AF%E4%BB%98%E7%B3%BB%E7%BB%9F)
-      - [用户充值/用户给组织充值](#%E7%94%A8%E6%88%B7%E5%85%85%E5%80%BC%E7%94%A8%E6%88%B7%E7%BB%99%E7%BB%84%E7%BB%87%E5%85%85%E5%80%BC)
-      - [提现(仅用户可)](#%E6%8F%90%E7%8E%B0%E4%BB%85%E7%94%A8%E6%88%B7%E5%8F%AF)
 
 ## API
 
@@ -71,7 +64,6 @@
     - 对于键值不符合文档要求的 request，一律返回 400 Bad Request
     - 对于不在文档列表中的 request HTTP verb，一律返回 405 Method Not Allowed
     - 除部分注册、登陆可访问的 API 之外，未经正确验证 JWT 的 API 访问一律返回 401 Unauthorized
-    - 对于每个带 json 的 GET 查询API，请转成 param 再发过去，格式为 `resource?key1=value1&key2=value2`
 ```json
 //response: Bad Request. This post is SOMEHOW WRONG. 
 //e.g. key is not correct, or value contain not-allowed characters (just like attacker)
@@ -195,7 +187,7 @@ Authorization: JWT eyJhbGciOiJIUzI
 ```
 
 ```json
-//response: get user(himself) info successfully
+//response: get user info successfully
 //user profile_photo will be downloaded independently from API
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -209,24 +201,8 @@ Content-Type: application/json
     "sex": "",
     "grade": "",
     "school": "",
-    "nickname": "",
     "bio": "",
     "balance": 0,
-    "avg_comment": 0
-}
-//response: JWT is in user table, but not the same user that is the queried one
-//only return a subset of personal info
-HTTP/1.1 200 OK
-Content-Type: application/json
-{
-    "profile_photo_path": "",
-    "name": "",
-    "age": 0,
-    "sex": "",
-    "grade": "",
-    "school": "",
-    "nickname": "",
-    "bio": "",
     "avg_comment": 0
 }
 
@@ -284,7 +260,7 @@ Content-Type: application/json
 //request: update photo, after update, pull photo to client
 POST /users/:user_id/profile_photo HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
-Content-Type: image/jpeg, image/jpg, image/png, image/bmp
+Content-Type: image/jpeg
 ```
 
 ```json
@@ -456,13 +432,6 @@ Content-Type: application/json
     "error_code": 404,
     "error_msg": "organization Not Found"
 }
-//response: create conflicted, duplicate name
-HTTP/1.1 409 Conflict
-Content-Type: application/json
-{
-    "error_code": 409,
-    "error_msg": "create conflicted, duplicate organization name"
-}
 //response: not support img format
 HTTP/1.1 415 Unsupported Media Type
 Content-Type: application/json
@@ -493,13 +462,14 @@ or
 HTTP/1.1 201 Created
 
 //response: JWT missing/incorrect/timeout, redirect to login;
+//or you dont have permission to add member to such "status"
 HTTP/1.1 401 Unauthorized
 Content-Type: application/json
 {
     "error_code": 401,
     "error_msg": "Unauthorized"
 }
-or //when you are not owner, add member to admin
+or
 {
     "error_code": 401,
     "error_msg": "insufficient permission"
@@ -510,13 +480,6 @@ Content-Type: application/json
 {
     "error_code": 404,
     "error_msg": "user/organizations Not Found"
-}
-//response: member already in org, add member as a owner
-HTTP/1.1 409 Conflict
-Content-Type: application/json
-{
-    "error_code": 409,
-    "error_msg": "Conflict"
 }
 ```
 
@@ -536,7 +499,6 @@ HTTP/1.1 200 OK
 
 //response: JWT missing/incorrect/timeout, redirect to login;
 //or you dont have permission to modify member to such "status"
-//or edit self permission
 HTTP/1.1 401 Unauthorized
 Content-Type: application/json
 {
@@ -554,13 +516,6 @@ Content-Type: application/json
 {
     "error_code": 404,
     "error_msg": "user/organizations Not Found"
-}
-//response: edit someone to owner
-HTTP/1.1 409 Conflict
-Content-Type: application/json
-{
-    "error_code": 409,
-    "error_msg": "Conflict"
 }
 ```
 
@@ -593,13 +548,6 @@ Content-Type: application/json
 {
     "error_code": 404,
     "error_msg": "user/organizations Not Found"
-}
-//response: delete self or owner
-HTTP/1.1 409 Conflict
-Content-Type: application/json
-{
-    "error_code": 409,
-    "error_msg": "Conflict"
 }
 ```
 
@@ -743,13 +691,6 @@ Content-Type: application/json
     "error_code": 404,
     "error_msg": "user/organization Not Found"
 }
-//response: insufficient fund
-HTTP/1.1 409 Conflict
-Content-Type: application/json
-{
-    "error_code": 409,
-    "error_msg": "Conflict"
-}
 ```
 
 #### 用户/组织查询自己创建的任务列表
@@ -834,38 +775,12 @@ Content-Type: application/json
 }
 ```
 
-#### 查询自己已接收的任务
-```json
-//request: get user received tasks 
-GET /users/:user_id/received_tasks HTTP/1.1
-Authorization: JWT eyJhbGciOiJIUzI
-```
-```json
-//response: just a list of tasks brief info
-HTTP/1.1 200 OK
-Content-Type: application/json
-{
-    "tasks":[
-        {
-            "task_id": 123,
-            "task_name": "name",
-            "status": "status"
-        },
-        {
-            "task_id": 124,
-            "task_name": "name",
-            "status": "status"
-        }
-    ]
-}
-```
-
 #### 任务查询
 
 ```json
 //request: user query tasks
 //NOTE never return all tasks in one query
-//NOTE maybe we can set an size and RETURN_SIZE(like 20), 
+//TODO maybe we can set an size and RETURN_SIZE(like 20), 
 //each query only return size-RETURN_SIZE tasks.
 GET /users/:user_id/tasks HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
@@ -1019,8 +934,7 @@ Authorization: JWT eyJhbGciOiJIUzI
 ```json
 //response: accept task successfully, show updated task
 HTTP/1.1 201 Created
-//return a updated task info
-//use GET /users/:user_id/tasks/:task_id
+//TODO return a updated task info
 ```
 
 #### 任务完成
@@ -1032,11 +946,7 @@ Authorization: JWT eyJhbGciOiJIUzI
 ```json
 //response: finish step successfully, show updated task
 HTTP/1.1 200 OK
-Content-Type: application/json
-{
-    "task_id": 1,
-    "task_finished_steps": 1
-}
+//TODO return a updated task info
 ```
 
 #### 任务审核
@@ -1048,14 +958,7 @@ Authorization: JWT eyJhbGciOiJIUzI
 ```json
 //response: task finish accepted successfully
 HTTP/1.1 200 OK
-//should return a new doing-er, done-er, finished-er list
-{
-    "task_id": 1,
-    "participant_ids": [123, 124, 125, 126],
-    "ongoing_participant_ids": [123, 124],
-    "waiting_examine_participant_ids": [125],
-    "finished_participant_ids": [126]
-}
+//TODO should return a new doing-er, done-er, finished-er list
 ```
 
 #### 撤回任务
@@ -1068,7 +971,6 @@ PUT /users/:user_id/organizations/:organization_id/tasks/:task_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
 {
-    "task_id": 1,
     "status": "pending"
 }
 ```
@@ -1077,16 +979,12 @@ Content-Type: application/json
 ```json
 //request: user editing task
 //NOTE only for not published(waiting/pending) tasks 
-//NOTE front end should initialize a "create task" page with pervious parameters already filled
-//pervious parameters can get from GET /users/:user_id/tasks/:task_id
-//allow user to edit the parameters
-//then PUT new parameters
 PUT /users/:user_id/tasks/:task_id HTTP/1.1
 //or request: organization creating task 
 PUT /users/:user_id/organizations/:organization_id/tasks/:task_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 Content-Type: application/json
-//the same json as create task
+//TODO the same json as create task
 ```
 
 #### 组织/个人删除任务
@@ -1098,80 +996,5 @@ DELETE /users/:user_id/organizations/:organization_id/tasks/:task_id HTTP/1.1
 Authorization: JWT eyJhbGciOiJIUzI
 ```
 ```json
-//response: show deleted task info. 
-HTTP/1.1 200 OK
-Content-Type: application/json
-{
-    "task_id": 1,
-    "task_name": "task_name"
-}
-```
-
-### 评论系统
-
-#### 用户新增评论
-```
-POST /users/:user_id/tasks/:task_id/comment HTTP/1.1
-Content-Type: application/json
-{
-    "customer_review_id": 1,
-    "title": "title",
-    "content": "content",
-    "rate": 5
-}
-```
-```json
-HTTP/1.1 201 CREATED
-```
-
-#### 组织/用户回评
-```
-POST /users/:user_id/tasks/:task_id/feedback/:user_id HTTP/1.1
-POST /users/:user_id/organizations/:organization_id/tasks/:task_id/feedback/:user_id HTTP/1.1
-Content-Type: application/json
-{
-    "feedback_review_id": 1,
-    "title": "title",
-    "content": "content",
-    "rate": 5
-}
-```
-```json
-HTTP/1.1 201 CREATED
-```
-
-### 支付系统
-#### 用户充值/用户给组织充值
-```
-PUT /users/:user_id/balance HTTP/1.1
-PUT /users/:user_id/organizations/:organization_id/balance HTTP/1.1
-Content-Type: application/json
-{
-    "amount": 1
-}
-```
-```
-HTTP/1.1 200 OK
-Content-Type: application/json
-{
-    "amount": 11
-}
-```
-#### 提现(仅用户可)
-```
-PUT /users/:user_id/balance HTTP/1.1
-Content-Type: application/json
-{
-    "amount": -1
-}
-```
-```
-HTTP/1.1 200 OK
-Content-Type: application/json
-{
-    "amount": 9
-}
-// insufficient foud
-HTTP/1.1 409 conflict
-Content-Type: application/json
+//TODO
 ```
