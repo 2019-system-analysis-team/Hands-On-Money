@@ -4,11 +4,19 @@
 
 [传送门](https://2019-system-analysis-team.github.io/Hands-On-Money/)，其中包括全部文档和报告
 
-## 项目成果展示
+## 项目成果展示/用户手册
 
 [传送门](https://2019-system-analysis-team.github.io/Hands-On-Money/01-01-demo-pre)
 
-## 一键部署
+## 软件设计文档
+
+[传送门](https://2019-system-analysis-team.github.io/Hands-On-Money/07-design-document)
+
+## 软件需求规格说明书
+
+[传送门](https://2019-system-analysis-team.github.io/Hands-On-Money/06-requirement-specification)
+
+## 一键部署/安装说明书
 
 ```
 git clone https://github.com/2019-system-analysis-team/Hands-On-Money.git
@@ -36,14 +44,14 @@ bash deploy_bend.sh
 | 16340247 | Siri      | 项目管理、需求分析、后端设计与编码、项目文档撰写与整理、测试 | 17% |
 | 16340242 | Yuki      | 项目管理、需求分析、前端/UI设计与编码、项目文档撰写与整理 |17%|
 | 16340273 | cyuhei    | 前端编码实现、UI设计 |19%|
-| 16340228 | Sapphire  | 小部分前端编码实现 |4%|
+| 16340228 | Sapphire  | 小部分前端编码实现 |8%|
 | 16340225 | Popiko    | 后端编码实现、测试、部署 |19%|
-| 16340265 | 465924212 | 后端编码实现、测试 |12%|
-| 16340198 | enao_sun  | 后端编码实现、测试 |12%|
+| 16340265 | 465924212 | 后端编码实现、测试 |10%|
+| 16340198 | enao_sun  | 后端编码实现、测试 |10%|
 
 | 制品 | 16340247 | 16340242 | 16340273 | 16340228 | 16340225 | 16340265 | 16340198|
 | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-|前端| - | 20% | 10% | 70% | - | - | - |
+|前端| - | 15% | 15% | 70% | - | - | - |
 |后端| 12% | - | - | - | 50% | 19% | 19% |
 |SRS| 70% | 30% | - | - | - | - | - |
 |SD| 30% | 70% | - | - | - | - | - |
